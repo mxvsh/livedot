@@ -127,6 +127,8 @@ function LoginPage() {
                       className="w-full"
                       isDisabled={!registrationOpen}
                       onPress={() => handleOAuth(provider)}
+                      data-umami-event="sign-in-oauth"
+                      data-umami-event-provider={provider}
                     >
                       Continue with {PROVIDER_LABELS[provider] ?? provider}
                     </Button>
@@ -154,7 +156,7 @@ function LoginPage() {
 
                     {error && <p className="text-danger text-sm">{error}</p>}
 
-                    <Button type="submit" isDisabled={loading} className="w-full">
+                    <Button type="submit" isDisabled={loading} className="w-full" data-umami-event="sign-in">
                       {loading ? "Signing in..." : "Sign In"}
                     </Button>
                   </Form>

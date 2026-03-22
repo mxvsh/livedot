@@ -105,6 +105,7 @@ export default function CreateWebsiteModal({ isOpen, onOpenChange, onCreated }: 
                     form="create-website-form"
                     isDisabled={creating}
                     className="flex-1"
+                    data-umami-event="create-website"
                   >
                     <HugeiconsIcon icon={PlusSignIcon} size={16} />
                     {creating ? "Creating..." : "Create"}
