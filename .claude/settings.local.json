@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/monawwar/Projects/latty/node_modules/bun-types/docs -type f -name *.mdx)"
+    ]
+  }
+}
