@@ -51,7 +51,7 @@ function SetupPage() {
         className="w-full max-w-sm"
       >
         <Surface className="rounded-3xl p-8" variant="default">
-          <img src="/logo.png" alt="Livedot logo" className="mb-4 w-10 h-10 rounded-xl" />
+          <img src="/logo.svg" alt="Livedot logo" className="mb-4 w-10 h-10 rounded-xl" />
           
           <h1 className="text-2xl font-bold text-foreground mb-1">
             Welcome to Livedot
