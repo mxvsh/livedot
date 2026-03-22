@@ -7,6 +7,7 @@ import {
   Settings01Icon,
   UserIcon,
   HelpCircleIcon,
+  Github,
 } from "@hugeicons/core-free-icons";
 import { useAuthStore } from "@/stores/auth";
 import ProfileModal from "./ProfileModal";
@@ -29,6 +30,17 @@ export default function Navbar() {
           <span className="text-lg font-semibold text-foreground font-chillax">livedot</span>
         </div>
 
+        <div className="flex items-center gap-3">
+          <a
+            href="https://github.com/mxvsh/livedot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors border border-border rounded-lg px-2.5 py-1.5"
+          >
+           <HugeiconsIcon icon={Github} className="w-4 h-4" />
+            Star on GitHub
+          </a>
+
         <Dropdown>
           <Dropdown.Trigger className="rounded-full cursor-pointer">
             <Avatar>
@@ -44,7 +56,6 @@ export default function Navbar() {
                   </Avatar>
                   <div className="flex flex-col gap-0">
                     <p className="text-sm leading-5 font-medium">{user.username}</p>
-                    <p className="text-xs leading-none text-muted">v{import.meta.env.VITE_VERSION ?? "dev"}</p>
                   </div>
                 </div>
               </div>
@@ -82,6 +93,7 @@ export default function Navbar() {
             </Dropdown.Menu>
           </Dropdown.Popover>
         </Dropdown>
+        </div>
       </div>
     </nav>
 
