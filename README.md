@@ -44,6 +44,8 @@ Watch your users live across the world — fast, minimal, and real-time.
 
 ## Installation (Docker)
 
+> For a full setup guide with Nginx Proxy Manager, SSL, and GeoIP, see the [Self-Hosting Guide](./docs/self-hosting.md).
+
 ### Run using prebuilt image (GHCR)
 
 ```bash
