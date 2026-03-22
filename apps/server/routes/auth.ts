@@ -1,43 +1,36 @@
 import { Hono } from "hono";
-import { getCookie, setCookie, deleteCookie } from "hono/cookie";
-import { eq, count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "@livedot/db";
-import { users, authSessions } from "@livedot/db/schema";
-import { validateSession } from "../middleware/auth";
+import { user, account } from "@livedot/db/schema";
+import { auth } from "../auth";
+import { env } from "../env";
+import { getSessionFromRequest } from "../middleware/auth";
 
-const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
+const otpStore = new Map<string, { otp: string; expires: number }>();
 
 async function getUserCount() {
-  const result = await db.select({ count: count() }).from(users);
+  const result = await db.select({ count: count() }).from(user);
   return result[0]?.count ?? 0;
 }
 
-async function createSession(userId: string): Promise<string> {
-  const id = crypto.randomUUID();
-  const expiresAt = new Date(Date.now() + SESSION_MAX_AGE * 1000);
-  await db.insert(authSessions).values({ id, userId, expiresAt });
-  return id;
-}
-
-function setSessionCookie(c: any, sessionId: string) {
-  setCookie(c, "session", sessionId, {
-    httpOnly: true,
-    sameSite: "Lax",
-    path: "/",
-    maxAge: SESSION_MAX_AGE,
-  });
-}
-
 export const authRoutes = new Hono()
+  .get("/meta", (c) => {
+    const providers: string[] = [];
+    if (env.LIVEDOT_CLOUD) {
+      if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) providers.push("github");
+      if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) providers.push("google");
+    }
+    return c.json({ cloud: env.LIVEDOT_CLOUD, providers });
+  })
+
   .get("/status", async (c) => {
     const userCount = await getUserCount();
-    const sessionId = getCookie(c, "session");
-    const user = await validateSession(sessionId);
+    const session = await getSessionFromRequest(c.req.raw);
 
     return c.json({
       needsSetup: userCount === 0,
-      authenticated: !!user,
-      user: user ? { id: user.id, username: user.username } : null,
+      authenticated: !!session,
+      user: session ? { id: session.user.id, username: session.user.username ?? session.user.name } : null,
     });
   })
 
@@ -52,47 +45,78 @@ export const authRoutes = new Hono()
       return c.json({ error: "Username and password (min 6 chars) required" }, 400);
     }
 
-    const hash = await Bun.password.hash(password);
-    const [user] = await db
-      .insert(users)
-      .values({ username, passwordHash: hash })
-      .returning();
+    try {
+      const res = await auth.api.signUpEmail({
+        asResponse: true,
+        body: { email: `${username}@livedot.local`, password, name: username, username },
+        headers: c.req.raw.headers,
+      });
 
-    const sessionId = await createSession(user.id);
-    setSessionCookie(c, sessionId);
+      const setCookie = res.headers.get("set-cookie");
+      if (setCookie) c.header("set-cookie", setCookie);
 
-    return c.json({ ok: true, user: { id: user.id, username: user.username } });
+      const data = await res.json();
+      return c.json({ ok: true, user: { id: data.user?.id, username } });
+    } catch (err: any) {
+      const message = err?.body?.message ?? err?.message ?? "Setup failed";
+      return c.json({ error: message }, err?.status ?? 500);
+    }
   })
 
   .post("/login", async (c) => {
     const { username, password } = await c.req.json();
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username))
-      .limit(1);
+    try {
+      const res = await auth.api.signInEmail({
+        asResponse: true,
+        body: { email: `${username}@livedot.local`, password },
+        headers: c.req.raw.headers,
+      });
 
-    if (!user) {
-      return c.json({ error: "Invalid credentials" }, 401);
+      const setCookie = res.headers.get("set-cookie");
+      if (setCookie) c.header("set-cookie", setCookie);
+
+      const data = await res.json();
+      return c.json({ ok: true, user: { id: data.user?.id, username } });
+    } catch (err: any) {
+      const message = err?.body?.message ?? err?.message ?? "Invalid credentials";
+      return c.json({ error: message }, err?.status ?? 401);
+    }
+  })
+
+  .post("/forgot-password", async (c) => {
+    const { username } = await c.req.json();
+    const found = await db.select({ id: user.id }).from(user).where(eq(user.username, username)).limit(1);
+    if (!found.length) return c.json({ error: "User not found" }, 404);
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore.set(username, { otp, expires: Date.now() + 10 * 60 * 1000 });
+    console.log(`\n[Livedot] Password reset OTP for "${username}": ${otp}\n`);
+    return c.json({ ok: true });
+  })
+
+  .post("/reset-password", async (c) => {
+    const { username, otp, newPassword } = await c.req.json();
+    if (!newPassword || newPassword.length < 6) return c.json({ error: "Password must be at least 6 characters" }, 400);
+
+    const stored = otpStore.get(username);
+    if (!stored || stored.otp !== otp || Date.now() > stored.expires) {
+      return c.json({ error: "Invalid or expired OTP" }, 400);
     }
 
-    const valid = await Bun.password.verify(password, user.passwordHash);
-    if (!valid) {
-      return c.json({ error: "Invalid credentials" }, 401);
-    }
+    const found = await db.select({ id: user.id }).from(user).where(eq(user.username, username)).limit(1);
+    if (!found.length) return c.json({ error: "User not found" }, 404);
 
-    const sessionId = await createSession(user.id);
-    setSessionCookie(c, sessionId);
+    const hash = await Bun.password.hash(newPassword, "argon2id");
+    await db.update(account)
+      .set({ password: hash })
+      .where(eq(account.userId, found[0].id));
 
-    return c.json({ ok: true, user: { id: user.id, username: user.username } });
+    otpStore.delete(username);
+    return c.json({ ok: true });
   })
 
   .post("/logout", async (c) => {
-    const sessionId = getCookie(c, "session");
-    if (sessionId) {
-      await db.delete(authSessions).where(eq(authSessions.id, sessionId));
-      deleteCookie(c, "session", { path: "/" });
-    }
+    await auth.api.signOut({ headers: c.req.raw.headers });
     return c.json({ ok: true });
   });

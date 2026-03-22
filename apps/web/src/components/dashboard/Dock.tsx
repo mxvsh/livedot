@@ -61,7 +61,7 @@ export default function Dock({ websiteName, count, connected }: Props) {
               variant="ghost"
               onPress={async () => {
                 await logout();
-                navigate({ to: "/login" });
+                navigate({ to: "/auth/login" });
               }}
               className="text-sm text-muted"
             >

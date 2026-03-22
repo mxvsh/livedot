@@ -41,9 +41,9 @@ function HomePage() {
       if (!checked) await check();
       const state = useAuthStore.getState();
       if (state.needsSetup) {
-        navigate({ to: "/setup" });
+        navigate({ to: "/auth/register" });
       } else if (!state.user) {
-        navigate({ to: "/login" });
+        navigate({ to: "/auth/login" });
       } else {
         load(true);
       }

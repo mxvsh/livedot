@@ -8,20 +8,40 @@ import {
   Label,
   TextField,
   FieldError,
+  Description,
   Surface,
 } from "@heroui/react";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
+import { useEffect } from "react";
 
-export const Route = createFileRoute("/login")({
-  component: LoginPage,
+export const Route = createFileRoute("/auth/register")({
+  component: RegisterPage,
 });
 
-function LoginPage() {
+function RegisterPage() {
   const navigate = useNavigate();
-  const setUser = useAuthStore((s) => s.setUser);
+  const { setUser, cloud, check, checked } = useAuthStore();
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!checked) check();
+  }, []);
+
   const [loading, setLoading] = useState(false);
+
+  if (!checked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (cloud) {
+    navigate({ to: "/auth/login" });
+    return null;
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,7 +51,7 @@ function LoginPage() {
     const username = formData.get("username")?.toString() || "";
     const password = formData.get("password")?.toString() || "";
     try {
-      const { user } = await api.login(username, password);
+      const { user } = await api.setup(username, password);
       setUser(user);
       navigate({ to: "/" });
     } catch (err: any) {
@@ -50,27 +70,38 @@ function LoginPage() {
         className="w-full max-w-sm"
       >
         <Surface className="rounded-3xl p-8" variant="default">
-          <h1 className="text-2xl font-bold text-foreground mb-1">Livedot</h1>
+          <img src="/logo.svg" alt="Livedot logo" className="mb-4 w-10 h-10 rounded-xl" />
+          
+          <h1 className="text-2xl font-bold text-foreground mb-1">
+            Welcome to Livedot
+          </h1>
           <p className="text-muted text-sm mb-6">
-            Sign in to your dashboard.
+            {"Create your admin account to get started."}
           </p>
           <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <TextField isRequired name="username" variant="secondary">
               <Label>Username</Label>
-              <Input placeholder="Username" autoFocus />
+              <Input placeholder="admin" autoFocus />
               <FieldError />
             </TextField>
 
-            <TextField isRequired name="password" type="password" variant="secondary">
+            <TextField
+              isRequired
+              name="password"
+              type="password"
+              minLength={6}
+              variant="secondary"
+            >
               <Label>Password</Label>
-              <Input placeholder="Password" />
+              <Input placeholder="Min 6 characters" />
+              <Description>At least 6 characters</Description>
               <FieldError />
             </TextField>
 
             {error && <p className="text-danger text-sm">{error}</p>}
 
             <Button type="submit" isDisabled={loading} className="w-full">
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Creating..." : "Create Account"}
             </Button>
           </Form>
         </Surface>

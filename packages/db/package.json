@@ -9,7 +9,7 @@
   },
   "scripts": {
     "generate": "bunx drizzle-kit generate",
-    "push": "bunx drizzle-kit push"
+    "push": "mkdir -p data && bunx drizzle-kit push"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.1"

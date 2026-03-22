@@ -1,12 +1,13 @@
 import { Hono } from "hono";
 import type { Server } from "bun";
+import { env } from "./env";
 import { db } from "@livedot/db";
 import { websites } from "@livedot/db/schema";
+import { auth } from "./auth";
 import { authRoutes } from "./routes/auth";
 import { websiteRoutes } from "./routes/websites";
 import { eventRoutes } from "./routes/events";
 import { wsHandler, type WSData } from "./ws";
-import { validateSession } from "./middleware/auth";
 import { startSweep } from "./sessions";
 
 // Cache website IDs → origin hostnames
@@ -29,7 +30,10 @@ loadWebsiteCache().catch(console.error);
 // Hono app
 const app = new Hono();
 
-// Event route first — no auth required (public tracker endpoint)
+// better-auth handler — catches all /api/auth/* routes
+app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+
+// App routes
 app.route("/api", eventRoutes);
 app.route("/api", authRoutes);
 app.route("/api", websiteRoutes);
@@ -53,7 +57,7 @@ export function getServer() {
 
 // Start Bun server with Hono + WebSocket
 const server = Bun.serve({
-  port: Number(process.env.PORT) || 5550,
+  port: env.PORT,
   fetch(req, server) {
     const url = new URL(req.url);
 
@@ -64,18 +68,12 @@ const server = Bun.serve({
         return new Response("Missing website parameter", { status: 400 });
       }
 
-      // Parse cookie manually for the upgrade path
-      const cookies = req.headers.get("cookie") || "";
-      const sessionMatch = cookies.match(/(?:^|;\s*)session=([^;]*)/);
-      const sessionId = sessionMatch?.[1];
-
-      // We need to validate synchronously for upgrade, so we handle it async
-      return validateSession(sessionId).then((user) => {
-        if (!user) {
+      return auth.api.getSession({ headers: req.headers }).then((session) => {
+        if (!session) {
           return new Response("Unauthorized", { status: 401 });
         }
         const upgraded = server.upgrade<WSData>(req, {
-          data: { websiteId, userId: user.id },
+          data: { websiteId, userId: session.user.id },
         });
         if (!upgraded) {
           return new Response("WebSocket upgrade failed", { status: 400 });

@@ -49,7 +49,7 @@ export default function Navbar() {
               onAction={async (key) => {
                 if (key === "logout") {
                   await logout();
-                  navigate({ to: "/login" });
+                  navigate({ to: "/auth/login" });
                 }
               }}
             >

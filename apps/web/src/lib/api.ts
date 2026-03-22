@@ -11,6 +11,11 @@ export interface Website {
   createdAt: string;
 }
 
+export interface MetaResponse {
+  cloud: boolean;
+  providers: string[];
+}
+
 export interface StatusResponse {
   needsSetup: boolean;
   authenticated: boolean;
@@ -30,6 +35,7 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  getMeta: () => request<MetaResponse>("/api/meta"),
   getStatus: () => request<StatusResponse>("/api/status"),
   setup: (username: string, password: string) =>
     request<{ ok: boolean; user: User }>("/api/setup", {
@@ -42,6 +48,16 @@ export const api = {
       body: JSON.stringify({ username, password }),
     }),
   logout: () => request<{ ok: boolean }>("/api/logout", { method: "POST" }),
+  forgotPassword: (username: string) =>
+    request<{ ok: boolean }>("/api/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ username }),
+    }),
+  resetPassword: (username: string, otp: string, newPassword: string) =>
+    request<{ ok: boolean }>("/api/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ username, otp, newPassword }),
+    }),
   getWebsites: () => request<Website[]>("/api/websites"),
   createWebsite: (name: string, url: string) =>
     request<Website>("/api/websites", {

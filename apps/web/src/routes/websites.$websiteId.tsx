@@ -27,7 +27,7 @@ function WebsiteDashboard() {
       if (!checked) await check();
       const state = useAuthStore.getState();
       if (!state.user) {
-        navigate({ to: "/login" });
+        navigate({ to: "/auth/login" });
         return;
       }
       const websites = await api.getWebsites();

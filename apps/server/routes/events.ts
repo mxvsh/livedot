@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { websiteCache, getServer } from "../index";
 import { resolveGeo } from "../geo";
 import { upsertSession } from "../sessions";
+import { env } from "../env";
 
 // --- Rate limiting: max 1 request per 3s per IP+websiteId ---
 const rateMap = new Map<string, number>();
@@ -61,7 +62,7 @@ export const eventRoutes = new Hono()
       }
 
       const server = getServer();
-      const isDev = process.env.NODE_ENV !== "production";
+      const isDev = env.NODE_ENV !== "production";
 
       // Bot filter
       const ua = c.req.header("user-agent");
