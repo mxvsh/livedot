@@ -35,6 +35,10 @@ logs
 /data
 packages/db/data/
 
+# geo database
+apps/server/geo/*.mmdb
+apps/server/geo/*.tar.gz
+
 # turbo
 .turbo/
 

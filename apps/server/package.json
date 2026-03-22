@@ -12,6 +12,7 @@
     "drizzle-orm": "^0.45.1",
     "fast-geoip": "^1.1.88",
     "hono": "^4",
+    "mmdb-lib": "^3.0.2",
     "zod": "^4.3.6"
   },
   "devDependencies": {

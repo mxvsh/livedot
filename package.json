@@ -10,6 +10,7 @@
     "dev:web": "bun run --filter web dev",
     "db:generate": "bun run --filter @livedot/db generate",
     "db:push": "bun run --filter @livedot/db push",
+    "geo:download": "bun scripts/download-geodb.ts",
     "release": "release-it"
   },
   "devDependencies": {

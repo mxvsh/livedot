@@ -84,6 +84,24 @@ export const authRoutes = new Hono()
     }
   })
 
+  .post("/change-password", async (c) => {
+    const { currentPassword, newPassword } = await c.req.json();
+    if (!newPassword || newPassword.length < 6) return c.json({ error: "Password must be at least 6 characters" }, 400);
+
+    const res = await auth.api.changePassword({
+      asResponse: true,
+      body: { currentPassword, newPassword, revokeOtherSessions: false },
+      headers: c.req.raw.headers,
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      return c.json({ error: (body as any).message ?? "Failed to change password" }, res.status as any);
+    }
+
+    return c.json({ ok: true });
+  })
+
   .post("/forgot-password", async (c) => {
     const { username } = await c.req.json();
     const found = await db.select({ id: user.id }).from(user).where(eq(user.username, username)).limit(1);

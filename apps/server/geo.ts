@@ -1,8 +1,27 @@
-import geoip from "fast-geoip";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+import { existsSync, readFileSync } from "fs";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const DB_PATH =
+  process.env.GEOIP_DB_PATH ??
+  resolve(__dirname, "./geo/GeoLite2-City.mmdb");
+
+// Try to load GeoLite2 — fall back to fast-geoip if not present
+let mmdbReader: import("mmdb-lib").Reader<Record<string, any>> | null = null;
+
+if (existsSync(DB_PATH)) {
+  const { Reader } = await import("mmdb-lib");
+  mmdbReader = new Reader(readFileSync(DB_PATH));
+  console.log("[geo] Using GeoLite2-City (high accuracy)");
+} else {
+  console.log("[geo] GeoLite2-City.mmdb not found — using fast-geoip (lower accuracy)");
+  console.log("[geo] For better accuracy run: MAXMIND_LICENSE_KEY=<key> bun geo:download");
+}
 
 let publicIp: string | null = null;
 
-// Fetch this machine's public IP once for dev fallback
 async function getPublicIp(): Promise<string | null> {
   if (publicIp) return publicIp;
   try {
@@ -30,14 +49,24 @@ export async function resolveGeo(
 ): Promise<{ lat: number; lng: number } | null> {
   let resolvedIp = ip;
 
-  // In dev, local IPs have no geo — use the machine's public IP instead
   if (isPrivateIp(ip)) {
     const pub = await getPublicIp();
     if (!pub) return null;
     resolvedIp = pub;
   }
 
-  const result = await geoip.lookup(resolvedIp);
+  if (mmdbReader) {
+    try {
+      const result = mmdbReader.get(resolvedIp) as any;
+      const lat = result?.location?.latitude;
+      const lng = result?.location?.longitude;
+      if (typeof lat === "number" && typeof lng === "number") return { lat, lng };
+    } catch {}
+  }
+
+  // Fallback to fast-geoip
+  const geoip = await import("fast-geoip");
+  const result = await geoip.default.lookup(resolvedIp);
   if (!result?.ll) return null;
   return { lat: result.ll[0], lng: result.ll[1] };
 }
