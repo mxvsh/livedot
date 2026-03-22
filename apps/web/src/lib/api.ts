@@ -6,6 +6,7 @@ export interface User {
 export interface Website {
   id: string;
   name: string;
+  url: string;
   userId: string;
   createdAt: string;
 }
@@ -42,10 +43,10 @@ export const api = {
     }),
   logout: () => request<{ ok: boolean }>("/api/logout", { method: "POST" }),
   getWebsites: () => request<Website[]>("/api/websites"),
-  createWebsite: (name: string) =>
+  createWebsite: (name: string, url: string) =>
     request<Website>("/api/websites", {
       method: "POST",
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, url }),
     }),
   deleteWebsite: (id: string) =>
     request<{ ok: boolean }>(`/api/websites/${id}`, { method: "DELETE" }),

@@ -19,7 +19,7 @@ export const websiteRoutes = new Hono()
 
   .post("/websites", async (c) => {
     const user = c.get("user");
-    const { name } = await c.req.json();
+    const { name, url } = await c.req.json();
 
     if (!name?.trim()) {
       return c.json({ error: "Name is required" }, 400);
@@ -27,7 +27,7 @@ export const websiteRoutes = new Hono()
 
     const [website] = await db
       .insert(websites)
-      .values({ name: name.trim(), userId: user.id })
+      .values({ name: name.trim(), url: url?.trim() || "", userId: user.id })
       .returning();
 
     websiteIdCache.add(website.id);

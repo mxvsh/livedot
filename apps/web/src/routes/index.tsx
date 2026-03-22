@@ -74,12 +74,13 @@ function HomePage() {
     setCreating(true);
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name")?.toString().trim();
+    const url = formData.get("url")?.toString().trim() || "";
     if (!name) {
       setCreating(false);
       return;
     }
     try {
-      await api.createWebsite(name);
+      await api.createWebsite(name, url);
       // Don't reset knownIds so only the new one animates
       await load(false);
       setModalOpen(false);
@@ -166,6 +167,11 @@ function HomePage() {
                         <Input placeholder="My Website" autoFocus className="ring-inset" />
                         <FieldError />
                       </TextField>
+                      <TextField variant="secondary" name="url" className="w-full">
+                        <Label>URL</Label>
+                        <Input placeholder="https://example.com" className="ring-inset" />
+                        <FieldError />
+                      </TextField>
                     </Form>
                   </Modal.Body>
                   <Modal.Footer>
@@ -233,9 +239,11 @@ function HomePage() {
                           <Card.Title>
                             {website.name}
                           </Card.Title>
-                          <Card.Description className="font-mono text-xs mt-1">
-                            {website.id}
-                          </Card.Description>
+                          {website.url && (
+                            <Card.Description className="text-xs mt-1">
+                              {website.url}
+                            </Card.Description>
+                          )}
                         </div>
                         <div className="flex items-center gap-3 ml-3 shrink-0">
                           <WebsiteLiveCount websiteId={website.id} />

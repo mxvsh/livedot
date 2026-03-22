@@ -21,5 +21,6 @@ export const websites = sqliteTable("websites", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  url: text("url").notNull().default(""),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
