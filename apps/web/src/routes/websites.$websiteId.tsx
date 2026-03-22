@@ -90,7 +90,7 @@ function WebsiteDashboard() {
 
       <div className="fixed bottom-3 left-3 z-40 md:bottom-4 md:left-4">
         <span className="text-xs text-muted/60">
-          livedot {import.meta.env.VITE_VERSION ? `v${import.meta.env.VITE_VERSION}` : ""}
+          livedot {import.meta.env.VITE_VERSION ?? ""}
         </span>
       </div>
       

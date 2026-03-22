@@ -125,7 +125,7 @@ function HomePage() {
 
       <div className="max-w-2xl mx-auto px-4 pb-8 flex items-center justify-center">
         <span className="text-xs text-muted/50">
-          livedot{import.meta.env.VITE_VERSION ? ` (v${import.meta.env.VITE_VERSION})` : ""}
+          livedot{import.meta.env.VITE_VERSION ? ` (${import.meta.env.VITE_VERSION})` : ""}
         </span>
       </div>
     </div>
