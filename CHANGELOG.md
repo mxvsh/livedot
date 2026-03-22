@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.0-beta.2](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.1...v0.1.0-beta.2) (2026-03-22)
+
+* Add conventional-changelog-conventionalcommits ([](https://github.com/mxvsh/livedot/commit/f4f33b9c4e767cf7737d2f36e09cc158e27cb461))
+* Migrate to CJS ([](https://github.com/mxvsh/livedot/commit/b460cd9480fd11249359b10865a99d4713f46f95))
+* Setup conventional commit ([](https://github.com/mxvsh/livedot/commit/c2343c277091c9bea9b89ce12a04a5cb449a1dfd))
+* Fix invalid cred ([](https://github.com/mxvsh/livedot/commit/c9c4f313a84e458494fbdd1e770612833b8068f2))
+* Setup GeoDB support ([](https://github.com/mxvsh/livedot/commit/6230abb2e327eec4401e1d7e9139b03d52a0b3fa))
+* Setup password reset from profile ([](https://github.com/mxvsh/livedot/commit/009b301823db7e010b02365e3acfa00d60afc615))
+* Add error handling to CreateWebsiteModal ([](https://github.com/mxvsh/livedot/commit/b10834d067be1717fd5973c12338bde1f80e23a3))
+* Show livedot version ([](https://github.com/mxvsh/livedot/commit/31a04eb205843dca94217cf4128f41d80ea3a2e8))
+* Setup OAuth and checks ([](https://github.com/mxvsh/livedot/commit/0e47dd9944fa042f94376c6636c32ab6c44812d5))
+* Reduce image size ([](https://github.com/mxvsh/livedot/commit/d74abb5b430511e1f7f42d576f925c8e7f550cf0))
+* Add image and features section to README ([](https://github.com/mxvsh/livedot/commit/93f36a64a1398b978ddb536484a20c198cd85a43))
+* Setup release-it ([](https://github.com/mxvsh/livedot/commit/c928c7dcb52ef45c2d45316fb69bbb18ad1ed4b3))
+
 ## 0.1.0-beta.1
 
 Initial beta release of Livedot — self-hosted, real-time website visitor tracker.
