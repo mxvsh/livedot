@@ -26,6 +26,10 @@ Watch your users live across the world — fast, minimal, and real-time.
 
 ---
 
+<img width="1624" height="1060" alt="image" src="https://github.com/user-attachments/assets/795247b8-fa60-49b8-9cff-39ae11bcca95" />
+
+
+
 ## Features
 
 - Real-time visitor tracking
