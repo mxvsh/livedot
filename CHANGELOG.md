@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-beta.6](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.5...v0.1.0-beta.6) (2026-03-22)
+
+* Fix max user sign up check ([](https://github.com/mxvsh/livedot/commit/549317062a547da3c0a4a674186d6ddbcbd224f6))
+
 ## [0.1.0-beta.5](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.4...v0.1.0-beta.5) (2026-03-22)
 
 * Fix duplicate "v" ([](https://github.com/mxvsh/livedot/commit/7762f5c136d9773a08f714acb6569067bcfc6b44))
