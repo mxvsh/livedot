@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512px" height="512px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>logo</title>
+    <defs>
+        <linearGradient x1="-9.20910508%" y1="-5.19243317%" x2="64.3875877%" y2="50%" id="linearGradient-1">
+            <stop stop-color="#96E421" offset="0%"></stop>
+            <stop stop-color="#C2F4A9" offset="99.9153191%"></stop>
+        </linearGradient>
+        <path d="M0,0 L512,0 L512,512 L0,512 L0,0 Z" id="path-2"></path>
+    </defs>
+    <g id="logo" stroke="none" fill="none" xlink:href="#path-2" fill-rule="evenodd">
+        <use fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+        <circle id="Oval" fill="#000000" cx="256" cy="256" r="63"></circle>
+    </g>
+</svg>
