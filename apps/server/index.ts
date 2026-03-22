@@ -9,12 +9,19 @@ import { wsHandler, type WSData } from "./ws";
 import { validateSession } from "./middleware/auth";
 import { startSweep } from "./sessions";
 
-// Cache valid website IDs
-export const websiteIdCache = new Set<string>();
+// Cache website IDs → origin hostnames
+export const websiteCache = new Map<string, string>();
 
 async function loadWebsiteCache() {
-  const all = await db.select({ id: websites.id }).from(websites);
-  for (const w of all) websiteIdCache.add(w.id);
+  const all = await db.select({ id: websites.id, url: websites.url }).from(websites);
+  for (const w of all) {
+    try {
+      const hostname = w.url ? new URL(w.url).hostname : "";
+      websiteCache.set(w.id, hostname);
+    } catch {
+      websiteCache.set(w.id, "");
+    }
+  }
 }
 
 loadWebsiteCache().catch(console.error);

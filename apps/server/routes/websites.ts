@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@livedot/db";
 import { websites } from "@livedot/db/schema";
 import { requireAuth } from "../middleware/auth";
-import { websiteIdCache } from "../index";
+import { websiteCache } from "../index";
 
 export const websiteRoutes = new Hono()
   .use(requireAuth)
@@ -30,7 +30,12 @@ export const websiteRoutes = new Hono()
       .values({ name: name.trim(), url: url?.trim() || "", userId: user.id })
       .returning();
 
-    websiteIdCache.add(website.id);
+    try {
+      const hostname = website.url ? new URL(website.url).hostname : "";
+      websiteCache.set(website.id, hostname);
+    } catch {
+      websiteCache.set(website.id, "");
+    }
     return c.json(website);
   })
 
@@ -49,6 +54,12 @@ export const websiteRoutes = new Hono()
       .where(eq(websites.id, id))
       .returning();
 
+    try {
+      const hostname = updated.url ? new URL(updated.url).hostname : "";
+      websiteCache.set(updated.id, hostname);
+    } catch {
+      websiteCache.set(updated.id, "");
+    }
     return c.json(updated);
   })
 
@@ -57,7 +68,7 @@ export const websiteRoutes = new Hono()
     const id = c.req.param("id");
 
     await db.delete(websites).where(eq(websites.id, id));
-    websiteIdCache.delete(id);
+    websiteCache.delete(id);
 
     return c.json({ ok: true });
   });
