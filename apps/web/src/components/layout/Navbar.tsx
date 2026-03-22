@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Avatar, Dropdown, Separator } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -8,6 +9,7 @@ import {
   HelpCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { useAuthStore } from "@/stores/auth";
+import ProfileModal from "./ProfileModal";
 
 function getInitials(username: string) {
   return username.slice(0, 2).toUpperCase();
@@ -16,8 +18,10 @@ function getInitials(username: string) {
 export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   return (
+    <>
     <nav className="border-b border-border bg-surface/80 backdrop-blur-xl">
       <div className="max-w-2xl mx-auto px-4 flex items-center justify-between h-14">
         <div className="flex items-center gap-2">
@@ -47,6 +51,7 @@ export default function Navbar() {
             )}
             <Dropdown.Menu
               onAction={async (key) => {
+                if (key === "profile") setProfileOpen(true);
                 if (key === "logout") {
                   await logout();
                   navigate({ to: "/auth/login" });
@@ -79,5 +84,8 @@ export default function Navbar() {
         </Dropdown>
       </div>
     </nav>
+
+    <ProfileModal isOpen={profileOpen} onOpenChange={setProfileOpen} />
+    </>
   );
 }
