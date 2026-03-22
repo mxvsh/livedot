@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --hot src/index.ts"
+    "dev": "bun --hot index.ts"
   },
   "dependencies": {
     "hono": "^4",
