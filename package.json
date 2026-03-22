@@ -12,13 +12,18 @@
     "@heroui/react": "^3.0.1",
     "@heroui/styles": "^3.0.1",
     "bun-plugin-tailwind": "^0.1.2",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.1",
     "react": "^19",
     "react-dom": "^19",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "wrangler": "^4.76.0"
   },
   "devDependencies": {
+    "@types/bun": "latest",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/bun": "latest"
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.21.0"
   }
 }
