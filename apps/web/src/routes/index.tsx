@@ -218,11 +218,15 @@ function HomePage() {
                         <Card.Title>
                           {website.name}
                         </Card.Title>
-                        {website.url && (
-                          <Card.Description className="text-xs mt-1">
-                            {website.url}
-                          </Card.Description>
-                        )}
+                        <Card.Description className="text-xs mt-1 flex items-center gap-2">
+                          <span className="font-mono text-muted/60">{website.id.slice(0, 8)}</span>
+                          {website.url && (
+                            <>
+                              <span className="text-muted/30">·</span>
+                              <span>{website.url}</span>
+                            </>
+                          )}
+                        </Card.Description>
                       </div>
                       <div className="flex items-center gap-3 ml-3 shrink-0">
                         <WebsiteLiveCount websiteId={website.id} />
