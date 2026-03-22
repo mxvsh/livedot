@@ -26,8 +26,8 @@ function HomePage() {
   const [editTarget, setEditTarget] = useState<Website | null>(null);
   const [snippetTarget, setSnippetTarget] = useState<Website | null>(null);
 
-  async function load() {
-    setLoading(true);
+  async function load(showSpinner = false) {
+    if (showSpinner) setLoading(true);
     try {
       const data = await api.getWebsites();
       setWebsites(data);
@@ -45,7 +45,7 @@ function HomePage() {
       } else if (!state.user) {
         navigate({ to: "/login" });
       } else {
-        load();
+        load(true);
       }
     })();
   }, []);
