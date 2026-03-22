@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-beta.11](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.10...v0.1.0-beta.11) (2026-03-22)
+
+* Fix IP read ([](https://github.com/mxvsh/livedot/commit/b2f7d48037fe1758f256f2f0d59dc6ed2f39c6b0))
+
 ## [0.1.0-beta.10](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.9...v0.1.0-beta.10) (2026-03-22)
 
 * Allow existing user to sign in ([](https://github.com/mxvsh/livedot/commit/6a41577747864c13a2be948ffcf0751c73523384))
