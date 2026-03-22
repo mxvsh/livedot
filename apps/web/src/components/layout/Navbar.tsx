@@ -40,7 +40,7 @@ export default function Navbar() {
                   </Avatar>
                   <div className="flex flex-col gap-0">
                     <p className="text-sm leading-5 font-medium">{user.username}</p>
-                    <p className="text-xs leading-none text-muted">Administrator</p>
+                    <p className="text-xs leading-none text-muted">v{import.meta.env.VITE_VERSION ?? "dev"}</p>
                   </div>
                 </div>
               </div>

@@ -9,6 +9,8 @@ RUN turbo prune server web --docker
 
 # install all deps + build frontend
 FROM base AS build
+ARG VERSION=dev
+ENV VITE_VERSION=$VERSION
 COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile
 COPY --from=prune /app/out/full/ .
@@ -35,7 +37,9 @@ COPY --from=build /app/apps/web/dist/ /srv/
 COPY docker/Caddyfile /etc/caddy/Caddyfile
 COPY docker/entrypoint.sh .
 
+ARG VERSION=dev
 ENV NODE_ENV=production
+ENV VERSION=$VERSION
 ENV DATABASE_PATH=/data/livedot.db
 ENV PORT=5550
 EXPOSE 80

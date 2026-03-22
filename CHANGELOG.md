@@ -1,9 +1,6 @@
----
-"server": minor
-"web": minor
-"@livedot/db": minor
-"@livedot/shared": minor
----
+# Changelog
+
+## 0.1.0-beta.1
 
 Initial beta release of Livedot — self-hosted, real-time website visitor tracker.
 
