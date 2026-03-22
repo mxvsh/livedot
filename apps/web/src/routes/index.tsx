@@ -19,7 +19,6 @@ import {
   ArrowRight01Icon,
   Logout01Icon,
   Add01Icon,
-  Alert02Icon,
 } from "@hugeicons/core-free-icons";
 import { api, type Website } from "@/lib/api";
 import WebsiteLiveCount from "@/components/WebsiteLiveCount";
@@ -215,9 +214,7 @@ function HomePage() {
                   <Card.Header>
                     <div className="flex items-center justify-between w-full">
                       <div className="flex-1 min-w-0">
-                        <Card.Title>
-                          {website.name}
-                        </Card.Title>
+                        <Card.Title>{website.name}</Card.Title>
                         <Card.Description className="text-xs mt-1 flex items-center gap-2">
                           <span className="font-mono text-muted/60">{website.id.slice(0, 8)}</span>
                           {website.url && (
@@ -244,10 +241,7 @@ function HomePage() {
                           </Button>
                         </div>
                         <span className="text-muted transition-transform duration-200 group-hover:translate-x-1">
-                          <HugeiconsIcon
-                            icon={ArrowRight01Icon}
-                            size={18}
-                          />
+                          <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
                         </span>
                       </div>
                     </div>
@@ -263,16 +257,16 @@ function HomePage() {
               <AlertDialog.Container>
                 <AlertDialog.Dialog>
                   <AlertDialog.Header>
-                    <AlertDialog.Icon variant="danger">
-                      <HugeiconsIcon icon={Alert02Icon} size={20} />
-                    </AlertDialog.Icon>
+                    <AlertDialog.Icon status="danger" />
                     <AlertDialog.Heading>Delete Website</AlertDialog.Heading>
-                    <AlertDialog.Description>
-                      Are you sure you want to delete{" "}
-                      <strong>{deleteTarget?.name}</strong>? This action cannot
-                      be undone.
-                    </AlertDialog.Description>
                   </AlertDialog.Header>
+                  <AlertDialog.Body>
+                    <p className="text-sm text-muted">
+                      Are you sure you want to delete{" "}
+                      <strong className="text-foreground">{deleteTarget?.name}</strong>? This action cannot
+                      be undone.
+                    </p>
+                  </AlertDialog.Body>
                   <AlertDialog.Footer>
                     <Button
                       variant="outline"
