@@ -5,6 +5,7 @@ import { user, account } from "@livedot/db/schema";
 import { auth } from "../auth";
 import { env } from "../env";
 import { getSessionFromRequest } from "../middleware/auth";
+import { getUserLimits, setUserMetadata } from "../limits";
 
 const otpStore = new Map<string, { otp: string; expires: number }>();
 
@@ -36,8 +37,8 @@ export const authRoutes = new Hono()
 
   .post("/setup", async (c) => {
     const userCount = await getUserCount();
-    if (userCount > 0) {
-      return c.json({ error: "Setup already completed" }, 400);
+    if (userCount >= env.DEFAULT_MAX_USER_SIGNUP) {
+      return c.json({ error: "Max user limit reached" }, 400);
     }
 
     const { username, password } = await c.req.json();
@@ -61,7 +62,9 @@ export const authRoutes = new Hono()
       if (setCookie) c.header("set-cookie", setCookie);
 
       const data = await res.json();
-      return c.json({ ok: true, user: { id: data.user?.id, username } });
+      const userId = data.user?.id;
+      if (userId) await setUserMetadata(userId, { maxWebsites: env.DEFAULT_MAX_WEBSITES });
+      return c.json({ ok: true, user: { id: userId, username } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Setup failed";
       return c.json({ error: message }, 400);

@@ -13,6 +13,11 @@ const envSchema = z.object({
   GITHUB_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
+
+  // Defaults for new users/websites
+  DEFAULT_MAX_USER_SIGNUP: z.coerce.number().int().positive().default(1),
+  DEFAULT_MAX_CONNECTIONS: z.coerce.number().int().positive().default(1000),
+  DEFAULT_MAX_WEBSITES: z.coerce.number().int().min(0).default(0), // 0 = unlimited
 });
 
 const parsed = envSchema.safeParse(process.env);

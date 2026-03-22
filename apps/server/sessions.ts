@@ -6,8 +6,14 @@ export { type VisitorSession, type WSMessage };
 // Key: `${websiteId}:${sessionId}`
 const activeSessions = new Map<string, VisitorSession>();
 
-export function upsertSession(session: VisitorSession, server: Server | null) {
+export function upsertSession(session: VisitorSession, server: Server | null, maxConcurrent = 1000) {
   const key = `${session.websiteId}:${session.sessionId}`;
+  const isNew = !activeSessions.has(key);
+
+  if (isNew && getSessionsForWebsite(session.websiteId).length >= maxConcurrent) {
+    return; // Drop new session when at capacity
+  }
+
   activeSessions.set(key, session);
 
   const msg: WSMessage = { type: "upsert", session };

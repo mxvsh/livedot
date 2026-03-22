@@ -1,5 +1,13 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
+export interface UserMetadata {
+  maxWebsites?: number;
+}
+
+export interface WebsiteMetadata {
+  maxConnections?: number;
+}
+
 // better-auth required tables
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -11,6 +19,7 @@ export const user = sqliteTable("user", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
   username: text("username").unique(),
   displayUsername: text("display_username"),
+  metadata: text("metadata", { mode: "json" }).$type<UserMetadata>(),
 });
 
 export const session = sqliteTable("session", {
@@ -57,5 +66,6 @@ export const websites = sqliteTable("websites", {
     .references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   url: text("url").notNull().default(""),
+  metadata: text("metadata", { mode: "json" }).$type<Record<string, unknown>>(),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });

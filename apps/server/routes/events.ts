@@ -71,9 +71,9 @@ export const eventRoutes = new Hono()
       }
 
       // Origin check
-      const registeredHostname = websiteCache.get(websiteId)!;
+      const cached = websiteCache.get(websiteId)!;
       const origin = c.req.header("origin");
-      if (!isDev && !isValidOrigin(origin, registeredHostname)) {
+      if (!isDev && !isValidOrigin(origin, cached.hostname)) {
         return c.body(null, 403);
       }
 
@@ -101,7 +101,8 @@ export const eventRoutes = new Hono()
             pageUrl: url || "",
             lastSeen: Date.now(),
           },
-          server
+          server,
+          cached.maxConcurrent
         );
       }
 

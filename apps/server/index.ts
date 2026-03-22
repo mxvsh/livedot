@@ -10,17 +10,23 @@ import { eventRoutes } from "./routes/events";
 import { wsHandler, type WSData } from "./ws";
 import { startSweep } from "./sessions";
 
-// Cache website IDs → origin hostnames
-export const websiteCache = new Map<string, string>();
+interface WebsiteCacheEntry {
+  hostname: string;
+  maxConcurrent: number;
+}
+
+// Cache website IDs → { hostname, maxConcurrent }
+export const websiteCache = new Map<string, WebsiteCacheEntry>();
 
 async function loadWebsiteCache() {
-  const all = await db.select({ id: websites.id, url: websites.url }).from(websites);
+  const all = await db.select({ id: websites.id, url: websites.url, metadata: websites.metadata }).from(websites);
   for (const w of all) {
     try {
       const hostname = w.url ? new URL(w.url).hostname : "";
-      websiteCache.set(w.id, hostname);
+      const maxConcurrent = (w.metadata as any)?.maxConnections ?? env.DEFAULT_MAX_CONNECTIONS;
+      websiteCache.set(w.id, { hostname, maxConcurrent });
     } catch {
-      websiteCache.set(w.id, "");
+      websiteCache.set(w.id, { hostname: "", maxConcurrent: env.DEFAULT_MAX_CONNECTIONS });
     }
   }
 }
