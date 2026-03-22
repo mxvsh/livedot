@@ -10,6 +10,7 @@ import {
   Modal,
   TextField,
   FieldError,
+  Surface,
 } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -94,7 +95,10 @@ function HomePage() {
       {/* Navbar */}
       <nav className="border-b border-border bg-surface/80 backdrop-blur-xl">
         <div className="max-w-2xl mx-auto px-4 flex items-center justify-between h-14">
-          <span className="text-sm font-semibold text-foreground">Livedot</span>
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="Logo" className="h-5 rounded-md" />
+            <span className="text-sm font-semibold text-foreground">Livedot</span>
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -119,17 +123,17 @@ function HomePage() {
           {/* Header */}
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-1">
+              <h1 className="text-xl font-bold text-foreground mb-1">
                 Websites
               </h1>
               <p className="text-muted text-sm">
                 Add a website and start tracking live visitors.
               </p>
             </div>
-            <Button onPress={() => setModalOpen(true)}>
+            {websites.length > 0 && <Button onPress={() => setModalOpen(true)}>
               <HugeiconsIcon icon={PlusSignIcon} size={16} />
               New Website
-            </Button>
+            </Button>}
           </div>
 
           {/* Create website modal */}
@@ -182,7 +186,7 @@ function HomePage() {
 
           {/* Website list */}
           {websites.length === 0 ? (
-            <div className="text-center py-16">
+            <Surface className="text-center py-16 rounded-3xl">
               <p className="text-muted text-sm mb-4">
                 No websites yet. Add one to get started.
               </p>
@@ -190,7 +194,7 @@ function HomePage() {
                 <HugeiconsIcon icon={PlusSignIcon} size={16} />
                 New Website
               </Button>
-            </div>
+            </Surface>
           ) : (
             <div className="space-y-4">
               {websites.map((website, i) => (
