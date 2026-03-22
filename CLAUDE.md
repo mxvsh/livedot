@@ -1,111 +1,55 @@
----
-description: Use Bun instead of Node.js, npm, pnpm, or vite.
-globs: "*.ts, *.tsx, *.html, *.css, *.js, *.jsx, package.json"
-alwaysApply: false
----
+# Latty
 
-Default to using Bun instead of Node.js.
+Self-hosted, real-time website visitor tracker. Shows live visitors as glowing dots on a dark world map.
 
-- Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun test` instead of `jest` or `vitest`
-- Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
-- Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
-- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
-- Use `bunx <package> <command>` instead of `npx <package> <command>`
-- Bun automatically loads .env, so don't use dotenv.
+## Stack
 
-## APIs
+- **Monorepo**: Bun workspaces (`apps/` + `packages/`)
+- **Backend**: Hono on Bun.serve() with WebSocket pub/sub (`apps/server`)
+- **Frontend**: Vite + React 19 + TanStack Router + Tailwind 4 + HeroUI (`apps/web`)
+- **DB**: Drizzle ORM + bun:sqlite (dev) / D1 (prod) (`packages/db`)
+- **Shared types**: `packages/shared`
+- **Tracker snippet**: `packages/tracker` — embeddable `<script>` tag
+- **Icons**: `@hugeicons/core-free-icons` + `@hugeicons/react`
+- **Animations**: `motion` (framer-motion)
+- **Font**: Poppins
 
-- `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
-- `bun:sqlite` for SQLite. Don't use `better-sqlite3`.
-- `Bun.redis` for Redis. Don't use `ioredis`.
-- `Bun.sql` for Postgres. Don't use `pg` or `postgres.js`.
-- `WebSocket` is built-in. Don't use `ws`.
-- Prefer `Bun.file` over `node:fs`'s readFile/writeFile
-- Bun.$`ls` instead of execa.
+## Architecture
 
-## Testing
+- Users create "websites", get a tracking snippet (`data-website="<id>"`)
+- Tracker sends beacons to `/api/event` every 25s
+- Server resolves IP → lat/lng via `fast-geoip`, stores sessions in-memory
+- WebSocket broadcasts upsert/remove to dashboard subscribers per website
+- Sessions expire after 30s of inactivity (5s sweep interval)
+- Auth: username/password with Argon2id, session cookies
 
-Use `bun test` to run tests.
+## Key Commands
 
-```ts#index.test.ts
-import { test, expect } from "bun:test";
+- `bun run dev` — starts both server (:3000) and web (:5173)
+- `bun run dev:server` / `bun run dev:web` — individual
+- `bunx drizzle-kit push` — sync DB schema
+- `bun scripts/mock-visitors.ts --website <ID> --count 200` — simulate visitors
 
-test("hello world", () => {
-  expect(1).toBe(1);
-});
-```
+## Routes
 
-## Frontend
+- `/` — website list (centered, max-w-2xl)
+- `/websites/$websiteId` — full-screen map with floating tab switcher + dock
+- `/login` — sign in
+- `/setup` — first-run admin account creation
 
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
+## API Endpoints
 
-Server:
+- `POST /api/event` — tracker ingestion (public, no auth)
+- `GET/POST /api/websites` — CRUD (auth required)
+- `DELETE /api/websites/:id`
+- `GET /api/status` / `POST /api/setup` / `POST /api/login` / `POST /api/logout`
+- `GET /ws?website=<id>` — WebSocket for live session updates
 
-```ts#index.ts
-import index from "./index.html"
+## Conventions
 
-Bun.serve({
-  routes: {
-    "/": index,
-    "/api/users/:id": {
-      GET: (req) => {
-        return new Response(JSON.stringify({ id: req.params.id }));
-      },
-    },
-  },
-  // optional websocket support
-  websocket: {
-    open: (ws) => {
-      ws.send("Hello, world!");
-    },
-    message: (ws, message) => {
-      ws.send(message);
-    },
-    close: (ws) => {
-      // handle close
-    }
-  },
-  development: {
-    hmr: true,
-    console: true,
-  }
-})
-```
-
-HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>` tags can point to stylesheets and Bun's CSS bundler will bundle.
-
-```html#index.html
-<html>
-  <body>
-    <h1>Hello, world!</h1>
-    <script type="module" src="./frontend.tsx"></script>
-  </body>
-</html>
-```
-
-With the following `frontend.tsx`:
-
-```tsx#frontend.tsx
-import React from "react";
-import { createRoot } from "react-dom/client";
-
-// import .css files directly and it works
-import './index.css';
-
-const root = createRoot(document.body);
-
-export default function Frontend() {
-  return <h1>Hello, world!</h1>;
-}
-
-root.render(<Frontend />);
-```
-
-Then, run index.ts
-
-```sh
-bun --hot ./index.ts
-```
-
-For more information, read the Bun API docs in `node_modules/bun-types/docs/**.mdx`.
+- Use Bun everywhere — no Node.js, no npm/pnpm
+- Dark mode only (no light mode)
+- Entity naming: "website" not "project"
+- HeroUI components for forms, cards, modals, tooltips, buttons
+- Hugeicons for all icons
+- Motion for animations (entrance, tab switches, number counting)
