@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-beta.7](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.6...v0.1.0-beta.7) (2026-03-22)
+
+* Setup analytics ([](https://github.com/mxvsh/livedot/commit/d4cae5bcf9732bbc314c2172f1aa3f6d65c10adc))
+
 ## [0.1.0-beta.6](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.5...v0.1.0-beta.6) (2026-03-22)
 
 * Fix max user sign up check ([](https://github.com/mxvsh/livedot/commit/549317062a547da3c0a4a674186d6ddbcbd224f6))
