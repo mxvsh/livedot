@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
-import { motion } from "motion/react";
+import { useState, useEffect } from "react";
 import {
+  AlertDialog,
   Button,
   Card,
   Form,
@@ -19,6 +19,7 @@ import {
   ArrowRight01Icon,
   Logout01Icon,
   Add01Icon,
+  Alert02Icon,
 } from "@hugeicons/core-free-icons";
 import { api, type Website } from "@/lib/api";
 import WebsiteLiveCount from "@/components/WebsiteLiveCount";
@@ -33,23 +34,13 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const knownIds = useRef<Set<string> | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Website | null>(null);
 
-  async function load(isInitial = false) {
+  async function load() {
     setLoading(true);
     try {
       const data = await api.getWebsites();
-      if (isInitial) {
-        // On first load, mark all as known so they all animate
-        knownIds.current = null;
-      }
       setWebsites(data);
-      // After setting, store current IDs as known
-      // On initial load knownIds is null — set it so all animate
-      // On subsequent loads, don't reset — new IDs will be missing and animate
-      if (knownIds.current === null) {
-        knownIds.current = new Set();
-      }
     } finally {
       setLoading(false);
     }
@@ -65,7 +56,7 @@ function HomePage() {
         navigate({ to: "/login" });
         return;
       }
-      load(true);
+      load();
     });
   }, [navigate]);
 
@@ -81,17 +72,17 @@ function HomePage() {
     }
     try {
       await api.createWebsite(name, url);
-      // Don't reset knownIds so only the new one animates
-      await load(false);
+      await load();
       setModalOpen(false);
     } finally {
       setCreating(false);
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this website?")) return;
-    await api.deleteWebsite(id);
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    await api.deleteWebsite(deleteTarget.id);
+    setDeleteTarget(null);
     load();
   }
 
@@ -210,71 +201,95 @@ function HomePage() {
             </Surface>
           ) : (
             <div className="space-y-4">
-              {websites.map((website, i) => {
-                const isNew = !knownIds.current?.has(website.id);
-                if (isNew) knownIds.current?.add(website.id);
-                return (
-                <motion.div
+              {websites.map((website) => (
+                <Card
                   key={website.id}
-                  initial={isNew ? { opacity: 0, y: 12 } : false}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: isNew ? i * 0.06 : 0,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
+                  className="group cursor-pointer"
+                  onClick={() =>
+                    navigate({
+                      to: "/websites/$websiteId",
+                      params: { websiteId: website.id },
+                    })
+                  }
                 >
-                  <Card
-                    className="group cursor-pointer"
-                    onClick={() =>
-                      navigate({
-                        to: "/websites/$websiteId",
-                        params: { websiteId: website.id },
-                      })
-                    }
-                  >
-                    <Card.Header>
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex-1 min-w-0">
-                          <Card.Title>
-                            {website.name}
-                          </Card.Title>
-                          {website.url && (
-                            <Card.Description className="text-xs mt-1">
-                              {website.url}
-                            </Card.Description>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 ml-3 shrink-0">
-                          <WebsiteLiveCount websiteId={website.id} />
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(website.id);
-                            }}
-                          >
-                            <Button
-                              variant="ghost"
-                              className="text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <HugeiconsIcon icon={Delete02Icon} size={16} />
-                            </Button>
-                          </div>
-                          <span className="text-muted transition-transform duration-200 group-hover:translate-x-1">
-                            <HugeiconsIcon
-                              icon={ArrowRight01Icon}
-                              size={18}
-                            />
-                          </span>
-                        </div>
+                  <Card.Header>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex-1 min-w-0">
+                        <Card.Title>
+                          {website.name}
+                        </Card.Title>
+                        {website.url && (
+                          <Card.Description className="text-xs mt-1">
+                            {website.url}
+                          </Card.Description>
+                        )}
                       </div>
-                    </Card.Header>
-                  </Card>
-                </motion.div>
-                );
-              })}
+                      <div className="flex items-center gap-3 ml-3 shrink-0">
+                        <WebsiteLiveCount websiteId={website.id} />
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteTarget(website);
+                          }}
+                        >
+                          <Button
+                            variant="ghost"
+                            className="text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <HugeiconsIcon icon={Delete02Icon} size={16} />
+                          </Button>
+                        </div>
+                        <span className="text-muted transition-transform duration-200 group-hover:translate-x-1">
+                          <HugeiconsIcon
+                            icon={ArrowRight01Icon}
+                            size={18}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </Card.Header>
+                </Card>
+              ))}
             </div>
           )}
+
+          {/* Delete confirmation */}
+          <AlertDialog isOpen={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+            <AlertDialog.Backdrop>
+              <AlertDialog.Container>
+                <AlertDialog.Dialog>
+                  <AlertDialog.Header>
+                    <AlertDialog.Icon variant="danger">
+                      <HugeiconsIcon icon={Alert02Icon} size={20} />
+                    </AlertDialog.Icon>
+                    <AlertDialog.Heading>Delete Website</AlertDialog.Heading>
+                    <AlertDialog.Description>
+                      Are you sure you want to delete{" "}
+                      <strong>{deleteTarget?.name}</strong>? This action cannot
+                      be undone.
+                    </AlertDialog.Description>
+                  </AlertDialog.Header>
+                  <AlertDialog.Footer>
+                    <Button
+                      variant="outline"
+                      onPress={() => setDeleteTarget(null)}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onPress={handleDelete}
+                      className="flex-1"
+                    >
+                      <HugeiconsIcon icon={Delete02Icon} size={16} />
+                      Delete
+                    </Button>
+                  </AlertDialog.Footer>
+                </AlertDialog.Dialog>
+              </AlertDialog.Container>
+            </AlertDialog.Backdrop>
+          </AlertDialog>
       </div>
     </div>
   );
