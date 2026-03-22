@@ -22,6 +22,7 @@ export default function CreateWebsiteModal({ isOpen, onOpenChange, onCreated }: 
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState<Website | null>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
 
   const snippet = created
     ? `<script defer src="${window.location.origin}/t.js" data-website="${created.id}"></script>`
@@ -49,6 +50,8 @@ export default function CreateWebsiteModal({ isOpen, onOpenChange, onCreated }: 
       const website = await api.createWebsite(name, url);
       onCreated();
       setCreated(website);
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setCreating(false);
     }
@@ -91,6 +94,7 @@ export default function CreateWebsiteModal({ isOpen, onOpenChange, onCreated }: 
                       <FieldError />
                     </TextField>
                   </Form>
+                  {error && <p className="text-danger text-sm mt-2">{error}</p>}
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="outline" slot="close" className="flex-1">
