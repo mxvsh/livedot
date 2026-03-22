@@ -15,5 +15,5 @@ sqlite.run("PRAGMA foreign_keys = ON;");
 export const db = drizzle(sqlite, { schema });
 
 if (process.env.NODE_ENV === "production") {
-  migrate(db, { migrationsFolder: resolve(__dirname, "./drizzle") });
+  migrate(db, { migrationsFolder: resolve(__dirname, "./migrations") });
 }
