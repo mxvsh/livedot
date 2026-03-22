@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import type { Server } from "bun";
-import { db } from "@latty/db";
-import { websites } from "@latty/db/schema";
+import { db } from "@livedot/db";
+import { websites } from "@livedot/db/schema";
 import { authRoutes } from "./routes/auth";
 import { websiteRoutes } from "./routes/websites";
 import { eventRoutes } from "./routes/events";

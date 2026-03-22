@@ -2,8 +2,8 @@ import { createMiddleware } from "hono/factory";
 import type { Context } from "hono";
 import { getCookie } from "hono/cookie";
 import { eq } from "drizzle-orm";
-import { db } from "@latty/db";
-import { users, authSessions } from "@latty/db/schema";
+import { db } from "@livedot/db";
+import { users, authSessions } from "@livedot/db/schema";
 
 export async function validateSession(sessionId: string | undefined) {
   if (!sessionId) return null;

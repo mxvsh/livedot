@@ -13,8 +13,8 @@
       "name": "server",
       "version": "0.0.1",
       "dependencies": {
-        "@latty/db": "workspace:*",
-        "@latty/shared": "workspace:*",
+        "@livedot/db": "workspace:*",
+        "@livedot/shared": "workspace:*",
         "drizzle-orm": "^0.45.1",
         "fast-geoip": "^1.1.88",
         "hono": "^4",
@@ -31,7 +31,7 @@
         "@heroui/styles": "^3.0.1",
         "@hugeicons/core-free-icons": "^4.0.0",
         "@hugeicons/react": "^1.1.6",
-        "@latty/shared": "workspace:*",
+        "@livedot/shared": "workspace:*",
         "@tanstack/react-router": "^1",
         "@tanstack/router-devtools": "^1",
         "maplibre-gl": "^5.21.0",
@@ -51,18 +51,18 @@
       },
     },
     "packages/db": {
-      "name": "@latty/db",
+      "name": "@livedot/db",
       "version": "0.0.1",
       "dependencies": {
         "drizzle-orm": "^0.45.1",
       },
     },
     "packages/shared": {
-      "name": "@latty/shared",
+      "name": "@livedot/shared",
       "version": "0.0.1",
     },
     "packages/tracker": {
-      "name": "@latty/tracker",
+      "name": "@livedot/tracker",
       "version": "0.0.1",
     },
   },
@@ -203,11 +203,11 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@latty/db": ["@latty/db@workspace:packages/db"],
+    "@livedot/db": ["@livedot/db@workspace:packages/db"],
 
-    "@latty/shared": ["@latty/shared@workspace:packages/shared"],
+    "@livedot/shared": ["@livedot/shared@workspace:packages/shared"],
 
-    "@latty/tracker": ["@latty/tracker@workspace:packages/tracker"],
+    "@livedot/tracker": ["@livedot/tracker@workspace:packages/tracker"],
 
     "@libsql/client": ["@libsql/client@0.17.2", "", { "dependencies": { "@libsql/core": "^0.17.2", "@libsql/hrana-client": "^0.9.0", "js-base64": "^3.7.5", "libsql": "^0.5.28", "promise-limit": "^2.7.0" } }, "sha512-0aw0S3iQMHvOxfRt5j1atoCCPMT3gjsB2PS8/uxSM1DcDn39xqz6RlgSMxtP8I3JsxIXAFuw7S41baLEw0Zi+Q=="],
 

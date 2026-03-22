@@ -47,7 +47,7 @@ function LoginPage() {
         className="w-full max-w-sm"
       >
         <Surface className="rounded-3xl p-8" variant="default">
-          <h1 className="text-2xl font-bold text-foreground mb-1">Latty</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-1">Livedot</h1>
           <p className="text-muted text-sm mb-6">
             Sign in to your dashboard.
           </p>

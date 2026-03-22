@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { eq } from "drizzle-orm";
-import { db } from "@latty/db";
-import { websites } from "@latty/db/schema";
+import { db } from "@livedot/db";
+import { websites } from "@livedot/db/schema";
 import { requireAuth } from "../middleware/auth";
 import { websiteIdCache } from "../index";
 

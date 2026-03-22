@@ -1,10 +1,10 @@
-name = "latty"
+name = "livedot"
 main = "src/index.ts"
 compatibility_date = "2022-11-07"
 node_compat = true
 
 [[ d1_databases ]]
 binding = "DB"
-database_name = "latty"
+database_name = "livedot"
 database_id = ""
 migrations_dir = "drizzle"

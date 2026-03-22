@@ -1,5 +1,5 @@
 import type { Server } from "bun";
-import type { VisitorSession, WSMessage } from "@latty/shared";
+import type { VisitorSession, WSMessage } from "@livedot/shared";
 
 export { type VisitorSession, type WSMessage };
 

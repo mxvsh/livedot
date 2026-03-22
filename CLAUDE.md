@@ -1,4 +1,4 @@
-# Latty
+# Livedot
 
 Self-hosted, real-time website visitor tracker. Shows live visitors as glowing dots on a dark world map.
 

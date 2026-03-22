@@ -10,8 +10,8 @@
     "hono": "^4",
     "fast-geoip": "^1.1.88",
     "drizzle-orm": "^0.45.1",
-    "@latty/db": "workspace:*",
-    "@latty/shared": "workspace:*"
+    "@livedot/db": "workspace:*",
+    "@livedot/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest"

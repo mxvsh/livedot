@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { eq, count } from "drizzle-orm";
-import { db } from "@latty/db";
-import { users, authSessions } from "@latty/db/schema";
+import { db } from "@livedot/db";
+import { users, authSessions } from "@livedot/db/schema";
 import { validateSession } from "../middleware/auth";
 
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days

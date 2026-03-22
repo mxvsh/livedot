@@ -4,10 +4,10 @@
   if (!W) return;
 
   var E = el.src.replace(/\/t\.js$/, "");
-  var S = localStorage.getItem("_latty_sid");
+  var S = localStorage.getItem("_livedot_sid");
   if (!S) {
     S = crypto.randomUUID();
-    localStorage.setItem("_latty_sid", S);
+    localStorage.setItem("_livedot_sid", S);
   }
 
   function send() {

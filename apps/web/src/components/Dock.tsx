@@ -53,7 +53,7 @@ export default function Dock({ websiteName, count, connected }: Props) {
         {isHome && (
           <>
             <span className="text-sm font-semibold text-foreground px-2">
-              Latty
+              Livedot
             </span>
             <div className="w-px h-5 bg-separator mx-1" />
             <Button

@@ -48,14 +48,16 @@ function SetupPage() {
         className="w-full max-w-sm"
       >
         <Surface className="rounded-3xl p-8" variant="default">
+          <img src="/logo.png" alt="Livedot logo" className="mb-4 w-10 h-10 rounded-xl" />
+          
           <h1 className="text-2xl font-bold text-foreground mb-1">
-            Welcome to Latty
+            Welcome to Livedot
           </h1>
           <p className="text-muted text-sm mb-6">
             Create your admin account to get started.
           </p>
           <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <TextField isRequired name="username">
+            <TextField isRequired name="username" variant="secondary">
               <Label>Username</Label>
               <Input placeholder="admin" autoFocus />
               <FieldError />
@@ -66,6 +68,7 @@ function SetupPage() {
               name="password"
               type="password"
               minLength={6}
+              variant="secondary"
             >
               <Label>Password</Label>
               <Input placeholder="Min 6 characters" />

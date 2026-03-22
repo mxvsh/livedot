@@ -1,5 +1,5 @@
 /**
- * Mock visitor simulator for Latty
+ * Mock visitor simulator for Livedot
  *
  * Usage: bun scripts/mock-visitors.ts --website <WEBSITE_ID> --count 50
  *

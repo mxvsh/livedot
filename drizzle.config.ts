@@ -5,6 +5,6 @@ export default defineConfig({
   schema: "./packages/db/src/schema.ts",
   dialect: "sqlite",
   dbCredentials: {
-    url: "./packages/db/latty.db",
+    url: "./packages/db/livedot.db",
   },
 });

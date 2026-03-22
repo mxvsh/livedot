@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import * as schema from "./schema";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = resolve(__dirname, "../latty.db");
+const dbPath = resolve(__dirname, "../livedot.db");
 
 const sqlite = new Database(dbPath);
 sqlite.run("PRAGMA journal_mode = WAL;");

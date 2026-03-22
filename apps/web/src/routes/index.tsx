@@ -94,7 +94,7 @@ function HomePage() {
       {/* Navbar */}
       <nav className="border-b border-border bg-surface/80 backdrop-blur-xl">
         <div className="max-w-2xl mx-auto px-4 flex items-center justify-between h-14">
-          <span className="text-sm font-semibold text-foreground">Latty</span>
+          <span className="text-sm font-semibold text-foreground">Livedot</span>
           <Button
             variant="ghost"
             size="sm"
