@@ -1,6 +1,6 @@
 export interface VisitorSession {
   sessionId: string;
-  projectId: string;
+  websiteId: string;
   lat: number;
   lng: number;
   pageUrl: string;

@@ -3,7 +3,7 @@ export interface User {
   username: string;
 }
 
-export interface Project {
+export interface Website {
   id: string;
   name: string;
   userId: string;
@@ -41,12 +41,12 @@ export const api = {
       body: JSON.stringify({ username, password }),
     }),
   logout: () => request<{ ok: boolean }>("/api/logout", { method: "POST" }),
-  getProjects: () => request<Project[]>("/api/projects"),
-  createProject: (name: string) =>
-    request<Project>("/api/projects", {
+  getWebsites: () => request<Website[]>("/api/websites"),
+  createWebsite: (name: string) =>
+    request<Website>("/api/websites", {
       method: "POST",
       body: JSON.stringify({ name }),
     }),
-  deleteProject: (id: string) =>
-    request<{ ok: boolean }>(`/api/projects/${id}`, { method: "DELETE" }),
+  deleteWebsite: (id: string) =>
+    request<{ ok: boolean }>(`/api/websites/${id}`, { method: "DELETE" }),
 };

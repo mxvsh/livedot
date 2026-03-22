@@ -2,23 +2,23 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import type { Server } from "bun";
 import { db } from "@latty/db";
-import { projects } from "@latty/db/schema";
+import { websites } from "@latty/db/schema";
 import { authRoutes } from "./routes/auth";
-import { projectRoutes } from "./routes/projects";
+import { websiteRoutes } from "./routes/websites";
 import { eventRoutes } from "./routes/events";
 import { wsHandler, type WSData } from "./ws";
 import { validateSession } from "./middleware/auth";
 import { startSweep } from "./sessions";
 
-// Cache valid project IDs
-export const projectIdCache = new Set<string>();
+// Cache valid website IDs
+export const websiteIdCache = new Set<string>();
 
-async function loadProjectCache() {
-  const all = await db.select({ id: projects.id }).from(projects);
-  for (const p of all) projectIdCache.add(p.id);
+async function loadWebsiteCache() {
+  const all = await db.select({ id: websites.id }).from(websites);
+  for (const w of all) websiteIdCache.add(w.id);
 }
 
-loadProjectCache().catch(console.error);
+loadWebsiteCache().catch(console.error);
 
 // Hono app
 const app = new Hono();
@@ -26,7 +26,7 @@ const app = new Hono();
 // Event route first — no auth required (public tracker endpoint)
 app.route("/api", eventRoutes);
 app.route("/api", authRoutes);
-app.route("/api", projectRoutes);
+app.route("/api", websiteRoutes);
 
 // Serve tracker script
 const trackerScript = Bun.file(
@@ -61,9 +61,9 @@ const server = Bun.serve({
 
     // WebSocket upgrade
     if (url.pathname === "/ws") {
-      const projectId = url.searchParams.get("project");
-      if (!projectId) {
-        return new Response("Missing project parameter", { status: 400 });
+      const websiteId = url.searchParams.get("website");
+      if (!websiteId) {
+        return new Response("Missing website parameter", { status: 400 });
       }
 
       // Parse cookie manually for the upgrade path
@@ -77,7 +77,7 @@ const server = Bun.serve({
           return new Response("Unauthorized", { status: 401 });
         }
         const upgraded = server.upgrade<WSData>(req, {
-          data: { projectId, userId: user.id },
+          data: { websiteId, userId: user.id },
         });
         if (!upgraded) {
           return new Response("WebSocket upgrade failed", { status: 400 });

@@ -3,21 +3,21 @@ import type { VisitorSession, WSMessage } from "@latty/shared";
 
 export { type VisitorSession, type WSMessage };
 
-// Key: `${projectId}:${sessionId}`
+// Key: `${websiteId}:${sessionId}`
 const activeSessions = new Map<string, VisitorSession>();
 
 export function upsertSession(session: VisitorSession, server: Server | null) {
-  const key = `${session.projectId}:${session.sessionId}`;
+  const key = `${session.websiteId}:${session.sessionId}`;
   activeSessions.set(key, session);
 
   const msg: WSMessage = { type: "upsert", session };
-  server?.publish(`project:${session.projectId}`, JSON.stringify(msg));
+  server?.publish(`website:${session.websiteId}`, JSON.stringify(msg));
 }
 
-export function getSessionsForProject(projectId: string): VisitorSession[] {
+export function getSessionsForWebsite(websiteId: string): VisitorSession[] {
   const sessions: VisitorSession[] = [];
   for (const [key, session] of activeSessions) {
-    if (key.startsWith(`${projectId}:`)) {
+    if (key.startsWith(`${websiteId}:`)) {
       sessions.push(session);
     }
   }
@@ -35,7 +35,7 @@ export function startSweep(getServer: () => Server | null) {
       if (now - session.lastSeen > SESSION_TIMEOUT) {
         activeSessions.delete(key);
         const msg: WSMessage = { type: "remove", sessionId: session.sessionId };
-        server?.publish(`project:${session.projectId}`, JSON.stringify(msg));
+        server?.publish(`website:${session.websiteId}`, JSON.stringify(msg));
       }
     }
   }, 5_000);

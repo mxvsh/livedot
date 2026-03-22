@@ -1,20 +1,20 @@
 import type { ServerWebSocket } from "bun";
-import { getSessionsForProject, type WSMessage } from "./sessions";
+import { getSessionsForWebsite, type WSMessage } from "./sessions";
 
 export interface WSData {
-  projectId: string;
+  websiteId: string;
   userId: string;
 }
 
 export const wsHandler = {
   open(ws: ServerWebSocket<WSData>) {
-    ws.subscribe(`project:${ws.data.projectId}`);
-    const sessions = getSessionsForProject(ws.data.projectId);
+    ws.subscribe(`website:${ws.data.websiteId}`);
+    const sessions = getSessionsForWebsite(ws.data.websiteId);
     const msg: WSMessage = { type: "snapshot", sessions };
     ws.send(JSON.stringify(msg));
   },
   message(_ws: ServerWebSocket<WSData>, _message: string | Buffer) {},
   close(ws: ServerWebSocket<WSData>) {
-    ws.unsubscribe(`project:${ws.data.projectId}`);
+    ws.unsubscribe(`website:${ws.data.websiteId}`);
   },
 };

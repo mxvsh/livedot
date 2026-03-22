@@ -1,21 +1,47 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { api, type Project } from "@/lib/api";
-import { useWebSocket } from "@/hooks/useWebSocket";
-import Map from "@/components/Map";
-import LiveCount from "@/components/LiveCount";
+import { motion } from "motion/react";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  Label,
+  Modal,
+  TextField,
+  FieldError,
+} from "@heroui/react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  PlusSignIcon,
+  Delete02Icon,
+  ArrowRight01Icon,
+  Logout01Icon,
+  Add01Icon,
+} from "@hugeicons/core-free-icons";
+import { api, type Website } from "@/lib/api";
+import WebsiteLiveCount from "@/components/WebsiteLiveCount";
 
 export const Route = createFileRoute("/")({
-  component: DashboardPage,
+  component: HomePage,
 });
 
-function DashboardPage() {
+function HomePage() {
   const navigate = useNavigate();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
+  const [websites, setWebsites] = useState<Website[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const data = await api.getWebsites();
+      setWebsites(data);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     api.getStatus().then((status) => {
@@ -27,83 +53,206 @@ function DashboardPage() {
         navigate({ to: "/login" });
         return;
       }
-      api.getProjects().then((data) => {
-        setProjects(data);
-        if (data.length > 0) setSelectedProjectId(data[0].id);
-        setLoading(false);
-      });
+      load();
     });
   }, [navigate]);
 
-  const { sessions, connected, count } = useWebSocket(selectedProjectId);
-  const sessionArray = Array.from(sessions.values());
+  async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setCreating(true);
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name")?.toString().trim();
+    if (!name) {
+      setCreating(false);
+      return;
+    }
+    try {
+      await api.createWebsite(name);
+      await load();
+      setModalOpen(false);
+    } finally {
+      setCreating(false);
+    }
+  }
 
-  async function handleLogout() {
-    await api.logout();
-    navigate({ to: "/login" });
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this website?")) return;
+    await api.deleteWebsite(id);
+    load();
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="h-screen w-screen bg-black flex flex-col">
-      <div className="relative z-10 flex items-center justify-between px-4 py-2.5 bg-zinc-950/80 backdrop-blur-sm border-b border-zinc-800/50">
-        <div className="flex items-center gap-4">
-          <span className="text-white font-bold text-lg">Latty</span>
-          {projects.length > 0 && (
-            <select
-              value={selectedProjectId || ""}
-              onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
-            >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          )}
-          <LiveCount count={count} connected={connected} />
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate({ to: "/projects" })}
-            className="text-sm text-zinc-400 hover:text-white transition-colors"
+    <div className="min-h-screen">
+      {/* Navbar */}
+      <nav className="border-b border-border bg-surface/80 backdrop-blur-xl">
+        <div className="max-w-2xl mx-auto px-4 flex items-center justify-between h-14">
+          <span className="text-sm font-semibold text-foreground">Latty</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onPress={async () => {
+              await api.logout();
+              navigate({ to: "/login" });
+            }}
+            className="text-muted"
           >
-            Projects
-          </button>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-zinc-400 hover:text-white transition-colors"
-          >
+            <HugeiconsIcon icon={Logout01Icon} size={14} />
             Logout
-          </button>
+          </Button>
         </div>
-      </div>
-      <div className="flex-1 relative">
-        {projects.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <p className="text-zinc-400 mb-3">
-                No projects yet. Create one to start tracking.
+      </nav>
+
+      <div className="max-w-2xl mx-auto px-4 pt-10 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {/* Header */}
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-1">
+                Websites
+              </h1>
+              <p className="text-muted text-sm">
+                Add a website and start tracking live visitors.
               </p>
-              <button
-                onClick={() => navigate({ to: "/projects" })}
-                className="bg-cyan-500 hover:bg-cyan-400 text-black font-medium rounded-lg px-5 py-2.5 transition-colors"
-              >
-                Create Project
-              </button>
             </div>
+            <Button onPress={() => setModalOpen(true)}>
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              New Website
+            </Button>
           </div>
-        ) : (
-          <Map sessions={sessionArray} />
-        )}
+
+          {/* Create website modal */}
+          <Modal isOpen={modalOpen} onOpenChange={setModalOpen}>
+            <Modal.Backdrop>
+              <Modal.Container>
+                <Modal.Dialog className="sm:max-w-[400px]">
+                  <Modal.CloseTrigger />
+                  <Modal.Header>
+                    <Modal.Icon className="bg-default text-foreground">
+                      <HugeiconsIcon icon={Add01Icon} size={20} />
+                    </Modal.Icon>
+                    <Modal.Heading>New Website</Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <Form
+                      id="create-website-form"
+                      className="flex flex-col gap-4"
+                      onSubmit={handleCreate}
+                    >
+                      <TextField variant="secondary" isRequired name="name" className="w-full">
+                        <Label>Website name</Label>
+                        <Input placeholder="My Website" autoFocus className="ring-inset" />
+                        <FieldError />
+                      </TextField>
+                    </Form>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      variant="outline"
+                      slot="close"
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      form="create-website-form"
+                      isDisabled={creating}
+                      className="flex-1"
+                    >
+                      <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                      {creating ? "Creating..." : "Create"}
+                    </Button>
+                  </Modal.Footer>
+                </Modal.Dialog>
+              </Modal.Container>
+            </Modal.Backdrop>
+          </Modal>
+
+          {/* Website list */}
+          {websites.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-muted text-sm mb-4">
+                No websites yet. Add one to get started.
+              </p>
+              <Button onPress={() => setModalOpen(true)}>
+                <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                New Website
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {websites.map((website, i) => (
+                <motion.div
+                  key={website.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: i * 0.06,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <Card
+                    className="group cursor-pointer"
+                    onClick={() =>
+                      navigate({
+                        to: "/websites/$websiteId",
+                        params: { websiteId: website.id },
+                      })
+                    }
+                  >
+                    <Card.Header>
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex-1 min-w-0">
+                          <Card.Title>
+                            {website.name}
+                          </Card.Title>
+                          <Card.Description className="font-mono text-xs mt-1">
+                            {website.id}
+                          </Card.Description>
+                        </div>
+                        <div className="flex items-center gap-3 ml-3 shrink-0">
+                          <WebsiteLiveCount websiteId={website.id} />
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(website.id);
+                            }}
+                          >
+                            <Button
+                              variant="ghost"
+                              className="text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <HugeiconsIcon icon={Delete02Icon} size={16} />
+                            </Button>
+                          </div>
+                          <span className="text-muted transition-transform duration-200 group-hover:translate-x-1">
+                            <HugeiconsIcon
+                              icon={ArrowRight01Icon}
+                              size={18}
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </Card.Header>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
   );

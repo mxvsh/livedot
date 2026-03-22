@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { projectIdCache, getServer } from "../index";
+import { websiteIdCache, getServer } from "../index";
 import { resolveGeo } from "../geo";
 import { upsertSession } from "../sessions";
 
@@ -10,13 +10,13 @@ export const eventRoutes = new Hono()
   .post("/event", async (c) => {
     try {
       const text = await c.req.text();
-      const { projectId, sessionId, url, _mockLat, _mockLng } = JSON.parse(text);
+      const { websiteId, sessionId, url, _mockLat, _mockLng } = JSON.parse(text);
 
-      if (!projectId || !sessionId) {
+      if (!websiteId || !sessionId) {
         return c.body(null, 400);
       }
 
-      if (!projectIdCache.has(projectId)) {
+      if (!websiteIdCache.has(websiteId)) {
         return c.body(null, 404);
       }
 
@@ -35,7 +35,7 @@ export const eventRoutes = new Hono()
         upsertSession(
           {
             sessionId,
-            projectId,
+            websiteId,
             lat: geo.lat,
             lng: geo.lng,
             pageUrl: url || "",

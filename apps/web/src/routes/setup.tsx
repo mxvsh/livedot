@@ -1,5 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
+import { motion } from "motion/react";
+import {
+  Button,
+  Form,
+  Input,
+  Label,
+  TextField,
+  FieldError,
+  Description,
+  Surface,
+} from "@heroui/react";
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/setup")({
@@ -8,15 +19,16 @@ export const Route = createFileRoute("/setup")({
 
 function SetupPage() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get("username")?.toString() || "";
+    const password = formData.get("password")?.toString() || "";
     try {
       await api.setup(username, password);
       navigate({ to: "/" });
@@ -28,55 +40,47 @@ function SetupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="w-full max-w-sm">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white mb-1">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-sm"
+      >
+        <Surface className="rounded-3xl p-8" variant="default">
+          <h1 className="text-2xl font-bold text-foreground mb-1">
             Welcome to Latty
           </h1>
-          <p className="text-zinc-400 text-sm mb-6">
+          <p className="text-muted text-sm mb-6">
             Create your admin account to get started.
           </p>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500/40"
-                placeholder="admin"
-                required
-                autoFocus
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500/40"
-                placeholder="Min 6 characters"
-                minLength={6}
-                required
-              />
-            </div>
-            {error && <p className="text-red-400 text-sm">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-medium rounded-lg py-2.5 transition-colors disabled:opacity-50"
+          <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <TextField isRequired name="username">
+              <Label>Username</Label>
+              <Input placeholder="admin" autoFocus />
+              <FieldError />
+            </TextField>
+
+            <TextField
+              isRequired
+              name="password"
+              type="password"
+              minLength={6}
             >
+              <Label>Password</Label>
+              <Input placeholder="Min 6 characters" />
+              <Description>At least 6 characters</Description>
+              <FieldError />
+            </TextField>
+
+            {error && <p className="text-danger text-sm">{error}</p>}
+
+            <Button type="submit" isDisabled={loading} className="w-full">
               {loading ? "Creating..." : "Create Account"}
-            </button>
-          </form>
-        </div>
-      </div>
+            </Button>
+          </Form>
+        </Surface>
+      </motion.div>
     </div>
   );
 }

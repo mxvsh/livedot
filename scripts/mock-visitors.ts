@@ -1,7 +1,7 @@
 /**
  * Mock visitor simulator for Latty
  *
- * Usage: bun scripts/mock-visitors.ts --project <PROJECT_ID> --count 50
+ * Usage: bun scripts/mock-visitors.ts --website <WEBSITE_ID> --count 50
  *
  * Simulates N visitors from real cities around the world,
  * sending beacons every 25s just like the real tracker.
@@ -52,18 +52,18 @@ const CITIES = [
 
 // Parse args
 const args = process.argv.slice(2);
-let projectId = "";
+let websiteId = "";
 let count = 20;
 let endpoint = "http://localhost:3000";
 
 for (let i = 0; i < args.length; i++) {
-  if (args[i] === "--project" || args[i] === "-p") projectId = args[++i] || "";
+  if (args[i] === "--website" || args[i] === "-w") websiteId = args[++i] || "";
   if (args[i] === "--count" || args[i] === "-c") count = parseInt(args[++i] || "20");
   if (args[i] === "--endpoint" || args[i] === "-e") endpoint = args[++i] || endpoint;
 }
 
-if (!projectId) {
-  console.error("Usage: bun scripts/mock-visitors.ts --project <PROJECT_ID> [--count 20] [--endpoint http://localhost:3000]");
+if (!websiteId) {
+  console.error("Usage: bun scripts/mock-visitors.ts --website <WEBSITE_ID> [--count 20] [--endpoint http://localhost:3000]");
   process.exit(1);
 }
 
@@ -87,39 +87,47 @@ function seededRandom(seed: number) {
 const visitors: MockVisitor[] = [];
 const pages = ["/", "/about", "/pricing", "/docs", "/blog", "/contact", "/signup", "/features"];
 
+// Randomly distribute visitors across cities using global RNG
+const rngGlobal = seededRandom(42);
+
+// Give each city a random weight so distribution isn't uniform
+const weights = CITIES.map(() => 0.5 + rngGlobal() * 2);
+const totalWeight = weights.reduce((a, b) => a + b, 0);
+
 for (let i = 0; i < count; i++) {
+  // Use global RNG for city pick so each visitor gets a different city
+  let roll = rngGlobal() * totalWeight;
+  let cityIdx = 0;
+  for (let j = 0; j < weights.length; j++) {
+    roll -= weights[j]!;
+    if (roll <= 0) {
+      cityIdx = j;
+      break;
+    }
+  }
+  const city = CITIES[cityIdx]!;
+
+  // Per-visitor RNG for jitter and pages
   const rng = seededRandom(i + 1);
-  const city = CITIES[i % CITIES.length]!;
-  // Small jitter around city center so dots don't stack exactly
-  const lat = city.lat + (rng() - 0.5) * 0.5;
-  const lng = city.lng + (rng() - 0.5) * 0.5;
+  const lat = city.lat + (rng() - 0.5) * 0.4;
+  const lng = city.lng + (rng() - 0.5) * 0.4;
+
+  const shuffled = [...pages].sort(() => rng() - 0.5);
+  const visitorPages = shuffled.slice(0, 1 + Math.floor(rng() * 3));
 
   visitors.push({
     sessionId: `mock-${i.toString().padStart(4, "0")}`,
     city,
     lat,
     lng,
-    pages: pages.sort(() => rng() - 0.5).slice(0, 1 + Math.floor(rng() * 3)),
+    pages: visitorPages,
   });
 }
 
-console.log(`Simulating ${count} visitors for project ${projectId}`);
+console.log(`Simulating ${count} visitors for website ${websiteId}`);
 console.log(`Endpoint: ${endpoint}`);
 console.log(`Cities: ${[...new Set(visitors.map((v) => v.city.name))].join(", ")}`);
 console.log(`Press Ctrl+C to stop\n`);
-
-// Send events directly to the sessions module via the API
-// But since the API resolves IP → geo, and we want specific locations,
-// we'll hit a special mock endpoint or inject directly.
-// For simplicity, we'll POST to /api/event but also include lat/lng.
-// The server ignores lat/lng from the body, so we need a different approach.
-//
-// Best approach: bypass the API and connect via WebSocket to see results,
-// while directly calling the server's internal session store.
-// But since this is a standalone script, let's add a mock mode to the event endpoint.
-
-// Actually, the simplest way: POST events with a special header that includes coords.
-// Let's just modify the event handler to accept optional lat/lng in the body for dev.
 
 async function sendBeacon(visitor: MockVisitor) {
   const page = visitor.pages[Math.floor(Math.random() * visitor.pages.length)];
@@ -127,7 +135,7 @@ async function sendBeacon(visitor: MockVisitor) {
     await fetch(`${endpoint}/api/event`, {
       method: "POST",
       body: JSON.stringify({
-        projectId,
+        websiteId,
         sessionId: visitor.sessionId,
         url: `https://example.com${page}`,
         _mockLat: visitor.lat,

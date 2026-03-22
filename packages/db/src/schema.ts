@@ -15,7 +15,7 @@ export const authSessions = sqliteTable("auth_sessions", {
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
 });
 
-export const projects = sqliteTable("projects", {
+export const websites = sqliteTable("websites", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: text("user_id")
     .notNull()

@@ -1,7 +1,7 @@
 (function () {
   var el = document.currentScript;
-  var P = el.dataset.project;
-  if (!P) return;
+  var W = el.dataset.website;
+  if (!W) return;
 
   var E = el.src.replace(/\/t\.js$/, "");
   var S = localStorage.getItem("_latty_sid");
@@ -11,7 +11,7 @@
   }
 
   function send() {
-    var d = JSON.stringify({ projectId: P, sessionId: S, url: location.href });
+    var d = JSON.stringify({ websiteId: W, sessionId: S, url: location.href });
     if (navigator.sendBeacon) {
       navigator.sendBeacon(E + "/api/event", d);
     } else {

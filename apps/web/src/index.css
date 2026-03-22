@@ -43,8 +43,7 @@
   --field-radius: 0.75rem;
 
   /* Font Family */
-  /* Make sure to load Inter font in your app */
-  --font-sans: var(--font-inter);
+  --font-sans: "Poppins", sans-serif;
 }
 
 .dark,
@@ -81,4 +80,14 @@
   --surface-tertiary-foreground: oklch(99.11% 0.0015 281.33);
   --warning: oklch(82.03% 0.1392 79.64);
   --warning-foreground: oklch(21.03% 0.0059 79.64);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  height: 100%;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: "Poppins", sans-serif;
 }

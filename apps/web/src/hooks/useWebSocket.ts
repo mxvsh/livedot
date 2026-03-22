@@ -3,7 +3,7 @@ import type { VisitorSession, WSMessage } from "@latty/shared";
 
 export type { VisitorSession, WSMessage };
 
-export function useWebSocket(projectId: string | null) {
+export function useWebSocket(websiteId: string | null) {
   const [sessions, setSessions] = useState<Map<string, VisitorSession>>(
     new Map()
   );
@@ -12,11 +12,11 @@ export function useWebSocket(projectId: string | null) {
   const reconnectRef = useRef<ReturnType<typeof setTimeout>>();
 
   const connect = useCallback(() => {
-    if (!projectId) return;
+    if (!websiteId) return;
 
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
     const ws = new WebSocket(
-      `${protocol}//${location.host}/ws?project=${projectId}`
+      `${protocol}//${location.host}/ws?website=${websiteId}`
     );
     wsRef.current = ws;
 
@@ -50,7 +50,7 @@ export function useWebSocket(projectId: string | null) {
     };
 
     ws.onerror = () => ws.close();
-  }, [projectId]);
+  }, [websiteId]);
 
   useEffect(() => {
     connect();
