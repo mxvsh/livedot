@@ -4,21 +4,32 @@ import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import path from "path";
 
-function umamiPlugin() {
+function analyticsPlugin() {
   return {
-    name: "umami-inject",
+    name: "analytics-inject",
     transformIndexHtml(html: string) {
-      const url = process.env.VITE_UMAMI_URL;
-      const id = process.env.VITE_UMAMI_WEBSITE_ID;
-      if (!url || !id) return html;
-      const tag = `<script defer src="${url}/script.js" data-website-id="${id}"></script>`;
-      return html.replace("</head>", `  ${tag}\n  </head>`);
+      const tags: string[] = [];
+
+      const umamiUrl = process.env.VITE_UMAMI_URL;
+      const umamiId = process.env.VITE_UMAMI_WEBSITE_ID;
+      if (umamiUrl && umamiId) {
+        tags.push(`<script defer src="${umamiUrl}/script.js" data-website-id="${umamiId}"></script>`);
+      }
+
+      const livedotUrl = process.env.VITE_LIVEDOT_URL;
+      const livedotId = process.env.VITE_LIVEDOT_WEBSITE_ID;
+      if (livedotUrl && livedotId) {
+        tags.push(`<script defer src="${livedotUrl}/t.js" data-website="${livedotId}"></script>`);
+      }
+
+      if (!tags.length) return html;
+      return html.replace("</head>", `  ${tags.join("\n    ")}\n  </head>`);
     },
   };
 }
 
 export default defineConfig({
-  plugins: [TanStackRouterVite(), react(), tailwindcss(), umamiPlugin()],
+  plugins: [TanStackRouterVite(), react(), tailwindcss(), analyticsPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
