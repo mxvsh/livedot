@@ -29,9 +29,7 @@ app.route("/api", authRoutes);
 app.route("/api", websiteRoutes);
 
 // Serve tracker script
-const trackerScript = Bun.file(
-  new URL("../../../packages/tracker/src/tracker.js", import.meta.url).pathname
-);
+const trackerScript = Bun.file(new URL("./tracker.js", import.meta.url).pathname);
 
 app.get("/t.js", async (c) => {
   return c.body(await trackerScript.text(), 200, {
@@ -43,8 +41,8 @@ app.get("/t.js", async (c) => {
 
 // Prod: serve Vite build
 if (process.env.NODE_ENV === "production") {
-  app.use("/*", serveStatic({ root: "../../apps/web/dist" }));
-  app.get("/*", serveStatic({ path: "../../apps/web/dist/index.html" }));
+  app.use("/*", serveStatic({ root: "./apps/server/static" }));
+  app.get("/*", serveStatic({ path: "./apps/server/static/index.html" }));
 }
 
 // Server reference for WebSocket publishing
@@ -55,7 +53,7 @@ export function getServer() {
 
 // Start Bun server with Hono + WebSocket
 const server = Bun.serve({
-  port: 3000,
+  port: Number(process.env.PORT) || 5550,
   fetch(req, server) {
     const url = new URL(req.url);
 

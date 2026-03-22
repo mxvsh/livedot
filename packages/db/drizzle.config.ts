@@ -2,9 +2,9 @@ import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   out: "./drizzle",
-  schema: "./packages/db/src/schema.ts",
+  schema: "./schema.ts",
   dialect: "sqlite",
   dbCredentials: {
-    url: "./packages/db/livedot.db",
+    url: "./data/livedot.db",
   },
 });

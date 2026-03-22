@@ -1,0 +1,16 @@
+node_modules
+dist
+*.db
+*.db-shm
+*.db-wal
+.git
+.gitignore
+.claude
+.cursor
+.idea
+.DS_Store
+drizzle
+coverage
+*.log
+*.tgz
+*.md

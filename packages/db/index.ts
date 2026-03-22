@@ -1,14 +1,17 @@
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import * as schema from "./schema";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = resolve(__dirname, "../livedot.db");
+const dbPath = process.env.DATABASE_PATH || resolve(__dirname, "./data/livedot.db");
 
-const sqlite = new Database(dbPath);
+const sqlite = new Database(dbPath, { create: true });
 sqlite.run("PRAGMA journal_mode = WAL;");
 sqlite.run("PRAGMA foreign_keys = ON;");
 
 export const db = drizzle(sqlite, { schema });
+
+migrate(db, { migrationsFolder: resolve(__dirname, "./drizzle") });

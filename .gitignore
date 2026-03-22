@@ -32,12 +32,10 @@ logs
 .DS_Store
 
 # database
-packages/db/*.db
-packages/db/*.db-shm
-packages/db/*.db-wal
+packages/db/data/
 
-# drizzle
-drizzle/
+# turbo
+.turbo/
 
 # claude
 .claude/settings.local.json
