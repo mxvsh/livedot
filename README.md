@@ -11,9 +11,8 @@ Watch your users live across the world — fast, minimal, and real-time.
 </p>
 
 <p align="center">
-  <a href="https://livedot.dev">Website</a> · 
-  <a href="#">Documentation</a> · 
-  <a href="#">Live Demo</a>
+  <a href="https://app.livedot.dev">Try now</a> · 
+  <a href="https://discord.gg/3kUSy2d">Join Discord</a>
 </p>
 
 <br/>
@@ -26,7 +25,14 @@ Watch your users live across the world — fast, minimal, and real-time.
 
 ---
 
-<img width="812" height="530" alt="image" src="https://github.com/user-attachments/assets/0f858d81-637c-46f3-b289-5181aacc2dc6" />
+<img width="100%" alt="image" src="https://github.com/user-attachments/assets/0f858d81-637c-46f3-b289-5181aacc2dc6" />
+
+<br/>
+<br/>
+
+
+> [!WARNING]
+> Under active development — breaking changes may occur.
 
 ## Features
 
