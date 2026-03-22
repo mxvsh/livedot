@@ -11,5 +11,14 @@
   "npm": {
     "publish": false
   },
-  "hooks": {}
+  "hooks": {},
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "infile": "CHANGELOG.md",
+      "ignoreRecommendedBump": true,
+      "gitRawCommitsOpts": {
+        "ignore": ["^Update\\s"]
+      }
+    }
+  }
 }
