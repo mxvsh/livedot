@@ -84,12 +84,15 @@ function WebsiteDashboard() {
         </motion.div>
       </div>
 
-      {/* Website name bottom left */}
-      {websiteName && (
-        <div className="fixed bottom-3 left-3 z-40 md:bottom-4 md:left-4">
-          <span className="text-xs text-muted/60">{websiteName}</span>
-        </div>
-      )}
+      <div className="fixed bottom-3 left-3 z-40 md:bottom-4 md:left-4">
+        <span className="text-xs text-muted/60">Livedot</span>
+      </div>
+      
+      {/* Website name top left */}
+      <div className="fixed top-3 left-3 z-40 md:bottom-4 md:left-4">
+        <p className="text-xs text-muted/60">{websiteName}</p>
+        <p className="text-[10px] text-muted/60">{websiteId}</p>
+      </div>
 
       <Dock websiteName={websiteName} count={count} connected={connected} />
     </div>
