@@ -25,7 +25,7 @@ export function getSessionsForWebsite(websiteId: string): VisitorSession[] {
 }
 
 // Sweep expired sessions every 5 seconds
-const SESSION_TIMEOUT = 30_000;
+const SESSION_TIMEOUT = 10_000;
 
 export function startSweep(getServer: () => Server | null) {
   setInterval(() => {

@@ -20,7 +20,7 @@
   }
 
   send();
-  setInterval(send, 25000);
+  setInterval(send, 5000);
   document.addEventListener("visibilitychange", function () {
     if (document.visibilityState === "visible") send();
   });
