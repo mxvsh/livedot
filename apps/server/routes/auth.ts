@@ -52,6 +52,11 @@ export const authRoutes = new Hono()
         headers: c.req.raw.headers,
       });
 
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        return c.json({ error: (body as any).message ?? "Setup failed" }, 400);
+      }
+
       const setCookie = res.headers.get("set-cookie");
       if (setCookie) c.header("set-cookie", setCookie);
 
@@ -59,7 +64,7 @@ export const authRoutes = new Hono()
       return c.json({ ok: true, user: { id: data.user?.id, username } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Setup failed";
-      return c.json({ error: message }, err?.status ?? 500);
+      return c.json({ error: message }, 400);
     }
   })
 
@@ -73,6 +78,11 @@ export const authRoutes = new Hono()
         headers: c.req.raw.headers,
       });
 
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        return c.json({ error: (body as any).message ?? "Invalid credentials" }, 401);
+      }
+
       const setCookie = res.headers.get("set-cookie");
       if (setCookie) c.header("set-cookie", setCookie);
 
@@ -80,7 +90,7 @@ export const authRoutes = new Hono()
       return c.json({ ok: true, user: { id: data.user?.id, username } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Invalid credentials";
-      return c.json({ error: message }, err?.status ?? 401);
+      return c.json({ error: message }, 401);
     }
   })
 
