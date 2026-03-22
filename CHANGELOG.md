@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-beta.5](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.4...v0.1.0-beta.5) (2026-03-22)
+
+* Fix duplicate "v" ([](https://github.com/mxvsh/livedot/commit/7762f5c136d9773a08f714acb6569067bcfc6b44))
+
 ## [0.1.0-beta.4](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.3...v0.1.0-beta.4) (2026-03-22)
 
 * Fix migration path ([](https://github.com/mxvsh/livedot/commit/5aa2bb0834e263ebd99f603f1955b56049dc3845))
