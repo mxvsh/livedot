@@ -10,12 +10,10 @@
     "dev:web": "bun run --filter web dev",
     "db:generate": "bun run --filter @livedot/db generate",
     "db:push": "bun run --filter @livedot/db push",
-    "changeset": "changeset",
-    "version": "changeset version"
+    "release": "release-it"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.6.0",
-    "@changesets/cli": "^2.30.0",
+    "release-it": "^19.2.4",
     "turbo": "^2.8.20"
   }
 }
