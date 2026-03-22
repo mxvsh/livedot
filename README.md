@@ -11,7 +11,7 @@ Watch your users live across the world — fast, minimal, and real-time.
 </p>
 
 <p align="center">
-  <a href="https://app.livedot.dev">Try now</a> · 
+  <a href="https://cloud.livedot.dev">Try now</a> · 
   <a href="https://discord.gg/3kUSy2d">Join Discord</a>
 </p>
 
