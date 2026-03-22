@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-beta.10](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.9...v0.1.0-beta.10) (2026-03-22)
+
+* Allow existing user to sign in ([](https://github.com/mxvsh/livedot/commit/6a41577747864c13a2be948ffcf0751c73523384))
+
 ## [0.1.0-beta.9](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.8...v0.1.0-beta.9) (2026-03-22)
 
 * Make analytics is fully runtime ([](https://github.com/mxvsh/livedot/commit/7131c6fe2ad5375e2119ecd90c51d4d14166fa2d))
