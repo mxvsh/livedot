@@ -19,7 +19,7 @@ type Step = "login" | "forgot" | "reset";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { setUser, providers, check, checked } = useAuthStore();
+  const { setUser, providers, registrationOpen, check, checked } = useAuthStore();
   const [step, setStep] = useState<Step>("login");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -125,11 +125,17 @@ function LoginPage() {
                       key={provider}
                       variant="outline"
                       className="w-full"
+                      isDisabled={!registrationOpen}
                       onPress={() => handleOAuth(provider)}
                     >
                       Continue with {PROVIDER_LABELS[provider] ?? provider}
                     </Button>
                   ))}
+                  {!registrationOpen && (
+                    <p className="text-muted text-xs text-center mt-1">
+                      Registration is closed. Max user limit reached.
+                    </p>
+                  )}
                 </div>
               ) : (
                 <>

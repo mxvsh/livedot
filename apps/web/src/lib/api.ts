@@ -14,6 +14,7 @@ export interface Website {
 export interface MetaResponse {
   cloud: boolean;
   providers: string[];
+  registrationOpen: boolean;
 }
 
 export interface StatusResponse {

@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
+import { count } from "drizzle-orm";
 import { db } from "@livedot/db";
 import * as schema from "@livedot/db/schema";
 import { env } from "./env";
@@ -33,6 +34,19 @@ export const auth = betterAuth({
   plugins: [username()],
   socialProviders,
   trustedOrigins: ["http://localhost:5173"],
+  databaseHooks: {
+    user: {
+      create: {
+        before: async () => {
+          const result = await db.select({ count: count() }).from(schema.user);
+          const userCount = result[0]?.count ?? 0;
+          if (userCount >= env.DEFAULT_MAX_USER_SIGNUP) {
+            throw new Error("Registration is closed");
+          }
+        },
+      },
+    },
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     cookieCache: {

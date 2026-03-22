@@ -15,13 +15,15 @@ async function getUserCount() {
 }
 
 export const authRoutes = new Hono()
-  .get("/meta", (c) => {
+  .get("/meta", async (c) => {
     const providers: string[] = [];
     if (env.LIVEDOT_CLOUD) {
       if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) providers.push("github");
       if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) providers.push("google");
     }
-    return c.json({ cloud: env.LIVEDOT_CLOUD, providers });
+    const userCount = await getUserCount();
+    const registrationOpen = userCount < env.DEFAULT_MAX_USER_SIGNUP;
+    return c.json({ cloud: env.LIVEDOT_CLOUD, providers, registrationOpen });
   })
 
   .get("/status", async (c) => {

@@ -7,6 +7,7 @@ interface AuthState {
   checked: boolean;
   cloud: boolean;
   providers: string[];
+  registrationOpen: boolean;
   check: () => Promise<void>;
   setUser: (user: User) => void;
   logout: () => Promise<void>;
@@ -18,6 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   checked: false,
   cloud: false,
   providers: [],
+  registrationOpen: true,
 
   check: async () => {
     const [status, meta] = await Promise.all([api.getStatus(), api.getMeta()]);
@@ -27,6 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       checked: true,
       cloud: meta.cloud,
       providers: meta.providers,
+      registrationOpen: meta.registrationOpen,
     });
   },
 
