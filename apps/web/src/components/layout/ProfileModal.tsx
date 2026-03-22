@@ -91,13 +91,13 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
                 <Form className="flex flex-col gap-4" onSubmit={handleChangePassword}>
                   <TextField isRequired name="currentPassword" type="password" variant="secondary">
                     <Label>Current Password</Label>
-                    <Input placeholder="Enter current password" />
+                    <Input placeholder="Enter current password" className="ring-inset" />
                     <FieldError />
                   </TextField>
 
                   <TextField isRequired name="newPassword" type="password" minLength={6} variant="secondary">
                     <Label>New Password</Label>
-                    <Input placeholder="Min 6 characters" />
+                    <Input placeholder="Min 6 characters"  className="ring-inset" />
                     <Description>At least 6 characters</Description>
                     <FieldError />
                   </TextField>
