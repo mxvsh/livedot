@@ -6,8 +6,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { GlobeIcon, BrowserIcon } from "@hugeicons/core-free-icons";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { api } from "@/lib/api";
-import Map from "@/components/Map";
-import Dock from "@/components/Dock";
+import { useAuthStore } from "@/stores/auth";
+import Map from "@/components/dashboard/Map";
+import Dock from "@/components/dashboard/Dock";
 
 export const Route = createFileRoute("/websites/$websiteId")({
   component: WebsiteDashboard,
@@ -19,18 +20,21 @@ function WebsiteDashboard() {
   const [websiteName, setWebsiteName] = useState("");
   const [activeTab, setActiveTab] = useState<"map" | "pages">("map");
 
+  const { user, checked, check } = useAuthStore();
+
   useEffect(() => {
-    api.getStatus().then((status) => {
-      if (!status.authenticated) {
+    (async () => {
+      if (!checked) await check();
+      const state = useAuthStore.getState();
+      if (!state.user) {
         navigate({ to: "/login" });
         return;
       }
-      api.getWebsites().then((websites) => {
-        const w = websites.find((w) => w.id === websiteId);
-        if (w) setWebsiteName(w.name);
-      });
-    });
-  }, [navigate, websiteId]);
+      const websites = await api.getWebsites();
+      const w = websites.find((w) => w.id === websiteId);
+      if (w) setWebsiteName(w.name);
+    })();
+  }, [websiteId]);
 
   const { sessions, connected, count } = useWebSocket(websiteId);
   const sessionArray = Array.from(sessions.values());

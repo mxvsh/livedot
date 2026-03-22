@@ -3,8 +3,8 @@ import { motion } from "motion/react";
 import { Button, Tooltip } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft02Icon, Logout01Icon } from "@hugeicons/core-free-icons";
-import { api } from "@/lib/api";
-import AnimatedNumber from "@/components/AnimatedNumber";
+import { useAuthStore } from "@/stores/auth";
+import AnimatedNumber from "./AnimatedNumber";
 
 interface Props {
   websiteName?: string;
@@ -14,6 +14,7 @@ interface Props {
 
 export default function Dock({ websiteName, count, connected }: Props) {
   const navigate = useNavigate();
+  const logout = useAuthStore((s) => s.logout);
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isWebsite = location.pathname.startsWith("/websites/");
@@ -59,7 +60,7 @@ export default function Dock({ websiteName, count, connected }: Props) {
             <Button
               variant="ghost"
               onPress={async () => {
-                await api.logout();
+                await logout();
                 navigate({ to: "/login" });
               }}
               className="text-sm text-muted"

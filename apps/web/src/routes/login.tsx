@@ -11,6 +11,7 @@ import {
   Surface,
 } from "@heroui/react";
 import { api } from "@/lib/api";
+import { useAuthStore } from "@/stores/auth";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const setUser = useAuthStore((s) => s.setUser);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +31,8 @@ function LoginPage() {
     const username = formData.get("username")?.toString() || "";
     const password = formData.get("password")?.toString() || "";
     try {
-      await api.login(username, password);
+      const { user } = await api.login(username, password);
+      setUser(user);
       navigate({ to: "/" });
     } catch (err: any) {
       setError(err.message);
