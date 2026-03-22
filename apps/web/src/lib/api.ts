@@ -48,6 +48,11 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ name, url }),
     }),
+  updateWebsite: (id: string, name: string, url: string) =>
+    request<Website>(`/api/websites/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ name, url }),
+    }),
   deleteWebsite: (id: string) =>
     request<{ ok: boolean }>(`/api/websites/${id}`, { method: "DELETE" }),
 };

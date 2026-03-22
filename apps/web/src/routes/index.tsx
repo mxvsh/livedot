@@ -16,6 +16,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   PlusSignIcon,
   Delete02Icon,
+  PencilEdit01Icon,
   ArrowRight01Icon,
   Logout01Icon,
   Add01Icon,
@@ -34,6 +35,8 @@ function HomePage() {
   const [creating, setCreating] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Website | null>(null);
+  const [editTarget, setEditTarget] = useState<Website | null>(null);
+  const [editing, setEditing] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -75,6 +78,26 @@ function HomePage() {
       setModalOpen(false);
     } finally {
       setCreating(false);
+    }
+  }
+
+  async function handleEdit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!editTarget) return;
+    setEditing(true);
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name")?.toString().trim();
+    const url = formData.get("url")?.toString().trim() || "";
+    if (!name) {
+      setEditing(false);
+      return;
+    }
+    try {
+      await api.updateWebsite(editTarget.id, name, url);
+      await load();
+      setEditTarget(null);
+    } finally {
+      setEditing(false);
     }
   }
 
@@ -187,6 +210,58 @@ function HomePage() {
             </Modal.Backdrop>
           </Modal>
 
+          {/* Edit website modal */}
+          <Modal isOpen={!!editTarget} onOpenChange={(open) => { if (!open) setEditTarget(null); }}>
+            <Modal.Backdrop>
+              <Modal.Container>
+                <Modal.Dialog className="sm:max-w-[400px]">
+                  <Modal.CloseTrigger />
+                  <Modal.Header>
+                    <Modal.Icon className="bg-default text-foreground">
+                      <HugeiconsIcon icon={PencilEdit01Icon} size={20} />
+                    </Modal.Icon>
+                    <Modal.Heading>Edit Website</Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <Form
+                      id="edit-website-form"
+                      className="flex flex-col gap-4"
+                      onSubmit={handleEdit}
+                    >
+                      <TextField variant="secondary" isRequired name="name" defaultValue={editTarget?.name} className="w-full">
+                        <Label>Website name</Label>
+                        <Input autoFocus className="ring-inset" />
+                        <FieldError />
+                      </TextField>
+                      <TextField variant="secondary" name="url" defaultValue={editTarget?.url} className="w-full">
+                        <Label>URL</Label>
+                        <Input placeholder="https://example.com" className="ring-inset" />
+                        <FieldError />
+                      </TextField>
+                    </Form>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      variant="outline"
+                      onPress={() => setEditTarget(null)}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      form="edit-website-form"
+                      isDisabled={editing}
+                      className="flex-1"
+                    >
+                      {editing ? "Saving..." : "Save"}
+                    </Button>
+                  </Modal.Footer>
+                </Modal.Dialog>
+              </Modal.Container>
+            </Modal.Backdrop>
+          </Modal>
+
           {/* Website list */}
           {websites.length === 0 ? (
             <Surface className="text-center py-16 rounded-3xl">
@@ -227,19 +302,20 @@ function HomePage() {
                       </div>
                       <div className="flex items-center gap-3 ml-3 shrink-0">
                         <WebsiteLiveCount websiteId={website.id} />
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteTarget(website);
-                          }}
+                        <Button
+                          variant="ghost"
+                          className="text-muted hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                          onPress={() => setEditTarget(website)}
                         >
-                          <Button
-                            variant="ghost"
-                            className="text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <HugeiconsIcon icon={Delete02Icon} size={16} />
-                          </Button>
-                        </div>
+                          <HugeiconsIcon icon={PencilEdit01Icon} size={16} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"
+                          onPress={() => setDeleteTarget(website)}
+                        >
+                          <HugeiconsIcon icon={Delete02Icon} size={16} />
+                        </Button>
                         <span className="text-muted transition-transform duration-200 group-hover:translate-x-1">
                           <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
                         </span>

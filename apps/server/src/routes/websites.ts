@@ -34,6 +34,24 @@ export const websiteRoutes = new Hono()
     return c.json(website);
   })
 
+  .patch("/websites/:id", async (c) => {
+    const user = c.get("user");
+    const id = c.req.param("id");
+    const { name, url } = await c.req.json();
+
+    if (!name?.trim()) {
+      return c.json({ error: "Name is required" }, 400);
+    }
+
+    const [updated] = await db
+      .update(websites)
+      .set({ name: name.trim(), url: url?.trim() || "" })
+      .where(eq(websites.id, id))
+      .returning();
+
+    return c.json(updated);
+  })
+
   .delete("/websites/:id", async (c) => {
     const user = c.get("user");
     const id = c.req.param("id");
