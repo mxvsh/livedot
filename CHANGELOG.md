@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.0-beta.4](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.3...v0.1.0-beta.4) (2026-03-22)
+
+* Fix migration path ([](https://github.com/mxvsh/livedot/commit/5aa2bb0834e263ebd99f603f1955b56049dc3845))
+* Optimize docker build ([](https://github.com/mxvsh/livedot/commit/5802f1b4f2b290659d5d567e32b87648d9324e17))
+
 ## [0.1.0-beta.3](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.2...v0.1.0-beta.3) (2026-03-22)
 
 * Reset migrations ([](https://github.com/mxvsh/livedot/commit/b666a255ed7512859d88492ded6f37afc1590d16))
