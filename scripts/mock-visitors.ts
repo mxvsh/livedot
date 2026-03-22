@@ -54,7 +54,7 @@ const CITIES = [
 const args = process.argv.slice(2);
 let websiteId = "";
 let count = 20;
-let endpoint = "http://localhost:3000";
+let endpoint = "http://localhost:5550";
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--website" || args[i] === "-w") websiteId = args[++i] || "";
@@ -161,4 +161,4 @@ setInterval(() => {
     sendBeacon(visitor);
   }
   console.log(`\n↻ Sent ${visitors.length} beacons`);
-}, 25_000);
+}, 5_000);
