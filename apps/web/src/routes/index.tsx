@@ -20,6 +20,8 @@ import {
   ArrowRight01Icon,
   Logout01Icon,
   Add01Icon,
+  CodeIcon,
+  CodeSquareIcon
 } from "@hugeicons/core-free-icons";
 import { api, type Website } from "@/lib/api";
 import WebsiteLiveCount from "@/components/WebsiteLiveCount";
@@ -37,6 +39,8 @@ function HomePage() {
   const [deleteTarget, setDeleteTarget] = useState<Website | null>(null);
   const [editTarget, setEditTarget] = useState<Website | null>(null);
   const [editing, setEditing] = useState(false);
+  const [snippetTarget, setSnippetTarget] = useState<Website | null>(null);
+  const [copied, setCopied] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -291,12 +295,8 @@ function HomePage() {
                       <div className="flex-1 min-w-0">
                         <Card.Title>{website.name}</Card.Title>
                         <Card.Description className="text-xs mt-1 flex items-center gap-2">
-                          <span className="font-mono text-muted/60">{website.id.slice(0, 8)}</span>
                           {website.url && (
-                            <>
-                              <span className="text-muted/30">·</span>
-                              <span>{website.url}</span>
-                            </>
+                            <span>{website.url}</span>
                           )}
                         </Card.Description>
                       </div>
@@ -304,14 +304,21 @@ function HomePage() {
                         <WebsiteLiveCount websiteId={website.id} />
                         <Button
                           variant="ghost"
-                          className="text-muted hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="text-muted hover:text-foreground"
+                          onPress={() => { setCopied(false); setSnippetTarget(website); }}
+                        >
+                          <HugeiconsIcon icon={CodeSquareIcon} size={16} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="text-muted hover:text-foreground"
                           onPress={() => setEditTarget(website)}
                         >
                           <HugeiconsIcon icon={PencilEdit01Icon} size={16} />
                         </Button>
                         <Button
                           variant="ghost"
-                          className="text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="text-muted hover:text-danger"
                           onPress={() => setDeleteTarget(website)}
                         >
                           <HugeiconsIcon icon={Delete02Icon} size={16} />
@@ -326,6 +333,52 @@ function HomePage() {
               ))}
             </div>
           )}
+
+          {/* Snippet modal */}
+          <Modal isOpen={!!snippetTarget} onOpenChange={(open) => { if (!open) setSnippetTarget(null); }}>
+            <Modal.Backdrop>
+              <Modal.Container>
+                <Modal.Dialog className="sm:max-w-[500px]">
+                  <Modal.CloseTrigger />
+                  <Modal.Header>
+                    <Modal.Icon className="bg-default text-foreground">
+                      <HugeiconsIcon icon={CodeIcon} size={20} />
+                    </Modal.Icon>
+                    <Modal.Heading>Tracking Script</Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p className="text-sm text-muted mb-3">
+                      Add this snippet to your website's HTML:
+                    </p>
+                    <pre className="bg-default rounded-xl p-4 text-xs font-mono text-foreground overflow-x-auto select-all">
+{`<script defer src="${window.location.origin}/t.js" data-website="${snippetTarget?.id}"></script>`}
+                    </pre>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      variant="outline"
+                      onPress={() => setSnippetTarget(null)}
+                      className="flex-1"
+                    >
+                      Close
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onPress={() => {
+                        navigator.clipboard.writeText(
+                          `<script defer src="${window.location.origin}/t.js" data-website="${snippetTarget?.id}"></script>`
+                        );
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                    >
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                  </Modal.Footer>
+                </Modal.Dialog>
+              </Modal.Container>
+            </Modal.Backdrop>
+          </Modal>
 
           {/* Delete confirmation */}
           <AlertDialog isOpen={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
