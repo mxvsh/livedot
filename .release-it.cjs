@@ -15,6 +15,7 @@ module.exports = {
   plugins: {
     "@release-it/conventional-changelog": {
       infile: "CHANGELOG.md",
+      preset: "conventionalcommits",
       writerOpts: {
         transform: (commit) => {
           const msg = commit.header || "";
