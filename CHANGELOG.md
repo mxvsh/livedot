@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.0-beta.3](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.2...v0.1.0-beta.3) (2026-03-22)
+
+* Reset migrations ([](https://github.com/mxvsh/livedot/commit/b666a255ed7512859d88492ded6f37afc1590d16))
+* Setup limits and configurations ([](https://github.com/mxvsh/livedot/commit/2d69254f3d3d52f8afe4a0928b4ebc5266dff2aa))
+
 ## [0.1.0-beta.2](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.1...v0.1.0-beta.2) (2026-03-22)
 
 * Add conventional-changelog-conventionalcommits ([](https://github.com/mxvsh/livedot/commit/f4f33b9c4e767cf7737d2f36e09cc158e27cb461))
