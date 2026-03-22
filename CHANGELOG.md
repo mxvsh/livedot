@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.0-beta.8](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.7...v0.1.0-beta.8) (2026-03-22)
+
+* Add Livedot tracking support ([](https://github.com/mxvsh/livedot/commit/e02f5ddecf56bcf433d188de8f279b7d78ef4560))
+* Create LICENSE ([](https://github.com/mxvsh/livedot/commit/04e9d1f647c7531bb893773a997a8feb69f8ab44))
+
 ## [0.1.0-beta.7](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.6...v0.1.0-beta.7) (2026-03-22)
 
 * Setup analytics ([](https://github.com/mxvsh/livedot/commit/d4cae5bcf9732bbc314c2172f1aa3f6d65c10adc))
