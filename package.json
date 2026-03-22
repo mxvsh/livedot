@@ -1,29 +1,17 @@
 {
-  "name": "bun-react-template",
+  "name": "latty",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "bun --hot src/index.ts",
-    "start": "NODE_ENV=production bun src/index.ts",
-    "build": "bun run build.ts"
-  },
-  "dependencies": {
-    "@heroui/react": "^3.0.1",
-    "@heroui/styles": "^3.0.1",
-    "bun-plugin-tailwind": "^0.1.2",
-    "dotenv": "^17.3.1",
-    "drizzle-orm": "^0.45.1",
-    "react": "^19",
-    "react-dom": "^19",
-    "tailwindcss": "^4.1.11",
-    "wrangler": "^4.76.0"
+    "dev": "bun run --filter '*' dev",
+    "dev:server": "bun run --filter server dev",
+    "dev:web": "bun run --filter web dev",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:push": "bunx drizzle-kit push"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.10",
-    "tsx": "^4.21.0"
+    "better-sqlite3": "^12.8.0"
   }
 }

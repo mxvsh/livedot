@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts"
+  },
+  "dependencies": {
+    "hono": "^4",
+    "fast-geoip": "^1.1.88",
+    "drizzle-orm": "^0.45.1",
+    "@latty/db": "workspace:*",
+    "@latty/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
