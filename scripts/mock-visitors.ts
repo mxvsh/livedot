@@ -147,18 +147,38 @@ async function sendBeacon(visitor: MockVisitor) {
   }
 }
 
-// Initial burst — stagger over 3 seconds
-for (let i = 0; i < visitors.length; i++) {
-  setTimeout(() => {
-    sendBeacon(visitors[i]!);
-    console.log(`  → ${visitors[i]!.city.name} (${visitors[i]!.sessionId})`);
-  }, (i / visitors.length) * 3000);
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function randBetween(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Keep alive — send beacons every 25 seconds
-setInterval(() => {
-  for (const visitor of visitors) {
-    sendBeacon(visitor);
+// Send visitors in waves — batches of 8-12, with 200-600ms between batches
+async function sendWave(list: MockVisitor[], label: string) {
+  const shuffled = [...list].sort(() => Math.random() - 0.5);
+
+  for (let i = 0; i < shuffled.length; ) {
+    const batchSize = Math.min(randBetween(8, 12), shuffled.length - i);
+    const batch = shuffled.slice(i, i + batchSize);
+
+    await Promise.all(batch.map((v) => sendBeacon(v)));
+    console.log(`  ${label} batch ${Math.floor(i / 10) + 1}: ${batch.map((v) => v.city.name).join(", ")}`);
+
+    i += batchSize;
+
+    if (i < shuffled.length) {
+      await sleep(randBetween(200, 600));
+    }
   }
-  console.log(`\n↻ Sent ${visitors.length} beacons`);
+}
+
+// Initial burst
+console.log("\n⚡ Sending initial visitors...\n");
+await sendWave(visitors, "→");
+console.log(`\n✓ All ${visitors.length} visitors online\n`);
+
+// Keep alive — send all at once every 5s (no delays needed for keepalive)
+setInterval(() => {
+  Promise.all(visitors.map((v) => sendBeacon(v)));
+  console.log(`↻ ${visitors.length} keepalive beacons`);
 }, 5_000);
