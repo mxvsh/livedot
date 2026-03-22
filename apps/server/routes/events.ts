@@ -78,7 +78,12 @@ export const eventRoutes = new Hono()
       }
 
       // Rate limit
-      const ip = server?.requestIP(c.req.raw)?.address ?? "127.0.0.1";
+      const ip =
+        c.req.header("cf-connecting-ip") ||
+        c.req.header("x-forwarded-for")?.split(",")[0].trim() ||
+        server?.requestIP(c.req.raw)?.address ||
+        "127.0.0.1";
+
       if (!isDev && isRateLimited(ip, websiteId)) {
         return c.body(null, 429);
       }
