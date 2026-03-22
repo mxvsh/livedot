@@ -21,8 +21,8 @@ export default function Navbar() {
     <nav className="border-b border-border bg-surface/80 backdrop-blur-xl">
       <div className="max-w-2xl mx-auto px-4 flex items-center justify-between h-14">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="h-5 rounded-md" />
-          <span className="text-sm font-semibold text-foreground font-chillax">Livedot</span>
+          <img src="/logo.png" alt="Logo" className="h-6 rounded-md" />
+          <span className="text-lg font-semibold text-foreground font-chillax">livedot</span>
         </div>
 
         <Dropdown>

@@ -1,5 +1,16 @@
 @import "tailwindcss";
-@import "@heroui/styles"; 
+@import "@heroui/styles";
+
+@font-face {
+  font-family: "Chillax";
+  src: url("/fonts/Chillax-Variable.ttf") format("truetype");
+  font-weight: 200 700;
+  font-display: swap;
+}
+
+@utility font-chillax {
+  font-family: "Chillax", sans-serif;
+} 
 
 :root,
 .light,
