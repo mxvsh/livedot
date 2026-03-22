@@ -37,7 +37,8 @@ CREATE TABLE `user` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`username` text,
-	`display_username` text
+	`display_username` text,
+	`metadata` text
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);--> statement-breakpoint
@@ -56,6 +57,7 @@ CREATE TABLE `websites` (
 	`user_id` text NOT NULL,
 	`name` text NOT NULL,
 	`url` text DEFAULT '' NOT NULL,
+	`metadata` text,
 	`created_at` integer,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
