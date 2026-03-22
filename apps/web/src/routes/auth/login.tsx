@@ -120,12 +120,16 @@ function LoginPage() {
 
               {providers.length > 0 ? (
                 <div className="flex flex-col gap-2">
+                  {!registrationOpen && (
+                    <p className="text-muted text-xs text-center mb-1">
+                      Registration is closed. Existing accounts only.
+                    </p>
+                  )}
                   {providers.map((provider) => (
                     <Button
                       key={provider}
                       variant="outline"
                       className="w-full"
-                      isDisabled={!registrationOpen}
                       onPress={() => handleOAuth(provider)}
                       data-umami-event="sign-in-oauth"
                       data-umami-event-provider={provider}
@@ -133,11 +137,6 @@ function LoginPage() {
                       Continue with {PROVIDER_LABELS[provider] ?? provider}
                     </Button>
                   ))}
-                  {!registrationOpen && (
-                    <p className="text-muted text-xs text-center mt-1">
-                      Registration is closed. Max user limit reached.
-                    </p>
-                  )}
                 </div>
               ) : (
                 <>
