@@ -45,10 +45,6 @@ jobs:
       - name: Build frontend
         env:
           VITE_VERSION: ${{ steps.version.outputs.VERSION }}
-          VITE_UMAMI_URL: ${{ vars.VITE_UMAMI_URL }}
-          VITE_UMAMI_WEBSITE_ID: ${{ vars.VITE_UMAMI_WEBSITE_ID }}
-          VITE_LIVEDOT_URL: ${{ vars.VITE_LIVEDOT_URL }}
-          VITE_LIVEDOT_WEBSITE_ID: ${{ vars.VITE_LIVEDOT_WEBSITE_ID }}
         run: bun run --cwd apps/web build
 
       - name: Upload frontend dist

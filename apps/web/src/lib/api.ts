@@ -15,6 +15,10 @@ export interface MetaResponse {
   cloud: boolean;
   providers: string[];
   registrationOpen: boolean;
+  analytics: {
+    umami: { url: string; websiteId: string } | null;
+    livedot: { url: string; websiteId: string } | null;
+  };
 }
 
 export interface StatusResponse {

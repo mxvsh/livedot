@@ -23,7 +23,15 @@ export const authRoutes = new Hono()
     }
     const userCount = await getUserCount();
     const registrationOpen = userCount < env.DEFAULT_MAX_USER_SIGNUP;
-    return c.json({ cloud: env.LIVEDOT_CLOUD, providers, registrationOpen });
+    return c.json({
+      cloud: env.LIVEDOT_CLOUD,
+      providers,
+      registrationOpen,
+      analytics: {
+        umami: env.UMAMI_URL && env.UMAMI_WEBSITE_ID ? { url: env.UMAMI_URL, websiteId: env.UMAMI_WEBSITE_ID } : null,
+        livedot: env.LIVEDOT_URL && env.LIVEDOT_WEBSITE_ID ? { url: env.LIVEDOT_URL, websiteId: env.LIVEDOT_WEBSITE_ID } : null,
+      },
+    });
   })
 
   .get("/status", async (c) => {

@@ -14,6 +14,12 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 
+  // Analytics (optional)
+  UMAMI_URL: z.string().optional(),
+  UMAMI_WEBSITE_ID: z.string().optional(),
+  LIVEDOT_URL: z.string().optional(),
+  LIVEDOT_WEBSITE_ID: z.string().optional(),
+
   // Defaults for new users/websites
   DEFAULT_MAX_USER_SIGNUP: z.coerce.number().int().positive().default(1),
   DEFAULT_MAX_CONNECTIONS: z.coerce.number().int().positive().default(1000),
