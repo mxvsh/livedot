@@ -7,13 +7,9 @@
  *   MAXMIND_LICENSE_KEY=your_key bun scripts/download-geodb.ts
  *   bun scripts/download-geodb.ts --key your_key
  */
-import { createWriteStream } from "fs";
 import { mkdir } from "fs/promises";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { pipeline } from "stream/promises";
-import { createGunzip } from "zlib";
-import { extract } from "tar";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -23,11 +19,11 @@ const key =
 
 if (!key) {
   console.error("Error: MAXMIND_LICENSE_KEY env var or --key <key> required");
-  console.error("Get a free key at: https://www.maxmind.com/en/geolite2/signup");
   process.exit(1);
 }
 
 const outDir = resolve(__dirname, "../apps/server/geo");
+const tarPath = resolve(outDir, "geo.tar.gz");
 const outFile = resolve(outDir, "GeoLite2-City.mmdb");
 
 await mkdir(outDir, { recursive: true });
@@ -41,20 +37,22 @@ if (!res.ok) {
   process.exit(1);
 }
 
-// Stream tar.gz → extract the .mmdb file
-const tmpTar = resolve(outDir, "geo.tar.gz");
-const file = createWriteStream(tmpTar);
-await pipeline(res.body as any, file);
-
+await Bun.write(tarPath, res);
 console.log("Extracting...");
-await extract({
-  file: tmpTar,
-  cwd: outDir,
-  filter: (path) => path.endsWith(".mmdb"),
-  strip: 1,
-});
 
-// Cleanup tar
-await Bun.file(tmpTar).exists() && Bun.spawn(["rm", tmpTar]);
+// Extract to temp dir then find the .mmdb (avoids --wildcards which isn't supported on macOS)
+const tmpDir = resolve(outDir, "_tmp");
+await mkdir(tmpDir, { recursive: true });
+const proc = Bun.spawn(["tar", "-xzf", tarPath, "-C", tmpDir], { stdout: "inherit", stderr: "inherit" });
+await proc.exited;
+
+const glob = new Bun.Glob("**/*.mmdb");
+for await (const file of glob.scan(tmpDir)) {
+  await Bun.write(outFile, Bun.file(resolve(tmpDir, file)));
+  break;
+}
+Bun.spawn(["rm", "-rf", tmpDir]);
+
+await Bun.file(tarPath).exists() && Bun.spawn(["rm", "-f", tarPath]);
 
 console.log(`Done → ${outFile}`);
