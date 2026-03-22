@@ -1,6 +1,6 @@
 {
   "name": "livedot",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.1",
   "private": true,
   "packageManager": "bun@1.3.5",
   "workspaces": ["apps/*", "packages/*"],
@@ -9,9 +9,13 @@
     "dev:server": "bun run --filter server dev",
     "dev:web": "bun run --filter web dev",
     "db:generate": "bun run --filter @livedot/db generate",
-    "db:push": "bun run --filter @livedot/db push"
+    "db:push": "bun run --filter @livedot/db push",
+    "changeset": "changeset",
+    "version": "changeset version"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0",
     "turbo": "^2.8.20"
   }
 }
