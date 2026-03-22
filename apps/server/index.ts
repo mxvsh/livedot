@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { serveStatic } from "hono/bun";
 import type { Server } from "bun";
 import { db } from "@livedot/db";
 import { websites } from "@livedot/db/schema";
@@ -38,12 +37,6 @@ app.get("/t.js", async (c) => {
     "Access-Control-Allow-Origin": "*",
   });
 });
-
-// Prod: serve Vite build
-if (process.env.NODE_ENV === "production") {
-  app.use("/*", serveStatic({ root: "./apps/server/static" }));
-  app.get("/*", serveStatic({ path: "./apps/server/static/index.html" }));
-}
 
 // Server reference for WebSocket publishing
 let _server: Server | null = null;

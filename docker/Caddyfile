@@ -1,0 +1,19 @@
+:80 {
+	# api + websocket → bun
+	handle /api/* {
+		reverse_proxy localhost:5550
+	}
+	handle /ws {
+		reverse_proxy localhost:5550
+	}
+	handle /t.js {
+		reverse_proxy localhost:5550
+	}
+
+	# static frontend (SPA fallback)
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

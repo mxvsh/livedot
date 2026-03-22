@@ -32,6 +32,7 @@ logs
 .DS_Store
 
 # database
+/data
 packages/db/data/
 
 # turbo

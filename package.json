@@ -8,8 +8,8 @@
     "dev": "bun run --filter '*' dev",
     "dev:server": "bun run --filter server dev",
     "dev:web": "bun run --filter web dev",
-    "db:generate": "bunx drizzle-kit@latest generate",
-    "db:push": "bunx drizzle-kit@latest push"
+    "db:generate": "bunx --cwd packages/db drizzle-kit@latest generate",
+    "db:push": "bunx --cwd packages/db drizzle-kit@latest push"
   },
   "devDependencies": {
     "turbo": "^2.8.20"

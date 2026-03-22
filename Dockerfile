@@ -22,18 +22,21 @@ COPY --from=prune /app/out/json/ /temp/
 RUN cd /temp && bun install --frozen-lockfile --production
 
 # production
-FROM base AS release
+FROM caddy:2-alpine AS release
+RUN apk add --no-cache libstdc++ libgcc
+COPY --from=oven/bun:1-alpine /usr/local/bin/bun /usr/local/bin/bun
+WORKDIR /app
 COPY --from=prod-deps /temp/node_modules/ node_modules/
 COPY --from=build /app/apps/server/ apps/server/
 COPY --from=build /app/packages/db/ packages/db/
 COPY --from=build /app/packages/shared/ packages/shared/
 COPY --from=build /app/package.json .
-COPY --from=build /app/apps/web/dist/ apps/server/static/
+COPY --from=build /app/apps/web/dist/ /srv/
+COPY docker/Caddyfile /etc/caddy/Caddyfile
 COPY docker/entrypoint.sh .
 
-USER bun
 ENV NODE_ENV=production
 ENV DATABASE_PATH=/data/livedot.db
 ENV PORT=5550
-EXPOSE 5550/tcp
+EXPOSE 80
 ENTRYPOINT ["./entrypoint.sh"]
