@@ -41,6 +41,7 @@ ARG VERSION=dev
 ENV NODE_ENV=production
 ENV VERSION=$VERSION
 ENV DATABASE_PATH=/data/livedot.db
+ENV GEOIP_DB_PATH=/geo/GeoLite2-City.mmdb
 ENV PORT=5550
 EXPOSE 80
 ENTRYPOINT ["./entrypoint.sh"]
