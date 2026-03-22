@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import {
   Button,
@@ -33,12 +33,23 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const knownIds = useRef<Set<string> | null>(null);
 
-  async function load() {
+  async function load(isInitial = false) {
     setLoading(true);
     try {
       const data = await api.getWebsites();
+      if (isInitial) {
+        // On first load, mark all as known so they all animate
+        knownIds.current = null;
+      }
       setWebsites(data);
+      // After setting, store current IDs as known
+      // On initial load knownIds is null — set it so all animate
+      // On subsequent loads, don't reset — new IDs will be missing and animate
+      if (knownIds.current === null) {
+        knownIds.current = new Set();
+      }
     } finally {
       setLoading(false);
     }
@@ -54,7 +65,7 @@ function HomePage() {
         navigate({ to: "/login" });
         return;
       }
-      load();
+      load(true);
     });
   }, [navigate]);
 
@@ -69,7 +80,8 @@ function HomePage() {
     }
     try {
       await api.createWebsite(name);
-      await load();
+      // Don't reset knownIds so only the new one animates
+      await load(false);
       setModalOpen(false);
     } finally {
       setCreating(false);
@@ -115,11 +127,6 @@ function HomePage() {
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 pt-10 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        >
           {/* Header */}
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -197,14 +204,17 @@ function HomePage() {
             </Surface>
           ) : (
             <div className="space-y-4">
-              {websites.map((website, i) => (
+              {websites.map((website, i) => {
+                const isNew = !knownIds.current?.has(website.id);
+                if (isNew) knownIds.current?.add(website.id);
+                return (
                 <motion.div
                   key={website.id}
-                  initial={{ opacity: 0, y: 12 }}
+                  initial={isNew ? { opacity: 0, y: 12 } : false}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
                     duration: 0.3,
-                    delay: i * 0.06,
+                    delay: isNew ? i * 0.06 : 0,
                     ease: [0.22, 1, 0.36, 1],
                   }}
                 >
@@ -253,10 +263,10 @@ function HomePage() {
                     </Card.Header>
                   </Card>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           )}
-        </motion.div>
       </div>
     </div>
   );
