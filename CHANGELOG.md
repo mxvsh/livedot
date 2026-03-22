@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-beta.9](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.8...v0.1.0-beta.9) (2026-03-22)
+
+* Make analytics is fully runtime ([](https://github.com/mxvsh/livedot/commit/7131c6fe2ad5375e2119ecd90c51d4d14166fa2d))
+
 ## [0.1.0-beta.8](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.7...v0.1.0-beta.8) (2026-03-22)
 
 * Add Livedot tracking support ([](https://github.com/mxvsh/livedot/commit/e02f5ddecf56bcf433d188de8f279b7d78ef4560))
