@@ -7,8 +7,15 @@ RUN bun add -g turbo@^2
 COPY . .
 RUN turbo prune server web --docker
 
-# install all deps + build frontend (local/dev builds)
-FROM base AS build
+# install deps + build server only (no web build)
+FROM base AS build-server
+COPY --from=prune /app/out/json/ .
+RUN bun install --frozen-lockfile
+COPY --from=prune /app/out/full/ .
+COPY tsconfig.json .
+
+# build web frontend (only used in local Docker builds)
+FROM base AS build-web
 ARG APP_VERSION=dev
 ENV VITE_VERSION=$APP_VERSION
 COPY --from=prune /app/out/json/ .
@@ -23,16 +30,16 @@ RUN mkdir -p /temp
 COPY --from=prune /app/out/json/ /temp/
 RUN cd /temp && bun install --frozen-lockfile --production
 
-# runtime base — shared between local and CI targets
+# runtime base — server + prod deps, no web dist
 FROM caddy:2-alpine AS runtime-base
 RUN apk add --no-cache libstdc++ libgcc
 COPY --from=oven/bun:1-alpine /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /app
 COPY --from=prod-deps /temp/node_modules/ node_modules/
-COPY --from=build /app/apps/server/ apps/server/
-COPY --from=build /app/packages/db/ packages/db/
-COPY --from=build /app/packages/shared/ packages/shared/
-COPY --from=build /app/package.json .
+COPY --from=build-server /app/apps/server/ apps/server/
+COPY --from=build-server /app/packages/db/ packages/db/
+COPY --from=build-server /app/packages/shared/ packages/shared/
+COPY --from=build-server /app/package.json .
 COPY docker/Caddyfile /etc/caddy/Caddyfile
 COPY docker/entrypoint.sh .
 ARG APP_VERSION=dev
@@ -44,7 +51,7 @@ EXPOSE 80
 
 # local build — web built inside Docker
 FROM runtime-base AS runtime
-COPY --from=build /app/apps/web/dist/ /srv/
+COPY --from=build-web /app/apps/web/dist/ /srv/
 ENTRYPOINT ["./entrypoint.sh"]
 
 # CI build — web dist pre-built and passed in via build context
