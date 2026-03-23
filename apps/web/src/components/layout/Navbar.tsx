@@ -10,6 +10,7 @@ import {
   Github,
 } from "@hugeicons/core-free-icons";
 import { useAuthStore } from "@/stores/auth";
+import { planLabel } from "@livedot/shared/plans";
 import ProfileModal from "./ProfileModal";
 
 function getInitials(username: string) {
@@ -30,7 +31,7 @@ export default function Navbar() {
           <span className="text-lg font-semibold text-foreground font-chillax">livedot</span>
           {user?.plan && (
             <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.08] text-muted">
-              {user.plan === "ce" ? "community" : user.plan}
+              {planLabel(user.plan)}
             </span>
           )}
         </div>

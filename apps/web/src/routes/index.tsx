@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { api, type Website } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
+import { getPlan } from "@livedot/shared/plans";
 import Navbar from "@/components/layout/Navbar";
 import WebsiteCard from "@/components/websites/WebsiteCard";
 import CreateWebsiteModal from "@/components/websites/CreateWebsiteModal";
@@ -65,7 +66,17 @@ function HomePage() {
       <div className="max-w-2xl mx-auto px-4 pt-10 pb-12">
         <div className="flex items-end justify-between mb-10">
           <div>
-            <h1 className="text-xl font-bold text-foreground mb-1">Websites</h1>
+            <h1 className="text-xl font-bold text-foreground mb-1">
+              Websites
+              {user?.plan && user.plan !== "ce" && (() => {
+                const { maxWebsites } = getPlan(user.plan);
+                return maxWebsites > 0 ? (
+                  <span className="text-sm font-normal text-muted ml-2">
+                    {websites.length}/{maxWebsites}
+                  </span>
+                ) : null;
+              })()}
+            </h1>
             <p className="text-muted text-sm">
               Add a website and start tracking live visitors.
             </p>

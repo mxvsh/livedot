@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@livedot/db";
 import { user } from "@livedot/db/schema";
 import { env } from "./env";
-import { getPlan, resolveUserLimits, type PlanConfig, type PlanId } from "./plans";
+import { getPlan, resolveUserLimits, type PlanConfig, type PlanId } from "@livedot/shared/plans";
 
 export function defaultPlan(): PlanId {
   return env.LIVEDOT_CLOUD ? "free" : "ce";

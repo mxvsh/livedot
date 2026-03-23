@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./index.ts",
-    "./types": "./types.ts"
+    "./types": "./types.ts",
+    "./plans": "./plans.ts"
   }
 }

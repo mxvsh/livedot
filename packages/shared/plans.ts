@@ -27,3 +27,14 @@ export function resolveUserLimits(plan: PlanConfig, overrides?: Partial<PlanConf
     historyMax: overrides.historyMax ?? plan.historyMax,
   };
 }
+
+/** Display-friendly plan name */
+export function planLabel(planId: string): string {
+  switch (planId) {
+    case "ce": return "Community";
+    case "free": return "Free";
+    case "pro": return "Pro";
+    case "max": return "Max";
+    default: return planId;
+  }
+}
