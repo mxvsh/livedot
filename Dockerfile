@@ -39,6 +39,7 @@ COPY --from=prod-deps /temp/node_modules/ node_modules/
 COPY --from=build-server /app/apps/server/ apps/server/
 COPY --from=build-server /app/packages/ packages/
 COPY --from=build-server /app/package.json .
+RUN bun install --production
 COPY docker/Caddyfile /etc/caddy/Caddyfile
 COPY docker/entrypoint.sh .
 ARG APP_VERSION=dev
