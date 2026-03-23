@@ -6,15 +6,15 @@ export { type VisitorSession, type WSMessage, type HistoryPoint, type ActivityEv
 // Key: `${websiteId}:${sessionId}`
 const activeSessions = new Map<string, VisitorSession>();
 
-// Key: websiteId → last 360 samples (5s intervals × 360 = 30 minutes)
+// Key: websiteId → last 120 samples (5s intervals × 120 = 10 minutes)
 const historyStore = new Map<string, HistoryPoint[]>();
-const HISTORY_MAX = 360;
+const HISTORY_MAX = 120;
 const SESSION_TIMEOUT = 10_000;
 
 // Key: websiteId → Map<sessionId, ActivityEvent[]>
 const eventStore = new Map<string, Map<string, ActivityEvent[]>>();
 const MAX_EVENTS_PER_SESSION = 50;
-const EVENT_RETENTION = 30 * 60_000; // 30 minutes
+const EVENT_RETENTION = 10 * 60_000; // 10 minutes
 
 function addEvent(websiteId: string, event: ActivityEvent) {
   let websiteEvents = eventStore.get(websiteId);

@@ -182,4 +182,4 @@ Custom events are not rate limited.
 - IP addresses are used only for geolocation lookup, then discarded
 - All session data is held in memory and never persisted to disk
 - Sessions are automatically removed after 10 seconds of inactivity
-- Activity events are cleaned up after 30 minutes
+- Activity events are cleaned up after 10 minutes

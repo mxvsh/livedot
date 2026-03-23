@@ -65,7 +65,7 @@ export default function VisitorChart({ websiteName, count, connected, history }:
                 connected ? "bg-[#96E421] animate-pulse" : "bg-zinc-500"
               }`}
             />
-            <span className="text-xs text-muted/50">30m</span>
+            <span className="text-xs text-muted/50">10m</span>
           </div>
         </div>
 
