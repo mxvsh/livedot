@@ -5,6 +5,7 @@ import { user, websites } from "@livedot/db/schema";
 import { requireAuth } from "../middleware/auth";
 import { websiteCache } from "../website-cache";
 import { getUserLimits } from "../limits";
+import { trackEvent } from "../tracking";
 
 function cacheEntryFromLimits(url: string, limits: { maxConnectionsPerSite: number; eventRetentionMs: number; historyMax: number }, shareToken: string | null = null) {
   try {
@@ -74,6 +75,7 @@ export const websiteRoutes = new Hono()
       .returning();
 
     websiteCache.set(website.id, cacheEntryFromLimits(website.url, limits, website.shareToken));
+    trackEvent("website_create");
     return c.json(website);
   })
 

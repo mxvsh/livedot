@@ -26,6 +26,10 @@ const envSchema = z.object({
   // Store adapter — if set, uses Redis instead of in-memory
   REDIS_URL: z.string().optional(),
 
+  // Better Auth
+  BETTER_AUTH_SECRET: z.string().optional(),
+  BETTER_AUTH_URL: z.string().optional(),
+
   // Email — SMTP (for cloud email verification)
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional().default(587),
