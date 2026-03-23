@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+html.embed,
+html.embed body {
+  background: transparent !important;
+  background-color: transparent !important;
+  color-scheme: light dark;
+}
+
 @font-face {
   font-family: "Chillax";
   src: url("/fonts/Chillax-Variable.ttf") format("truetype");

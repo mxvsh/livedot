@@ -1,4 +1,12 @@
 import "./index.css";
+
+if (window.location.pathname.startsWith("/embed")) {
+  document.documentElement.classList.add("embed");
+} else {
+  document.documentElement.classList.add("dark");
+  document.documentElement.setAttribute("data-theme", "dark");
+}
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
