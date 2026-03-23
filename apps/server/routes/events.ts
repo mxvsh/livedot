@@ -97,8 +97,12 @@ export const eventRoutes = new Hono()
         return c.body(null, 403);
       }
 
-      // Named events (data-umami-event clicks): store + publish, no rate limit, no geo
+      // Named events (data-livedot-event clicks): store + publish, no rate limit, no geo
       if (typeof eventName === "string" && eventName) {
+        if (cached.eventsPerMonth > 0 && getEventCount(websiteId) >= cached.eventsPerMonth) {
+          return c.body(null, 204);
+        }
+        incrementEventCount(websiteId);
         const timestamp = Date.now();
         recordCustomEvent(websiteId, { type: "event", sessionId, eventName, pageUrl: url || "", timestamp });
         const msg: import("@livedot/shared").WSMessage = {
