@@ -13,6 +13,7 @@
     "push:turso": "bunx drizzle-kit push --config drizzle.config.turso.ts"
   },
   "dependencies": {
+    "@livedot/logger": "workspace:*",
     "drizzle-orm": "^0.45.1"
   },
   "optionalDependencies": {

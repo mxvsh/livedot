@@ -2,8 +2,11 @@ import type { Server } from "bun";
 import type { VisitorSession, WSMessage, HistoryPoint, ActivityEvent } from "@livedot/shared";
 import type { StoreAdapter } from "@livedot/store";
 import { MemoryStore } from "@livedot/store";
+import { createLogger } from "@livedot/logger";
 import { websiteCache } from "./website-cache";
 import { env } from "./env";
+
+const log = createLogger("store");
 
 export { type VisitorSession, type WSMessage, type HistoryPoint, type ActivityEvent };
 
@@ -17,10 +20,10 @@ let store: StoreAdapter;
 if (env.REDIS_URL) {
   const { RedisStore } = await import("@livedot/store/redis");
   store = new RedisStore(env.REDIS_URL);
-  console.log("[store] Using Redis");
+  log.info("Using Redis");
 } else {
   store = new MemoryStore();
-  console.log("[store] Using in-memory");
+  log.info("Using in-memory");
 }
 
 export { store };

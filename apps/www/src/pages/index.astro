@@ -9,7 +9,7 @@ import MainLayout from "../layouts/MainLayout.astro";
 ---
 
 <MainLayout title="Livedot - Real-time User Visualization" pathname={Astro.url.pathname}>
-  <Header />
+  <Header pathname={Astro.url.pathname} />
   <main>
     <HeroSection />
     <FeaturesSection />

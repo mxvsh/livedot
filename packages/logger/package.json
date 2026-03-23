@@ -1,0 +1,13 @@
+{
+  "name": "@livedot/logger",
+  "version": "0.1.0-beta.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "dependencies": {
+    "pino": "^9",
+    "pino-pretty": "^13"
+  }
+}

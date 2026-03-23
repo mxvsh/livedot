@@ -1,6 +1,9 @@
 import { Hono } from "hono";
 import type { Server } from "bun";
+import { createLogger } from "@livedot/logger";
 import { env } from "./env";
+
+const log = createLogger("server");
 import { db } from "@livedot/db";
 import { websites } from "@livedot/db/schema";
 import { auth } from "./auth";
@@ -50,7 +53,7 @@ export async function reloadWebsiteCache() {
   await loadWebsiteCache();
 }
 
-loadWebsiteCache().catch(console.error);
+loadWebsiteCache().catch((err) => log.error(err, "Failed to load website cache"));
 
 // Hono app
 const app = new Hono();
@@ -115,4 +118,4 @@ const server = Bun.serve({
 _server = server;
 startTick(getServer);
 
-console.log(`Server running at ${server.url}`);
+log.info(`Server running at ${server.url}`);

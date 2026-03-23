@@ -1,7 +1,10 @@
 import { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
+import { createLogger } from "@livedot/logger";
 import * as schema from "./schema";
+
+const log = createLogger("db");
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -25,7 +28,7 @@ if (process.env.TURSO_URL) {
   }
 
   db = d;
-  console.log("[db] Using Turso");
+  log.info("Using Turso");
 } else {
   const { Database } = await import("bun:sqlite");
   const { drizzle } = await import("drizzle-orm/bun-sqlite");
@@ -43,7 +46,7 @@ if (process.env.TURSO_URL) {
   }
 
   db = d;
-  console.log("[db] Using SQLite");
+  log.info("Using SQLite");
 }
 
 export { db };

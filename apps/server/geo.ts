@@ -1,7 +1,9 @@
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { existsSync, readFileSync } from "fs";
+import { createLogger } from "@livedot/logger";
 
+const log = createLogger("geo");
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const DB_PATH =
@@ -14,10 +16,10 @@ let mmdbReader: import("mmdb-lib").Reader<Record<string, any>> | null = null;
 if (existsSync(DB_PATH)) {
   const { Reader } = await import("mmdb-lib");
   mmdbReader = new Reader(readFileSync(DB_PATH));
-  console.log("[geo] Using GeoLite2-City (high accuracy)");
+  log.info("Using GeoLite2-City (high accuracy)");
 } else {
-  console.log("[geo] GeoLite2-City.mmdb not found — using fast-geoip (lower accuracy)");
-  console.log("[geo] For better accuracy run: MAXMIND_LICENSE_KEY=<key> bun geo:download");
+  log.warn("GeoLite2-City.mmdb not found — using fast-geoip (lower accuracy)");
+  log.info("For better accuracy run: MAXMIND_LICENSE_KEY=<key> bun geo:download");
 }
 
 let publicIp: string | null = null;

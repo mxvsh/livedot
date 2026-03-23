@@ -2,10 +2,13 @@ import { Hono } from "hono";
 import { count, eq } from "drizzle-orm";
 import { db } from "@livedot/db";
 import { user, account } from "@livedot/db/schema";
+import { createLogger } from "@livedot/logger";
 import { auth } from "../auth";
 import { env } from "../env";
 import { getSessionFromRequest } from "../middleware/auth";
 import { defaultPlan } from "../limits";
+
+const log = createLogger("auth");
 
 const otpStore = new Map<string, { otp: string; expires: number }>();
 
@@ -146,7 +149,7 @@ export const authRoutes = new Hono()
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore.set(username, { otp, expires: Date.now() + 10 * 60 * 1000 });
-    console.log(`\n[Livedot] Password reset OTP for "${username}": ${otp}\n`);
+    log.info({ username, otp }, "Password reset OTP generated");
     return c.json({ ok: true });
   })
 

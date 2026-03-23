@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@livedot/db": "workspace:*",
+    "@livedot/logger": "workspace:*",
     "@livedot/shared": "workspace:*",
     "@livedot/store": "workspace:*",
     "drizzle-orm": "^0.45.1",
