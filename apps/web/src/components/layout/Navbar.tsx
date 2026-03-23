@@ -30,7 +30,7 @@ export default function Navbar() {
           <span className="text-lg font-semibold text-foreground font-chillax">livedot</span>
           {user?.plan && (
             <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.08] text-muted">
-              {user.plan}
+              {user.plan === "ce" ? "community" : user.plan}
             </span>
           )}
         </div>
