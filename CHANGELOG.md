@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.0-beta.15](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.14...v0.1.0-beta.15) (2026-03-23)
+
+* Changed from 30m to 10m ([](https://github.com/mxvsh/livedot/commit/0bfa732a1349e16a16ccca7bc69e59889353e5f9))
+* Reduce script caching ([](https://github.com/mxvsh/livedot/commit/2c4705c78874ae43820997259a48012c3db5b767))
+
 ## [0.1.0-beta.14](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.13...v0.1.0-beta.14) (2026-03-23)
 
 ## [0.1.0-beta.13](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.12...v0.1.0-beta.13) (2026-03-23)
