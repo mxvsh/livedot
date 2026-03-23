@@ -1,11 +1,10 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export interface UserMetadata {
+  // Optional per-user overrides (take precedence over plan defaults)
   maxWebsites?: number;
-}
-
-export interface WebsiteMetadata {
-  maxConnections?: number;
+  maxConnectionsPerSite?: number;
+  eventRetentionMs?: number;
 }
 
 // better-auth required tables
@@ -19,6 +18,7 @@ export const user = sqliteTable("user", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
   username: text("username").unique(),
   displayUsername: text("display_username"),
+  plan: text("plan").notNull().default("free"),
   metadata: text("metadata", { mode: "json" }).$type<UserMetadata>(),
 });
 
@@ -66,6 +66,6 @@ export const websites = sqliteTable("websites", {
     .references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   url: text("url").notNull().default(""),
-  metadata: text("metadata", { mode: "json" }).$type<Record<string, unknown>>(),
+  metadata: text("metadata", { mode: "json" }).$type<Record<string, unknown>>(), // no longer stores maxConnections — derived from owner's plan
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });

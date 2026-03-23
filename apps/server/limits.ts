@@ -2,30 +2,23 @@ import { eq } from "drizzle-orm";
 import { db } from "@livedot/db";
 import { user } from "@livedot/db/schema";
 import { env } from "./env";
+import { getPlan, resolveUserLimits, type PlanConfig, type PlanId } from "./plans";
 
-export interface UserLimits {
-  maxWebsites: number; // 0 = unlimited
+export function defaultPlan(): PlanId {
+  return env.LIVEDOT_CLOUD ? "free" : "ce";
 }
 
-function cloudDefaults(): UserLimits {
-  return { maxWebsites: env.DEFAULT_MAX_WEBSITES };
-}
+export async function getUserLimits(userId: string): Promise<PlanConfig> {
+  const found = await db
+    .select({ plan: user.plan, metadata: user.metadata })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
 
-function selfHostedDefaults(): UserLimits {
-  return { maxWebsites: env.DEFAULT_MAX_WEBSITES };
-}
-
-export function defaultLimits(): UserLimits {
-  return env.LIVEDOT_CLOUD ? cloudDefaults() : selfHostedDefaults();
-}
-
-export async function getUserLimits(userId: string): Promise<UserLimits> {
-  const found = await db.select({ metadata: user.metadata }).from(user).where(eq(user.id, userId)).limit(1);
-  const meta = found[0]?.metadata as any;
-  const defaults = defaultLimits();
-  return {
-    maxWebsites: meta?.maxWebsites ?? defaults.maxWebsites,
-  };
+  const row = found[0];
+  const plan = getPlan(row?.plan ?? defaultPlan());
+  const meta = row?.metadata as Partial<PlanConfig> | undefined;
+  return resolveUserLimits(plan, meta);
 }
 
 export async function setUserMetadata(userId: string, data: Record<string, unknown>) {

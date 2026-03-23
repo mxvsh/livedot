@@ -10,25 +10,44 @@ import { eventRoutes } from "./routes/events";
 import { wsHandler, type WSData } from "./ws";
 import { startTick } from "./sessions";
 
-interface WebsiteCacheEntry {
-  hostname: string;
-  maxConcurrent: number;
-}
-
-// Cache website IDs → { hostname, maxConcurrent }
-export const websiteCache = new Map<string, WebsiteCacheEntry>();
+import { websiteCache } from "./website-cache";
+export { websiteCache };
 
 async function loadWebsiteCache() {
-  const all = await db.select({ id: websites.id, url: websites.url, metadata: websites.metadata }).from(websites);
+  const { getUserLimits } = await import("./limits");
+  const all = await db
+    .select({ id: websites.id, url: websites.url, userId: websites.userId })
+    .from(websites);
+
+  // Batch user lookups
+  const userLimitsCache = new Map<string, Awaited<ReturnType<typeof getUserLimits>>>();
   for (const w of all) {
+    if (!userLimitsCache.has(w.userId)) {
+      userLimitsCache.set(w.userId, await getUserLimits(w.userId));
+    }
+    const limits = userLimitsCache.get(w.userId)!;
     try {
       const hostname = w.url ? new URL(w.url).hostname : "";
-      const maxConcurrent = (w.metadata as any)?.maxConnections ?? env.DEFAULT_MAX_CONNECTIONS;
-      websiteCache.set(w.id, { hostname, maxConcurrent });
+      websiteCache.set(w.id, {
+        hostname,
+        maxConcurrent: limits.maxConnectionsPerSite,
+        eventRetentionMs: limits.eventRetentionMs,
+        historyMax: limits.historyMax,
+      });
     } catch {
-      websiteCache.set(w.id, { hostname: "", maxConcurrent: env.DEFAULT_MAX_CONNECTIONS });
+      websiteCache.set(w.id, {
+        hostname: "",
+        maxConcurrent: limits.maxConnectionsPerSite,
+        eventRetentionMs: limits.eventRetentionMs,
+        historyMax: limits.historyMax,
+      });
     }
   }
+}
+
+export async function reloadWebsiteCache() {
+  websiteCache.clear();
+  await loadWebsiteCache();
 }
 
 loadWebsiteCache().catch(console.error);

@@ -5,7 +5,7 @@ import { user, account } from "@livedot/db/schema";
 import { auth } from "../auth";
 import { env } from "../env";
 import { getSessionFromRequest } from "../middleware/auth";
-import { getUserLimits, setUserMetadata } from "../limits";
+import { defaultPlan } from "../limits";
 
 const otpStore = new Map<string, { otp: string; expires: number }>();
 
@@ -73,7 +73,9 @@ export const authRoutes = new Hono()
 
       const data = await res.json();
       const userId = data.user?.id;
-      if (userId) await setUserMetadata(userId, { maxWebsites: env.DEFAULT_MAX_WEBSITES });
+      if (userId) {
+        await db.update(user).set({ plan: defaultPlan() }).where(eq(user.id, userId));
+      }
       return c.json({ ok: true, user: { id: userId, username } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Setup failed";

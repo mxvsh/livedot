@@ -1,20 +1,29 @@
 import type { Server } from "bun";
 import type { VisitorSession, WSMessage, HistoryPoint, ActivityEvent } from "@livedot/shared";
+import { websiteCache } from "./website-cache";
 
 export { type VisitorSession, type WSMessage, type HistoryPoint, type ActivityEvent };
 
 // Key: `${websiteId}:${sessionId}`
 const activeSessions = new Map<string, VisitorSession>();
 
-// Key: websiteId → last 120 samples (5s intervals × 120 = 10 minutes)
-const historyStore = new Map<string, HistoryPoint[]>();
-const HISTORY_MAX = 120;
 const SESSION_TIMEOUT = 10_000;
+
+// Key: websiteId → history samples
+const historyStore = new Map<string, HistoryPoint[]>();
 
 // Key: websiteId → Map<sessionId, ActivityEvent[]>
 const eventStore = new Map<string, Map<string, ActivityEvent[]>>();
 const MAX_EVENTS_PER_SESSION = 50;
-const EVENT_RETENTION = 10 * 60_000; // 10 minutes
+
+function getLimitsForWebsite(websiteId: string) {
+  const cached = websiteCache.get(websiteId);
+  return {
+    maxConcurrent: cached?.maxConcurrent ?? 0,
+    eventRetentionMs: cached?.eventRetentionMs ?? 0,
+    historyMax: cached?.historyMax ?? 0,
+  };
+}
 
 function addEvent(websiteId: string, event: ActivityEvent) {
   let websiteEvents = eventStore.get(websiteId);
@@ -36,18 +45,17 @@ export function getEventsForWebsite(websiteId: string): [string, ActivityEvent[]
   return [...websiteEvents];
 }
 
-export function upsertSession(session: VisitorSession, server: Server | null, maxConcurrent = 1000) {
+export function upsertSession(session: VisitorSession, server: Server | null, maxConcurrent = 0) {
   const key = `${session.websiteId}:${session.sessionId}`;
   const prev = activeSessions.get(key);
   const isNew = !prev;
 
-  if (isNew && getSessionsForWebsite(session.websiteId).length >= maxConcurrent) {
+  if (isNew && maxConcurrent > 0 && getSessionsForWebsite(session.websiteId).length >= maxConcurrent) {
     return;
   }
 
   activeSessions.set(key, session);
 
-  // Track activity events
   if (isNew) {
     addEvent(session.websiteId, { type: "join", sessionId: session.sessionId, pageUrl: session.pageUrl, timestamp: Date.now() });
   } else if (prev.pageUrl !== session.pageUrl) {
@@ -91,10 +99,14 @@ export function startTick(getServer: () => Server | null) {
     for (const id of historyStore.keys()) activeIds.add(id);
 
     for (const websiteId of activeIds) {
+      const { historyMax } = getLimitsForWebsite(websiteId);
       const count = getSessionsForWebsite(websiteId).length;
       const history = historyStore.get(websiteId) ?? [];
       history.push({ time: now, count });
-      if (history.length > HISTORY_MAX) history.splice(0, history.length - HISTORY_MAX);
+      // historyMax 0 = unlimited
+      if (historyMax > 0 && history.length > historyMax) {
+        history.splice(0, history.length - historyMax);
+      }
       historyStore.set(websiteId, history);
 
       const msg: WSMessage = { type: "history", history };
@@ -115,11 +127,13 @@ export function startTick(getServer: () => Server | null) {
       }
     }
 
-    // ── 3. Clean stale events (sessions gone > 30 min) ──
+    // ── 3. Clean stale events (per-website retention) ──
     for (const [websiteId, websiteEvents] of eventStore) {
+      const { eventRetentionMs } = getLimitsForWebsite(websiteId);
+      if (eventRetentionMs === 0) continue; // unlimited retention
       for (const [sessionId, events] of websiteEvents) {
         const latest = events[0]?.timestamp ?? 0;
-        if (now - latest > EVENT_RETENTION) {
+        if (now - latest > eventRetentionMs) {
           websiteEvents.delete(sessionId);
         }
       }

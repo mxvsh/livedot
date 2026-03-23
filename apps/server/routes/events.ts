@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { websiteCache, getServer } from "../index";
+import { websiteCache } from "../website-cache";
+import { getServer } from "../index";
 import { resolveGeo } from "../geo";
 import { upsertSession, recordCustomEvent } from "../sessions";
 import { env } from "../env";

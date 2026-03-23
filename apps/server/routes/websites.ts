@@ -3,17 +3,15 @@ import { eq } from "drizzle-orm";
 import { db } from "@livedot/db";
 import { websites } from "@livedot/db/schema";
 import { requireAuth } from "../middleware/auth";
-import { websiteCache } from "../index";
-import { env } from "../env";
+import { websiteCache } from "../website-cache";
 import { getUserLimits } from "../limits";
 
-function cacheEntry(w: { url: string; metadata: Record<string, unknown> | null }) {
-  const maxConnections = (w.metadata as any)?.maxConnections ?? env.DEFAULT_MAX_CONNECTIONS;
+function cacheEntryFromLimits(url: string, limits: { maxConnectionsPerSite: number; eventRetentionMs: number; historyMax: number }) {
   try {
-    const hostname = w.url ? new URL(w.url).hostname : "";
-    return { hostname, maxConcurrent: maxConnections };
+    const hostname = url ? new URL(url).hostname : "";
+    return { hostname, maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax };
   } catch {
-    return { hostname: "", maxConcurrent: maxConnections };
+    return { hostname: "", maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax };
   }
 }
 
@@ -34,21 +32,20 @@ export const websiteRoutes = new Hono()
       return c.json({ error: "Name is required" }, 400);
     }
 
-    const { maxWebsites } = await getUserLimits(user.id);
-    if (maxWebsites > 0) {
+    const limits = await getUserLimits(user.id);
+    if (limits.maxWebsites > 0) {
       const existing = await db.select({ id: websites.id }).from(websites).where(eq(websites.userId, user.id));
-      if (existing.length >= maxWebsites) {
-        return c.json({ error: `Website limit reached (max ${maxWebsites})` }, 400);
+      if (existing.length >= limits.maxWebsites) {
+        return c.json({ error: `Website limit reached (max ${limits.maxWebsites})` }, 400);
       }
     }
 
-    const metadata = { maxConnections: env.DEFAULT_MAX_CONNECTIONS };
     const [website] = await db
       .insert(websites)
-      .values({ name: name.trim(), url: url?.trim() || "", userId: user.id, metadata })
+      .values({ name: name.trim(), url: url?.trim() || "", userId: user.id })
       .returning();
 
-    websiteCache.set(website.id, cacheEntry(website));
+    websiteCache.set(website.id, cacheEntryFromLimits(website.url, limits));
     return c.json(website);
   })
 
@@ -67,16 +64,14 @@ export const websiteRoutes = new Hono()
       .where(eq(websites.id, id))
       .returning();
 
-    websiteCache.set(updated.id, cacheEntry(updated));
+    const limits = await getUserLimits(user.id);
+    websiteCache.set(updated.id, cacheEntryFromLimits(updated.url, limits));
     return c.json(updated);
   })
 
   .delete("/websites/:id", async (c) => {
-    const user = c.get("user");
     const id = c.req.param("id");
-
     await db.delete(websites).where(eq(websites.id, id));
     websiteCache.delete(id);
-
     return c.json({ ok: true });
   });

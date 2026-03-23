@@ -49,8 +49,7 @@ BETTER_AUTH_SECRET=your-random-secret-here
 BETTER_AUTH_URL=https://livedot.yourdomain.com
 
 DEFAULT_MAX_USER_SIGNUP=1
-DEFAULT_MAX_WEBSITES=0
-DEFAULT_MAX_CONNECTIONS=1000
+# Plans (ce/free/pro/max) are defined in code — self-hosted defaults to "ce" (unlimited)
 ```
 
 Generate a secret:

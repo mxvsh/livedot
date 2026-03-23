@@ -20,13 +20,8 @@ const envSchema = z.object({
   LIVEDOT_URL: z.string().optional(),
   LIVEDOT_WEBSITE_ID: z.string().optional(),
 
-  // History & event retention window (minutes)
-  HISTORY_WINDOW_MINUTES: z.coerce.number().int().positive().default(10),
-
-  // Defaults for new users/websites
+  // Global limits
   DEFAULT_MAX_USER_SIGNUP: z.coerce.number().int().positive().default(1),
-  DEFAULT_MAX_CONNECTIONS: z.coerce.number().int().positive().default(1000),
-  DEFAULT_MAX_WEBSITES: z.coerce.number().int().min(0).default(0), // 0 = unlimited
 });
 
 const parsed = envSchema.safeParse(process.env);
