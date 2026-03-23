@@ -22,6 +22,7 @@ function HomePage() {
   const { user, needsSetup, checked, check } = useAuthStore();
   const [websites, setWebsites] = useState<Website[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Website | null>(null);
   const [editTarget, setEditTarget] = useState<Website | null>(null);
@@ -34,12 +35,15 @@ function HomePage() {
       setWebsites(data);
     } finally {
       setLoading(false);
+      setLoaded(true);
     }
   }
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       if (!checked) await check();
+      if (cancelled) return;
       const state = useAuthStore.getState();
       if (state.needsSetup) {
         navigate({ to: "/auth/register" });
@@ -49,9 +53,10 @@ function HomePage() {
         load(true);
       }
     })();
+    return () => { cancelled = true; };
   }, []);
 
-  if (loading) {
+  if (!checked || !loaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />

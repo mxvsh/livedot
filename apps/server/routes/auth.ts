@@ -82,7 +82,7 @@ export const authRoutes = new Hono()
       if (userId) {
         await db.update(user).set({ plan: defaultPlan() }).where(eq(user.id, userId));
       }
-      return c.json({ ok: true, user: { id: userId, username } });
+      return c.json({ ok: true, user: { id: userId, username, plan: defaultPlan() } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Setup failed";
       return c.json({ error: message }, 400);
@@ -108,7 +108,13 @@ export const authRoutes = new Hono()
       if (setCookie) c.header("set-cookie", setCookie);
 
       const data = await res.json();
-      return c.json({ ok: true, user: { id: data.user?.id, username } });
+      const userId = data.user?.id;
+      let plan = "free";
+      if (userId) {
+        const found = await db.select({ plan: user.plan }).from(user).where(eq(user.id, userId)).limit(1);
+        plan = found[0]?.plan ?? "free";
+      }
+      return c.json({ ok: true, user: { id: userId, username, plan } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Invalid credentials";
       return c.json({ error: message }, 401);

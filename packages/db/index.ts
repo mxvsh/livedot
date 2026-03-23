@@ -1,19 +1,49 @@
-import { Database } from "bun:sqlite";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import * as schema from "./schema";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = process.env.DATABASE_PATH || resolve(__dirname, "./data/livedot.db");
 
-const sqlite = new Database(dbPath, { create: true });
-sqlite.run("PRAGMA journal_mode = WAL;");
-sqlite.run("PRAGMA foreign_keys = ON;");
+// Both bun:sqlite and libsql drizzle instances share this base type
+let db: BaseSQLiteDatabase<"sync" | "async", any, typeof schema>;
 
-export const db = drizzle(sqlite, { schema });
+if (process.env.TURSO_URL) {
+  const { createClient } = await import("@libsql/client");
+  const { drizzle } = await import("drizzle-orm/libsql");
+  const { migrate } = await import("drizzle-orm/libsql/migrator");
 
-if (process.env.NODE_ENV === "production") {
-  migrate(db, { migrationsFolder: resolve(__dirname, "./migrations") });
+  const client = createClient({
+    url: process.env.TURSO_URL,
+    authToken: process.env.TURSO_AUTH_TOKEN,
+  });
+
+  const d = drizzle(client, { schema });
+
+  if (process.env.NODE_ENV === "production") {
+    await migrate(d, { migrationsFolder: resolve(__dirname, "./migrations") });
+  }
+
+  db = d;
+  console.log("[db] Using Turso");
+} else {
+  const { Database } = await import("bun:sqlite");
+  const { drizzle } = await import("drizzle-orm/bun-sqlite");
+  const { migrate } = await import("drizzle-orm/bun-sqlite/migrator");
+
+  const dbPath = process.env.DATABASE_PATH || resolve(__dirname, "./data/livedot.db");
+  const sqlite = new Database(dbPath, { create: true });
+  sqlite.run("PRAGMA journal_mode = WAL;");
+  sqlite.run("PRAGMA foreign_keys = ON;");
+
+  const d = drizzle(sqlite, { schema });
+
+  if (process.env.NODE_ENV === "production") {
+    migrate(d, { migrationsFolder: resolve(__dirname, "./migrations") });
+  }
+
+  db = d;
+  console.log("[db] Using SQLite");
 }
+
+export { db };

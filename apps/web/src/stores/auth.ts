@@ -22,15 +22,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   registrationOpen: true,
 
   check: async () => {
-    const [status, meta] = await Promise.all([api.getStatus(), api.getMeta()]);
-    set({
-      user: status.user,
-      needsSetup: status.needsSetup,
-      checked: true,
-      cloud: meta.cloud,
-      providers: meta.providers,
-      registrationOpen: meta.registrationOpen,
-    });
+    try {
+      const [status, meta] = await Promise.all([api.getStatus(), api.getMeta()]);
+      set({
+        user: status.user,
+        needsSetup: status.needsSetup,
+        checked: true,
+        cloud: meta.cloud,
+        providers: meta.providers,
+        registrationOpen: meta.registrationOpen,
+      });
+    } catch {
+      // Server error (e.g. DB not initialized) — treat as needs setup
+      set({ user: null, needsSetup: true, checked: true });
+    }
   },
 
   setUser: (user) => set({ user, needsSetup: false }),

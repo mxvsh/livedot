@@ -9,10 +9,14 @@
   },
   "scripts": {
     "generate": "bunx drizzle-kit generate",
-    "push": "mkdir -p data && bunx drizzle-kit push"
+    "push": "mkdir -p data && bunx drizzle-kit push",
+    "push:turso": "bunx drizzle-kit push --config drizzle.config.turso.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.1"
+  },
+  "optionalDependencies": {
+    "@libsql/client": "^0.14"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.1"
