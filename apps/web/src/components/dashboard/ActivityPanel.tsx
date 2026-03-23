@@ -98,14 +98,14 @@ export default function ActivityPanel({ session, events, onClose }: Props) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -16, y: 8 }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      exit={{ opacity: 0, x: -16, y: 8 }}
-      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed bottom-10 left-3 z-50 w-68 md:bottom-12 md:left-4"
-      style={{ width: 272 }}
+      initial={{ y: 12, scale: 0.97 }}
+      animate={{ y: 0, scale: 1 }}
+      exit={{ y: 12, scale: 0.97 }}
+      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed bottom-10 left-3 z-50 md:bottom-12 md:left-4"
+      style={{ width: 272, willChange: "transform" }}
     >
-      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
+      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden" style={{ backfaceVisibility: "hidden" }}>
         {/* Header */}
         <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/[0.06]">
           <DiceBearAvatar sessionId={session.sessionId} size={28} />
