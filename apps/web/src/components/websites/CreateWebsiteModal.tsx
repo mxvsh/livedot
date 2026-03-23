@@ -67,7 +67,7 @@ export default function CreateWebsiteModal({ isOpen, onOpenChange, onCreated }: 
     <Modal isOpen={isOpen} onOpenChange={handleClose}>
       <Modal.Backdrop>
         <Modal.Container>
-          <Modal.Dialog className="sm:max-w-[500px]">
+          <Modal.Dialog className="sm:max-w-[400px]">
             <Modal.CloseTrigger />
             {!created ? (
               <>
