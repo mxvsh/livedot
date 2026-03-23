@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-beta.17](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.16...v0.1.0-beta.17) (2026-03-23)
+
+* Setup pino logger ([](https://github.com/mxvsh/livedot/commit/139429bc507b1353f7fb150a5f7511968860e09e))
+
 ## [0.1.0-beta.16](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.15...v0.1.0-beta.16) (2026-03-23)
 
 * Add website copy button ([](https://github.com/mxvsh/livedot/commit/2a099f969fa623758902c20649f055fc21577dc5))
