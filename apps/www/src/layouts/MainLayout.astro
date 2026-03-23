@@ -6,16 +6,22 @@ interface Props {
   title: string;
   description?: string;
   pathname?: string;
+  structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
+  includeFaqSchema?: boolean;
 }
 
 const {
   title,
   description = siteMetadata.description,
   pathname = "/",
+  structuredData = [],
+  includeFaqSchema = false,
 } = Astro.props;
 
 const canonicalUrl = new URL(pathname, Astro.site ?? Astro.url);
 const ogImageUrl = new URL(siteMetadata.ogImage, Astro.site ?? Astro.url);
+
+const extraStructuredData = Array.isArray(structuredData) ? structuredData : [structuredData];
 
 const pageJsonLd = {
   "@context": "https://schema.org",
@@ -39,17 +45,20 @@ const pageJsonLd = {
         priceCurrency: "USD",
       },
     },
-    {
-      "@type": "FAQPage",
-      mainEntity: faqItems.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer,
-        },
-      })),
-    },
+    ...(includeFaqSchema
+      ? [{
+          "@type": "FAQPage",
+          mainEntity: faqItems.map((item) => ({
+            "@type": "Question",
+            name: item.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: item.answer,
+            },
+          })),
+        }]
+      : []),
+    ...extraStructuredData,
   ],
 };
 ---

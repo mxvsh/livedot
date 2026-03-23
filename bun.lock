@@ -67,6 +67,7 @@
       "name": "www",
       "version": "0.0.1",
       "dependencies": {
+        "@livedot/shared": "workspace:*",
         "astro": "^6.0.8",
       },
       "devDependencies": {

@@ -1,0 +1,71 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import PricingSection from "../components/PricingSection.astro";
+import { formatCount, formatHistory, formatRetention, pricingPlans } from "../data/pricing";
+import { siteMetadata } from "../data/site";
+import MainLayout from "../layouts/MainLayout.astro";
+
+const pricingPath = Astro.url.pathname;
+const pricingUrl = new URL(pricingPath, Astro.site ?? Astro.url).href;
+const homeUrl = new URL("/", Astro.site ?? Astro.url).href;
+
+const pricingStructuredData = [
+  {
+    "@type": "WebPage",
+    name: "Livedot Pricing",
+    description: "Compare Livedot plan limits across the community and cloud tiers.",
+    url: pricingUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: siteMetadata.name,
+      url: homeUrl,
+    },
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: homeUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Pricing",
+        item: pricingUrl,
+      },
+    ],
+  },
+  {
+    "@type": "ItemList",
+    name: "Livedot pricing plans",
+    itemListElement: pricingPlans.map((plan, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Service",
+        name: `${siteMetadata.name} ${plan.label}`,
+        serviceType: `${plan.mode} plan`,
+        description: `${plan.summary} Includes ${formatCount(plan.config.maxWebsites, "websites")}, ${formatCount(plan.config.maxConnectionsPerSite, "connections per site")}, ${formatRetention(plan.config.eventRetentionMs).toLowerCase()}, and ${formatHistory(plan.config.historyMax).toLowerCase()}.`,
+        url: pricingUrl,
+      },
+    })),
+  },
+];
+---
+
+<MainLayout
+  title="Livedot Pricing - Plans for Live Traffic Monitoring"
+  description="Compare Livedot plan limits across the community and cloud tiers, including websites, connections, event retention, and history capacity."
+  pathname={pricingPath}
+  structuredData={pricingStructuredData}
+>
+  <Header pathname={Astro.url.pathname} />
+  <main class="pt-20">
+    <PricingSection />
+  </main>
+  <Footer />
+</MainLayout>

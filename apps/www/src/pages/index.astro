@@ -8,7 +8,7 @@ import FeaturesSection from "../components/FeaturesSection.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 ---
 
-<MainLayout title="Livedot - Real-time User Visualization" pathname={Astro.url.pathname}>
+<MainLayout title="Livedot - Real-time User Visualization" pathname={Astro.url.pathname} includeFaqSchema={true}>
   <Header pathname={Astro.url.pathname} />
   <main>
     <HeroSection />
