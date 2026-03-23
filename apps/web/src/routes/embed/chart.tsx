@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import BrandingBadge from "@/components/embed/BrandingBadge";
 import { aggregateHistoryPoints } from "@/lib/chart";
 import { useEmbedBranding } from "@/components/embed/useEmbedBranding";
 
@@ -12,13 +11,14 @@ export const Route = createFileRoute("/embed/chart")({
     bg: (search.bg as string) ?? "transparent",
     accent: (search.accent as string) ?? "#96E421",
     branding: (search.branding as string) ?? "",
+    scale: Number(search.scale ?? 0.9),
   }),
 });
 
-const W = 400;
-const H = 120;
-const PAD_TOP = 8;
-const PAD_BOT = 4;
+const W = 200;
+const H = 48;
+const PAD_TOP = 4;
+const PAD_BOT = 2;
 
 function buildPath(points: { count: number }[], close: boolean): string {
   if (points.length === 0) return "";
@@ -47,10 +47,11 @@ function buildPath(points: { count: number }[], close: boolean): string {
 }
 
 function EmbedChart() {
-  const { website, token, bg, accent, branding } = Route.useSearch();
-  const { count, connected, history } = useWebSocket(website || null, token || undefined);
+  const { website, token, bg, accent, branding, scale } = Route.useSearch();
+  const { count, connected, history } = useWebSocket(website || null, { token: token || undefined, recent: "10m" });
   const explicitBranding = branding === "1" || branding === "true";
   const showBranding = useEmbedBranding(website, token, explicitBranding);
+  const size = Number.isFinite(scale) ? Math.min(Math.max(scale, 0.6), 1.4) : 0.9;
 
   if (!website || !token) {
     return null;
@@ -63,35 +64,50 @@ function EmbedChart() {
   return (
     <div
       style={{
-        width: "100%",
-        height: "100vh",
-        background: bg,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        width: "fit-content",
+        background: bg === "transparent" ? "transparent" : bg,
+        display: "inline-flex",
         fontFamily: "system-ui, -apple-system, sans-serif",
-        overflow: "hidden",
-        position: "relative",
       }}
     >
-      <div style={{ width: "100%", maxWidth: 600, padding: "0 16px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div
+        style={{
+          width: 240 * size,
+          borderRadius: 24 * size,
+          border: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(255,255,255,0.04)",
+          backdropFilter: "blur(24px)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          overflow: "hidden",
+          padding: `${12 * size}px ${14 * size}px ${8 * size}px`,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 * size }}>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ fontSize: 12 * size, color: "rgba(250,250,250,0.8)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              Live visitors
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 * size, marginLeft: 8 * size }}>
             <span
               style={{
-                width: 6,
-                height: 6,
+                width: 6 * size,
+                height: 6 * size,
                 borderRadius: "50%",
                 background: connected ? accent : "#71717a",
+                boxShadow: connected ? `0 0 0 ${4 * size}px color-mix(in srgb, ${accent} 18%, transparent)` : "none",
               }}
             />
-            <span style={{ fontSize: 24, fontWeight: 700, color: "#fafafa" }}>{count}</span>
-            <span style={{ fontSize: 12, color: "#a1a1aa" }}>visitors</span>
+            <span style={{ fontSize: 12 * size, color: "rgba(161,161,170,0.75)" }}>10m</span>
           </div>
         </div>
 
-        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ width: "100%", height: 120 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 * size, marginBottom: 8 * size }}>
+          <span style={{ fontSize: 28 * size, fontWeight: 750, color: "#fafafa", lineHeight: 1, letterSpacing: "-0.04em" }}>{count}</span>
+          <span style={{ fontSize: 12 * size, color: "#a1a1aa" }}>visitors</span>
+        </div>
+
+        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ width: "100%", height: 48 * size }}>
           <defs>
             <linearGradient id="embed-area-fill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={accent} stopOpacity="0.2" />
@@ -113,7 +129,7 @@ function EmbedChart() {
                 d={linePath}
                 fill="none"
                 stroke={accent}
-                strokeWidth="2"
+                strokeWidth={1.5 * size}
                 strokeLinejoin="round"
                 strokeLinecap="round"
                 filter="url(#embed-line-glow)"
@@ -124,15 +140,31 @@ function EmbedChart() {
                 const yRange = H - PAD_TOP - PAD_BOT;
                 const cx = W;
                 const cy = PAD_TOP + yRange - (last.count / max) * yRange;
-                return <circle cx={cx} cy={cy} r="3" fill={accent} opacity="0.9" />;
+                return <circle cx={cx} cy={cy} r={2.5 * size} fill={accent} opacity="0.9" />;
               })()}
             </>
           ) : (
-            <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke={accent} strokeOpacity="0.15" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke={accent} strokeOpacity="0.15" strokeWidth={1 * size} strokeDasharray="4 4" />
           )}
         </svg>
+        {showBranding && (
+          <a
+            href="https://livedot.dev"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: "inline-block",
+              marginTop: 6 * size,
+              fontSize: 10 * size,
+              color: "rgba(255,255,255,0.48)",
+              textDecoration: "none",
+              letterSpacing: "0.01em",
+            }}
+          >
+            Powered by Livedot
+          </a>
+        )}
       </div>
-      {showBranding && <BrandingBadge />}
     </div>
   );
 }

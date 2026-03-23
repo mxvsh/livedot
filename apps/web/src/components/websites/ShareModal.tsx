@@ -49,7 +49,7 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
     : "";
 
   const chartEmbed = shareToken
-    ? `<iframe src="${origin}/embed/chart?website=${website?.id}&token=${shareToken}${brandingParam}" width="100%" height="200" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
+    ? `<iframe src="${origin}/embed/chart?website=${website?.id}&token=${shareToken}&scale=0.9${brandingParam}" width="260" height="128" frameborder="0" style="border:0;overflow:hidden;"></iframe>`
     : "";
 
   const liveEmbed = shareToken
@@ -68,8 +68,8 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
       title: "Chart Widget",
       description: "A compact traffic trend chart with the live count.",
       snippet: chartEmbed,
-      height: "200px",
-      width: "100%",
+      height: "128px",
+      width: "260px",
     },
     live: {
       title: "Live Count Widget",
@@ -217,6 +217,11 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
                       Learn more
                     </a>
                   </p>
+                  {activeTab === "chart" && (
+                    <p className="text-[10px] text-muted">
+                      Chart widget supports <code className="text-foreground/60">scale</code> too, for example <code className="text-foreground/60">scale=0.8</code>.
+                    </p>
+                  )}
                 </div>
               )}
             </Modal.Body>
