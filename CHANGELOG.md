@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.1](https://github.com/mxvsh/livedot/compare/v0.1.0...v0.1.1) (2026-03-23)
+
+* Setup branding in widget ([](https://github.com/mxvsh/livedot/commit/e384ab5bf21efc3aa345567ecaa1566952c1292b))
+* Live widget on landing page ([](https://github.com/mxvsh/livedot/commit/0fe94d801b3713f698549a136b289d34eaf6abd7))
+
 ## [0.1.0](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.20...v0.1.0) (2026-03-23)
 
 * DB migrations ([](https://github.com/mxvsh/livedot/commit/19b38d90a91a84be4024a702b50da23555d4a9f1))
