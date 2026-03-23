@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.0-beta.12](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.11...v0.1.0-beta.12) (2026-03-23)
+
+* Add realtime visitor chart ([](https://github.com/mxvsh/livedot/commit/ead395e596e4721b4a73b61b8e3315efc13edf71))
+* Improve glass effect ([](https://github.com/mxvsh/livedot/commit/d6d0339c555f9aab864a813ffc2e0b1074695982))
+* ActivityPanel visual styling for glassmorphism ([](https://github.com/mxvsh/livedot/commit/ad233fce759a0de5d3472441fbcd357abf76c84b))
+* Add real-time activity panel, map avatars, and event tracking ([](https://github.com/mxvsh/livedot/commit/6af80dec5bd5bf0e1b8fe86a3530160605dce8ca))
+* Delete wrangler.toml ([](https://github.com/mxvsh/livedot/commit/8a16810fd63eb15de2ee5f47313676155194d3f0))
+* Add self hosting guide ([](https://github.com/mxvsh/livedot/commit/e7c33958a9b6a059f9236eb8346a26bcf8674b92))
+
 ## [0.1.0-beta.11](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.10...v0.1.0-beta.11) (2026-03-22)
 
 * Fix IP read ([](https://github.com/mxvsh/livedot/commit/b2f7d48037fe1758f256f2f0d59dc6ed2f39c6b0))
