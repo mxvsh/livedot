@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Modal } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CodeIcon } from "@hugeicons/core-free-icons";
+import { CodeIcon, CopyIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import type { Website } from "@/lib/api";
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
 
 export default function SnippetModal({ website, onClose }: Props) {
   const [copied, setCopied] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const snippet = `<script defer src="${window.location.origin}/t.js" data-website="${website?.id}"></script>`;
 
@@ -19,6 +20,13 @@ export default function SnippetModal({ website, onClose }: Props) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
+
+  function handleCopyId() {
+    navigator.clipboard.writeText(website?.id ?? "");
+    setCopiedId(website?.id ?? null);
+    setTimeout(() => setCopiedId(null), 2000);
+  }
+
 
   return (
     <Modal
@@ -47,6 +55,15 @@ export default function SnippetModal({ website, onClose }: Props) {
               <pre className="bg-default rounded-xl p-4 text-xs font-mono text-foreground overflow-x-auto select-all">
                 {snippet}
               </pre>
+
+              <p className="mt-4 text-xs text-muted items-center inline-flex">
+                {website?.id}
+                <HugeiconsIcon
+                  onClick={handleCopyId}
+                  icon={
+                    copiedId === website?.id ? Tick02Icon : CopyIcon}
+                  className="w-4 h-4 ml-2" />
+              </p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="outline" onPress={onClose} className="flex-1">

@@ -5,7 +5,7 @@ import {
   Delete02Icon,
   PencilEdit01Icon,
   ArrowRight01Icon,
-  CodeSquareIcon,
+  CodeSimpleIcon,
 } from "@hugeicons/core-free-icons";
 import type { Website } from "@/lib/api";
 import WebsiteLiveCount from "./WebsiteLiveCount";
@@ -38,14 +38,15 @@ export default function WebsiteCard({ website, onSnippet, onEdit, onDelete }: Pr
               {website.url && <span>{website.url}</span>}
             </Card.Description>
           </div>
-          <div className="flex items-center gap-3 ml-3 shrink-0">
+          <div className="flex items-center ml-3 shrink-0">
             <WebsiteLiveCount websiteId={website.id} />
+            <div className="w-4"/>
             <Button
               variant="ghost"
               className="text-muted hover:text-foreground"
               onPress={() => onSnippet(website)}
             >
-              <HugeiconsIcon icon={CodeSquareIcon} size={16} />
+              <HugeiconsIcon icon={CodeSimpleIcon} size={16} />
             </Button>
             <Button
               variant="ghost"
