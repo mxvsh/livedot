@@ -7,11 +7,13 @@ export interface WSData {
 }
 
 export const wsHandler = {
-  open(ws: ServerWebSocket<WSData>) {
+  async open(ws: ServerWebSocket<WSData>) {
     ws.subscribe(`website:${ws.data.websiteId}`);
-    const sessions = getSessionsForWebsite(ws.data.websiteId);
-    const history = getHistoryForWebsite(ws.data.websiteId);
-    const events = getEventsForWebsite(ws.data.websiteId);
+    const [sessions, history, events] = await Promise.all([
+      getSessionsForWebsite(ws.data.websiteId),
+      getHistoryForWebsite(ws.data.websiteId),
+      getEventsForWebsite(ws.data.websiteId),
+    ]);
     const msg: WSMessage = { type: "snapshot", sessions, history, events };
     ws.send(JSON.stringify(msg));
   },

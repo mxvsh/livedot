@@ -20,6 +20,9 @@ const envSchema = z.object({
   LIVEDOT_URL: z.string().optional(),
   LIVEDOT_WEBSITE_ID: z.string().optional(),
 
+  // Store adapter — if set, uses Redis instead of in-memory
+  REDIS_URL: z.string().optional(),
+
   // Global limits
   DEFAULT_MAX_USER_SIGNUP: z.coerce.number().int().positive().default(1),
 });

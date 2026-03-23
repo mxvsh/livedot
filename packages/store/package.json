@@ -1,0 +1,18 @@
+{
+  "name": "@livedot/store",
+  "version": "0.1.0-beta.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./interface": "./interface.ts",
+    "./memory": "./memory.ts",
+    "./redis": "./redis.ts"
+  },
+  "dependencies": {
+    "@livedot/shared": "workspace:*"
+  },
+  "optionalDependencies": {
+    "ioredis": "^5"
+  }
+}

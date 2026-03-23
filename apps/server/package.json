@@ -9,6 +9,7 @@
   "dependencies": {
     "@livedot/db": "workspace:*",
     "@livedot/shared": "workspace:*",
+    "@livedot/store": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "fast-geoip": "^1.1.88",
     "hono": "^4",
