@@ -1,4 +1,4 @@
-import { PLANS, planLabel, type PlanConfig, type PlanId } from "@livedot/shared/plans";
+import { PLAN_META, PLANS, planLabel, type PlanConfig, type PlanId } from "@livedot/shared/plans";
 
 export type BillingMode = "Open source" | "Cloud";
 
@@ -7,6 +7,7 @@ export type PricingPlan = {
   label: string;
   config: PlanConfig;
   mode: BillingMode;
+  price: string | null;
   headline: string;
   summary: string;
   ctaLabel: string;
@@ -34,7 +35,7 @@ const planDetails: Record<PlanId, Omit<PricingPlan, "id" | "label" | "config">> 
   pro: {
     mode: "Cloud",
     headline: "More headroom for growing products.",
-    summary: "Built for teams that need more monthly event volume, deeper retention, and room for a few sites.",
+    summary: "Built for teams that need higher event volume, deeper retention, and room for a few sites.",
     ctaLabel: "Open Cloud",
     ctaHref: "https://cloud.livedot.dev",
     featured: true,
@@ -42,9 +43,9 @@ const planDetails: Record<PlanId, Omit<PricingPlan, "id" | "label" | "config">> 
   max: {
     mode: "Cloud",
     headline: "High-capacity limits for larger traffic.",
-    summary: "Built for teams monitoring more sites, heavier event volume, and a full week of retained live traffic.",
-    ctaLabel: "Talk to Us",
-    ctaHref: "mailto:hello@livedot.dev",
+    summary: "Built for teams monitoring more sites, higher event volume, and a full week of live traffic.",
+    ctaLabel: "Open Cloud",
+    ctaHref: "https://cloud.livedot.dev",
   },
 };
 
@@ -90,6 +91,7 @@ export const pricingPlans: PricingPlan[] = orderedPlanIds.map((id) => ({
   id,
   label: planLabel(id),
   config: PLANS[id],
+  price: PLAN_META[id]?.price ?? null,
   ...planDetails[id],
 }));
 

@@ -28,6 +28,19 @@ export function resolveUserLimits(plan: PlanConfig, overrides?: Partial<PlanConf
   };
 }
 
+export interface PlanMeta {
+  label: string;
+  price: string | null; // null = free/no charge
+  features: string[];
+}
+
+export const PLAN_META: Record<string, PlanMeta> = {
+  ce:   { label: "Community", price: null,      features: ["Unlimited websites", "Unlimited events"] },
+  free: { label: "Free",      price: null,      features: ["1 website", "10k events/month"] },
+  pro:  { label: "Pro",       price: "$2.99/mo", features: ["5 websites", "100k events/month"] },
+  max:  { label: "Max",       price: "$4.99/mo", features: ["20 websites", "1M events/month"] },
+};
+
 /** Display-friendly plan name */
 export function planLabel(planId: string): string {
   switch (planId) {

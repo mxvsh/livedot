@@ -3,7 +3,7 @@ import { Button, Modal } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CreditCardIcon } from "@hugeicons/core-free-icons";
 import { useAuthStore } from "@/stores/auth";
-import { planLabel, PLANS } from "@livedot/shared/plans";
+import { planLabel, PLAN_META } from "@livedot/shared/plans";
 import { api } from "@/lib/api";
 
 interface Props {
@@ -12,21 +12,7 @@ interface Props {
 }
 
 const PLAN_ORDER: Record<string, number> = { free: 0, pro: 1, max: 2, ce: 99 };
-
-const UPGRADE_PLANS = [
-  {
-    id: "pro",
-    label: "Pro",
-    price: "$2.99/mo",
-    features: ["5 websites", "100k events/month"],
-  },
-  {
-    id: "max",
-    label: "Max",
-    price: "$4.99/mo",
-    features: ["20 websites", "1M events/month"],
-  },
-];
+const UPGRADE_PLAN_IDS = ["pro", "max"];
 
 function fmt(n: number) {
   return n.toLocaleString();
@@ -131,25 +117,28 @@ export default function SubscriptionModal({ isOpen, onOpenChange }: Props) {
               {cloud && plan !== "ce" && planOrder < PLAN_ORDER.max && (
                 <div className="flex flex-col gap-2">
                   <p className="text-xs text-muted">Upgrade</p>
-                  {UPGRADE_PLANS.filter(p => PLAN_ORDER[p.id] > planOrder).map(upgradePlan => (
-                    <div key={upgradePlan.id} className="flex items-center justify-between rounded-xl bg-default p-3 gap-3">
+                  {UPGRADE_PLAN_IDS.filter(id => PLAN_ORDER[id] > planOrder).map(id => {
+                    const meta = PLAN_META[id];
+                    return (
+                    <div key={id} className="flex items-center justify-between rounded-xl bg-default p-3 gap-3">
                       <div className="flex flex-col gap-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-foreground">{upgradePlan.label}</span>
-                          <span className="text-xs text-muted">{upgradePlan.price}</span>
+                          <span className="text-sm font-medium text-foreground">{meta.label}</span>
+                          <span className="text-xs text-muted">{meta.price}</span>
                         </div>
-                        <p className="text-xs text-muted">{upgradePlan.features.join(" · ")}</p>
+                        <p className="text-xs text-muted">{meta.features.join(" · ")}</p>
                       </div>
                       <Button
                         size="sm"
                         isDisabled={checkoutLoading !== null}
-                        onPress={() => handleUpgrade(upgradePlan.id)}
+                        onPress={() => handleUpgrade(id)}
                         className="shrink-0"
                       >
-                        {checkoutLoading === upgradePlan.id ? "Loading..." : "Upgrade"}
+                        {checkoutLoading === id ? "Loading..." : "Upgrade"}
                       </Button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

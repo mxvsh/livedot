@@ -51,6 +51,14 @@ const pricingStructuredData = [
         serviceType: `${plan.mode} plan`,
         description: `${plan.summary} Includes ${formatCount(plan.config.maxWebsites, "websites")}, ${formatCount(plan.config.eventsPerMonth, "events per month")}, ${formatRetention(plan.config.eventRetentionMs).toLowerCase()}, and ${formatHistory(plan.config.historyMax).toLowerCase()}.`,
         url: pricingUrl,
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "USD",
+          price: plan.price ? plan.price.replace(/[^0-9.]/g, "") : "0",
+          availability: "https://schema.org/InStock",
+          category: plan.mode,
+          url: plan.ctaHref,
+        },
       },
     })),
   },
@@ -59,7 +67,7 @@ const pricingStructuredData = [
 
 <MainLayout
   title="Livedot Pricing - Plans for Live Traffic Monitoring"
-  description="Compare Livedot plan limits across the community and cloud tiers, including websites, connections, event retention, and history capacity."
+  description="Compare Livedot community and cloud plans by websites, monthly events, event retention, and live traffic history."
   pathname={pricingPath}
   structuredData={pricingStructuredData}
 >
