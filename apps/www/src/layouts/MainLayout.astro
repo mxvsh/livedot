@@ -88,6 +88,14 @@ const pageJsonLd = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl.href} />
 
+    {import.meta.env.PROD && (
+      <script
+        defer
+        src="https://analytics.monawwar.io/script.js"
+        data-website-id="c506ea8a-f77a-40cc-b15b-d6da0da8519c"
+      ></script>
+    )}
+
     <script type="application/ld+json" set:html={JSON.stringify(pageJsonLd)}></script>
   </head>
   <body class="bg-surface text-on-surface font-body antialiased">
