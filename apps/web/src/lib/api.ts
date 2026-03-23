@@ -9,6 +9,7 @@ export interface Website {
   name: string;
   url: string;
   userId: string;
+  shareToken: string | null;
   createdAt: string;
 }
 
@@ -82,4 +83,8 @@ export const api = {
     }),
   deleteWebsite: (id: string) =>
     request<{ ok: boolean }>(`/api/websites/${id}`, { method: "DELETE" }),
+  enableSharing: (id: string) =>
+    request<{ shareToken: string }>(`/api/websites/${id}/share`, { method: "POST" }),
+  disableSharing: (id: string) =>
+    request<{ ok: boolean }>(`/api/websites/${id}/share`, { method: "DELETE" }),
 };

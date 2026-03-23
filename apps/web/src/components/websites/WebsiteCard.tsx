@@ -6,6 +6,7 @@ import {
   PencilEdit01Icon,
   ArrowRight01Icon,
   CodeSimpleIcon,
+  LayoutGrid,
 } from "@hugeicons/core-free-icons";
 import type { Website } from "@/lib/api";
 import WebsiteLiveCount from "./WebsiteLiveCount";
@@ -13,11 +14,12 @@ import WebsiteLiveCount from "./WebsiteLiveCount";
 interface Props {
   website: Website;
   onSnippet: (website: Website) => void;
+  onShare: (website: Website) => void;
   onEdit: (website: Website) => void;
   onDelete: (website: Website) => void;
 }
 
-export default function WebsiteCard({ website, onSnippet, onEdit, onDelete }: Props) {
+export default function WebsiteCard({ website, onSnippet, onShare, onEdit, onDelete }: Props) {
   const navigate = useNavigate();
 
   return (
@@ -47,6 +49,13 @@ export default function WebsiteCard({ website, onSnippet, onEdit, onDelete }: Pr
               onPress={() => onSnippet(website)}
             >
               <HugeiconsIcon icon={CodeSimpleIcon} size={16} />
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-muted hover:text-foreground"
+              onPress={() => onShare(website)}
+            >
+              <HugeiconsIcon icon={LayoutGrid} size={16} />
             </Button>
             <Button
               variant="ghost"

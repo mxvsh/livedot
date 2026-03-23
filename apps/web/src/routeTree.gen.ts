@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WebsitesWebsiteIdRouteImport } from './routes/websites.$websiteId'
+import { Route as EmbedMapRouteImport } from './routes/embed/map'
+import { Route as EmbedChartRouteImport } from './routes/embed/chart'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
@@ -22,6 +24,16 @@ const IndexRoute = IndexRouteImport.update({
 const WebsitesWebsiteIdRoute = WebsitesWebsiteIdRouteImport.update({
   id: '/websites/$websiteId',
   path: '/websites/$websiteId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmbedMapRoute = EmbedMapRouteImport.update({
+  id: '/embed/map',
+  path: '/embed/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmbedChartRoute = EmbedChartRouteImport.update({
+  id: '/embed/chart',
+  path: '/embed/chart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
@@ -39,12 +51,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/embed/chart': typeof EmbedChartRoute
+  '/embed/map': typeof EmbedMapRoute
   '/websites/$websiteId': typeof WebsitesWebsiteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/embed/chart': typeof EmbedChartRoute
+  '/embed/map': typeof EmbedMapRoute
   '/websites/$websiteId': typeof WebsitesWebsiteIdRoute
 }
 export interface FileRoutesById {
@@ -52,18 +68,34 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/embed/chart': typeof EmbedChartRoute
+  '/embed/map': typeof EmbedMapRoute
   '/websites/$websiteId': typeof WebsitesWebsiteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/login' | '/auth/register' | '/websites/$websiteId'
+  fullPaths:
+    | '/'
+    | '/auth/login'
+    | '/auth/register'
+    | '/embed/chart'
+    | '/embed/map'
+    | '/websites/$websiteId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/login' | '/auth/register' | '/websites/$websiteId'
+  to:
+    | '/'
+    | '/auth/login'
+    | '/auth/register'
+    | '/embed/chart'
+    | '/embed/map'
+    | '/websites/$websiteId'
   id:
     | '__root__'
     | '/'
     | '/auth/login'
     | '/auth/register'
+    | '/embed/chart'
+    | '/embed/map'
     | '/websites/$websiteId'
   fileRoutesById: FileRoutesById
 }
@@ -71,6 +103,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  EmbedChartRoute: typeof EmbedChartRoute
+  EmbedMapRoute: typeof EmbedMapRoute
   WebsitesWebsiteIdRoute: typeof WebsitesWebsiteIdRoute
 }
 
@@ -88,6 +122,20 @@ declare module '@tanstack/react-router' {
       path: '/websites/$websiteId'
       fullPath: '/websites/$websiteId'
       preLoaderRoute: typeof WebsitesWebsiteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embed/map': {
+      id: '/embed/map'
+      path: '/embed/map'
+      fullPath: '/embed/map'
+      preLoaderRoute: typeof EmbedMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embed/chart': {
+      id: '/embed/chart'
+      path: '/embed/chart'
+      fullPath: '/embed/chart'
+      preLoaderRoute: typeof EmbedChartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/register': {
@@ -111,6 +159,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  EmbedChartRoute: EmbedChartRoute,
+  EmbedMapRoute: EmbedMapRoute,
   WebsitesWebsiteIdRoute: WebsitesWebsiteIdRoute,
 }
 export const routeTree = rootRouteImport

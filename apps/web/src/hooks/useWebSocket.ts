@@ -17,6 +17,7 @@ interface Conn {
   listeners: Set<() => void>;
   reconnectTimer?: ReturnType<typeof setTimeout>;
   snapshot: Snapshot;
+  _token?: string;
 }
 
 interface Snapshot {
@@ -55,9 +56,15 @@ function addEvent(c: Conn, event: ActivityEvent) {
   c.activityLog = next;
 }
 
-function openWS(websiteId: string, c: Conn) {
+function connKey(websiteId: string, token?: string) {
+  return token ? `${websiteId}:${token}` : websiteId;
+}
+
+function openWS(websiteId: string, c: Conn, token?: string) {
   const protocol = location.protocol === "https:" ? "wss:" : "ws:";
-  const ws = new WebSocket(`${protocol}//${location.host}/ws?website=${websiteId}`);
+  let url = `${protocol}//${location.host}/ws?website=${websiteId}`;
+  if (token) url += `&token=${encodeURIComponent(token)}`;
+  const ws = new WebSocket(url);
   c.ws = ws;
 
   ws.onopen = () => {
@@ -105,15 +112,16 @@ function openWS(websiteId: string, c: Conn) {
     c.connected = false;
     notify(c);
     if (c.ws === ws && c.refCount > 0) {
-      c.reconnectTimer = setTimeout(() => openWS(websiteId, c), 2000);
+      c.reconnectTimer = setTimeout(() => openWS(websiteId, c, c._token), 2000);
     }
   };
 
   ws.onerror = () => ws.close();
 }
 
-function sub(websiteId: string, listener: () => void): () => void {
-  let c = conns.get(websiteId);
+function sub(websiteId: string, listener: () => void, token?: string): () => void {
+  const key = connKey(websiteId, token);
+  let c = conns.get(key);
   if (!c) {
     c = {
       ws: null,
@@ -124,14 +132,15 @@ function sub(websiteId: string, listener: () => void): () => void {
       refCount: 0,
       listeners: new Set(),
       snapshot: EMPTY,
+      _token: token,
     };
-    conns.set(websiteId, c);
+    conns.set(key, c);
   }
 
   c.refCount++;
   c.listeners.add(listener);
 
-  if (c.refCount === 1) openWS(websiteId, c);
+  if (c.refCount === 1) openWS(websiteId, c, token);
 
   return () => {
     c.listeners.delete(listener);
@@ -140,26 +149,26 @@ function sub(websiteId: string, listener: () => void): () => void {
       clearTimeout(c.reconnectTimer);
       c.ws?.close();
       c.ws = null;
-      conns.delete(websiteId);
+      conns.delete(key);
     }
   };
 }
 
-function snap(websiteId: string): Snapshot {
-  return conns.get(websiteId)?.snapshot ?? EMPTY;
+function snap(websiteId: string, token?: string): Snapshot {
+  return conns.get(connKey(websiteId, token))?.snapshot ?? EMPTY;
 }
 
 // ─── React hook ───
 
-export function useWebSocket(websiteId: string | null) {
+export function useWebSocket(websiteId: string | null, token?: string) {
   const subscribe = useCallback(
-    (listener: () => void) => (websiteId ? sub(websiteId, listener) : () => {}),
-    [websiteId]
+    (listener: () => void) => (websiteId ? sub(websiteId, listener, token) : () => {}),
+    [websiteId, token]
   );
 
   const getSnapshot = useCallback(
-    () => (websiteId ? snap(websiteId) : EMPTY),
-    [websiteId]
+    () => (websiteId ? snap(websiteId, token) : EMPTY),
+    [websiteId, token]
   );
 
   return useSyncExternalStore(subscribe, getSnapshot);

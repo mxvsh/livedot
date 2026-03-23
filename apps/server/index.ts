@@ -19,7 +19,7 @@ export { websiteCache };
 async function loadWebsiteCache() {
   const { getUserLimits } = await import("./limits");
   const all = await db
-    .select({ id: websites.id, url: websites.url, userId: websites.userId })
+    .select({ id: websites.id, url: websites.url, userId: websites.userId, shareToken: websites.shareToken })
     .from(websites);
 
   // Batch user lookups
@@ -36,6 +36,7 @@ async function loadWebsiteCache() {
         maxConcurrent: limits.maxConnectionsPerSite,
         eventRetentionMs: limits.eventRetentionMs,
         historyMax: limits.historyMax,
+        shareToken: w.shareToken,
       });
     } catch {
       websiteCache.set(w.id, {
@@ -43,6 +44,7 @@ async function loadWebsiteCache() {
         maxConcurrent: limits.maxConnectionsPerSite,
         eventRetentionMs: limits.eventRetentionMs,
         historyMax: limits.historyMax,
+        shareToken: w.shareToken,
       });
     }
   }
@@ -96,6 +98,24 @@ const server = Bun.serve({
         return new Response("Missing website parameter", { status: 400 });
       }
 
+      const token = url.searchParams.get("token");
+
+      // Token-based auth for embeds
+      if (token) {
+        const cached = websiteCache.get(websiteId);
+        if (!cached?.shareToken || cached.shareToken !== token) {
+          return new Response("Invalid share token", { status: 401 });
+        }
+        const upgraded = server.upgrade<WSData>(req, {
+          data: { websiteId, userId: "__embed__" },
+        });
+        if (!upgraded) {
+          return new Response("WebSocket upgrade failed", { status: 400 });
+        }
+        return undefined;
+      }
+
+      // Session-based auth for dashboard
       return auth.api.getSession({ headers: req.headers }).then((session) => {
         if (!session) {
           return new Response("Unauthorized", { status: 401 });

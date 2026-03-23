@@ -3,6 +3,7 @@ export interface WebsiteCacheEntry {
   maxConcurrent: number; // 0 = unlimited
   eventRetentionMs: number; // 0 = unlimited
   historyMax: number; // 0 = unlimited
+  shareToken: string | null;
 }
 
 // Cache website IDs → limits derived from owner's plan

@@ -11,6 +11,7 @@ import WebsiteCard from "@/components/websites/WebsiteCard";
 import CreateWebsiteModal from "@/components/websites/CreateWebsiteModal";
 import EditWebsiteModal from "@/components/websites/EditWebsiteModal";
 import SnippetModal from "@/components/websites/SnippetModal";
+import ShareModal from "@/components/websites/ShareModal";
 import DeleteWebsiteDialog from "@/components/websites/DeleteWebsiteDialog";
 
 export const Route = createFileRoute("/")({
@@ -27,6 +28,7 @@ function HomePage() {
   const [deleteTarget, setDeleteTarget] = useState<Website | null>(null);
   const [editTarget, setEditTarget] = useState<Website | null>(null);
   const [snippetTarget, setSnippetTarget] = useState<Website | null>(null);
+  const [shareTarget, setShareTarget] = useState<Website | null>(null);
 
   async function load(showSpinner = false) {
     if (showSpinner) setLoading(true);
@@ -111,6 +113,7 @@ function HomePage() {
                 key={website.id}
                 website={website}
                 onSnippet={setSnippetTarget}
+                onShare={setShareTarget}
                 onEdit={setEditTarget}
                 onDelete={setDeleteTarget}
               />
@@ -131,6 +134,11 @@ function HomePage() {
         <SnippetModal
           website={snippetTarget}
           onClose={() => setSnippetTarget(null)}
+        />
+        <ShareModal
+          website={shareTarget}
+          onClose={() => setShareTarget(null)}
+          onUpdated={() => load()}
         />
         <DeleteWebsiteDialog
           website={deleteTarget}

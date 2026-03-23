@@ -66,6 +66,7 @@ export const websites = sqliteTable("websites", {
     .references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   url: text("url").notNull().default(""),
-  metadata: text("metadata", { mode: "json" }).$type<Record<string, unknown>>(), // no longer stores maxConnections — derived from owner's plan
+  shareToken: text("share_token").unique(),
+  metadata: text("metadata", { mode: "json" }).$type<Record<string, unknown>>(),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });

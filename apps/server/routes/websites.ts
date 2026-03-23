@@ -6,12 +6,12 @@ import { requireAuth } from "../middleware/auth";
 import { websiteCache } from "../website-cache";
 import { getUserLimits } from "../limits";
 
-function cacheEntryFromLimits(url: string, limits: { maxConnectionsPerSite: number; eventRetentionMs: number; historyMax: number }) {
+function cacheEntryFromLimits(url: string, limits: { maxConnectionsPerSite: number; eventRetentionMs: number; historyMax: number }, shareToken: string | null = null) {
   try {
     const hostname = url ? new URL(url).hostname : "";
-    return { hostname, maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax };
+    return { hostname, maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
   } catch {
-    return { hostname: "", maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax };
+    return { hostname: "", maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
   }
 }
 
@@ -45,7 +45,7 @@ export const websiteRoutes = new Hono()
       .values({ name: name.trim(), url: url?.trim() || "", userId: user.id })
       .returning();
 
-    websiteCache.set(website.id, cacheEntryFromLimits(website.url, limits));
+    websiteCache.set(website.id, cacheEntryFromLimits(website.url, limits, website.shareToken));
     return c.json(website);
   })
 
@@ -65,7 +65,7 @@ export const websiteRoutes = new Hono()
       .returning();
 
     const limits = await getUserLimits(user.id);
-    websiteCache.set(updated.id, cacheEntryFromLimits(updated.url, limits));
+    websiteCache.set(updated.id, cacheEntryFromLimits(updated.url, limits, updated.shareToken));
     return c.json(updated);
   })
 
@@ -73,5 +73,36 @@ export const websiteRoutes = new Hono()
     const id = c.req.param("id");
     await db.delete(websites).where(eq(websites.id, id));
     websiteCache.delete(id);
+    return c.json({ ok: true });
+  })
+
+  .post("/websites/:id/share", async (c) => {
+    const user = c.get("user");
+    const id = c.req.param("id");
+
+    const [website] = await db.select().from(websites).where(eq(websites.id, id)).limit(1);
+    if (!website || website.userId !== user.id) return c.json({ error: "Not found" }, 404);
+
+    const shareToken = crypto.randomUUID().replace(/-/g, "").slice(0, 24);
+    await db.update(websites).set({ shareToken }).where(eq(websites.id, id));
+
+    const cached = websiteCache.get(id);
+    if (cached) cached.shareToken = shareToken;
+
+    return c.json({ shareToken });
+  })
+
+  .delete("/websites/:id/share", async (c) => {
+    const user = c.get("user");
+    const id = c.req.param("id");
+
+    const [website] = await db.select().from(websites).where(eq(websites.id, id)).limit(1);
+    if (!website || website.userId !== user.id) return c.json({ error: "Not found" }, 404);
+
+    await db.update(websites).set({ shareToken: null }).where(eq(websites.id, id));
+
+    const cached = websiteCache.get(id);
+    if (cached) cached.shareToken = null;
+
     return c.json({ ok: true });
   });
