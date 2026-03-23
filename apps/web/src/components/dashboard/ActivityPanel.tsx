@@ -105,9 +105,9 @@ export default function ActivityPanel({ session, events, onClose }: Props) {
       className="fixed bottom-10 left-3 z-50 w-68 md:bottom-12 md:left-4"
       style={{ width: 272 }}
     >
-      <div className="rounded-2xl border border-border bg-surface/95 backdrop-blur-xl shadow-xl overflow-hidden">
+      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-border">
+        <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/[0.06]">
           <DiceBearAvatar sessionId={session.sessionId} size={28} />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-mono text-foreground/90 leading-tight">{shortId}</p>
