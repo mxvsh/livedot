@@ -37,8 +37,7 @@ COPY --from=oven/bun:1-alpine /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /app
 COPY --from=prod-deps /temp/node_modules/ node_modules/
 COPY --from=build-server /app/apps/server/ apps/server/
-COPY --from=build-server /app/packages/db/ packages/db/
-COPY --from=build-server /app/packages/shared/ packages/shared/
+COPY --from=build-server /app/packages/ packages/
 COPY --from=build-server /app/package.json .
 COPY docker/Caddyfile /etc/caddy/Caddyfile
 COPY docker/entrypoint.sh .
