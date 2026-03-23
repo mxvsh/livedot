@@ -10,4 +10,5 @@ export interface VisitorSession {
 export type WSMessage =
   | { type: "snapshot"; sessions: VisitorSession[] }
   | { type: "upsert"; session: VisitorSession }
-  | { type: "remove"; sessionId: string };
+  | { type: "remove"; sessionId: string }
+  | { type: "event"; sessionId: string; eventName: string; pageUrl: string; timestamp: number };

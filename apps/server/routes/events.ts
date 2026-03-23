@@ -51,7 +51,7 @@ export const eventRoutes = new Hono()
   .post("/event", async (c) => {
     try {
       const text = await c.req.text();
-      const { websiteId, sessionId, url, _mockLat, _mockLng } = JSON.parse(text);
+      const { websiteId, sessionId, url, eventName, _mockLat, _mockLng } = JSON.parse(text);
 
       if (!websiteId || !sessionId) {
         return c.body(null, 400);
@@ -77,7 +77,20 @@ export const eventRoutes = new Hono()
         return c.body(null, 403);
       }
 
-      // Rate limit
+      // Named events (data-umami-event clicks): publish and return — no rate limit, no geo
+      if (typeof eventName === "string" && eventName) {
+        const msg: import("@livedot/shared").WSMessage = {
+          type: "event",
+          sessionId,
+          eventName,
+          pageUrl: url || "",
+          timestamp: Date.now(),
+        };
+        server?.publish(`website:${websiteId}`, JSON.stringify(msg));
+        return c.body(null, 204);
+      }
+
+      // Rate limit (beacon only)
       const ip =
         c.req.header("cf-connecting-ip") ||
         c.req.header("x-forwarded-for")?.split(",")[0].trim() ||

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Tooltip } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GlobeIcon, BrowserIcon } from "@hugeicons/core-free-icons";
@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 import Map from "@/components/dashboard/Map";
 import Dock from "@/components/dashboard/Dock";
+import ActivityPanel from "@/components/dashboard/ActivityPanel";
 
 export const Route = createFileRoute("/websites/$websiteId")({
   component: WebsiteDashboard,
@@ -19,6 +20,7 @@ function WebsiteDashboard() {
   const navigate = useNavigate();
   const [websiteName, setWebsiteName] = useState("");
   const [activeTab, setActiveTab] = useState<"map" | "pages">("map");
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
   const { user, checked, check } = useAuthStore();
 
@@ -36,13 +38,27 @@ function WebsiteDashboard() {
     })();
   }, [websiteId]);
 
-  const { sessions, connected, count } = useWebSocket(websiteId);
+  const { sessions, connected, count, activityLog } = useWebSocket(websiteId);
   const sessionArray = Array.from(sessions.values());
+
+  const selectedSession = selectedSessionId ? sessions.get(selectedSessionId) ?? null : null;
+  const selectedEvents = selectedSessionId ? (activityLog.get(selectedSessionId) ?? []) : [];
+
+  // Deselect if session disappears
+  useEffect(() => {
+    if (selectedSessionId && !sessions.has(selectedSessionId)) {
+      setSelectedSessionId(null);
+    }
+  }, [sessions, selectedSessionId]);
 
   return (
     <div className="h-screen w-screen relative">
       {/* Map (full screen) */}
-      <Map sessions={sessionArray} />
+      <Map
+        sessions={sessionArray}
+        selectedSessionId={selectedSessionId}
+        onSessionSelect={setSelectedSessionId}
+      />
 
       {/* Floating top bar */}
       <div className="fixed top-3 left-1/2 z-50 -translate-x-1/2 md:top-4">
@@ -88,16 +104,28 @@ function WebsiteDashboard() {
         </motion.div>
       </div>
 
+      {/* Website name top left */}
+      <div className="fixed top-3 left-3 z-40 md:top-4 md:left-4">
+        <p className="text-xs text-muted/60">{websiteName}</p>
+        <p className="text-[10px] text-muted/60">{websiteId}</p>
+      </div>
+
+      {/* Activity panel (bottom left) — shown when a session is selected */}
+      <AnimatePresence>
+        {selectedSession && (
+          <ActivityPanel
+            key={selectedSession.sessionId}
+            session={selectedSession}
+            events={selectedEvents}
+            onClose={() => setSelectedSessionId(null)}
+          />
+        )}
+      </AnimatePresence>
+
       <div className="fixed bottom-3 left-3 z-40 md:bottom-4 md:left-4">
         <span className="text-xs text-muted/60">
           livedot {import.meta.env.VITE_VERSION ?? ""}
         </span>
-      </div>
-      
-      {/* Website name top left */}
-      <div className="fixed top-3 left-3 z-40 md:bottom-4 md:left-4">
-        <p className="text-xs text-muted/60">{websiteName}</p>
-        <p className="text-[10px] text-muted/60">{websiteId}</p>
       </div>
 
       <Dock websiteName={websiteName} count={count} connected={connected} />
