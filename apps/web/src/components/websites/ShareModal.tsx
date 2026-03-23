@@ -12,12 +12,30 @@ interface Props {
   onUpdated: () => void;
 }
 
+type EmbedTab = "map" | "chart" | "live";
+
+const embedPreviewImages: Record<EmbedTab, { src: string; alt: string }> = {
+  map: {
+    src: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&h=675&q=80",
+    alt: "Map widget placeholder preview",
+  },
+  chart: {
+    src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&h=600&q=80",
+    alt: "Chart widget placeholder preview",
+  },
+  live: {
+    src: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&h=320&q=80",
+    alt: "Live count widget placeholder preview",
+  },
+};
+
 export default function ShareModal({ website, onClose, onUpdated }: Props) {
   const user = useAuthStore((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [localToken, setLocalToken] = useState<string | null | undefined>(undefined);
   const [brandingOptIn, setBrandingOptIn] = useState(false);
+  const [activeTab, setActiveTab] = useState<EmbedTab>("map");
 
   const shareToken = localToken !== undefined ? localToken : website?.shareToken;
   const isSharing = !!shareToken;
@@ -33,6 +51,36 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
   const chartEmbed = shareToken
     ? `<iframe src="${origin}/embed/chart?website=${website?.id}&token=${shareToken}${brandingParam}" width="100%" height="200" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
     : "";
+
+  const liveEmbed = shareToken
+    ? `<iframe src="${origin}/embed/live?website=${website?.id}&token=${shareToken}&scale=0.85${brandingParam}" width="260" height="84" frameborder="0" style="border:0;overflow:hidden;"></iframe>`
+    : "";
+
+  const embeds = {
+    map: {
+      title: "Map Widget",
+      description: "A full live world map with active visitors.",
+      snippet: mapEmbed,
+      height: "400px",
+      width: "100%",
+    },
+    chart: {
+      title: "Chart Widget",
+      description: "A compact traffic trend chart with the live count.",
+      snippet: chartEmbed,
+      height: "200px",
+      width: "100%",
+    },
+    live: {
+      title: "Live Count Widget",
+      description: "Just the live dot and current visitor count.",
+      snippet: liveEmbed,
+      height: "84px",
+      width: "260px",
+    },
+  } satisfies Record<EmbedTab, { title: string; description: string; snippet: string; height: string; width: string }>;
+
+  const activeEmbed = embeds[activeTab];
 
   async function toggleSharing() {
     if (!website) return;
@@ -65,6 +113,7 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
           setCopied(null);
           setLocalToken(undefined);
           setBrandingOptIn(false);
+          setActiveTab("map");
           onClose();
         }
       }}
@@ -74,10 +123,10 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
           <Modal.Dialog className="sm:max-w-[400px]">
             <Modal.CloseTrigger />
             <Modal.Header>
-              <Modal.Icon className="bg-default text-foreground">
+              {/*<Modal.Icon className="bg-default text-foreground">
                 <HugeiconsIcon icon={Share01Icon} size={20} />
-              </Modal.Icon>
-              <Modal.Heading>Embed Widget</Modal.Heading>
+              </Modal.Icon>*/}
+              {/*<Modal.Heading>Embed Widget</Modal.Heading>*/}
             </Modal.Header>
             <Modal.Body>
               {!isSharing ? (
@@ -105,61 +154,73 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
                         className="mt-0.5 h-4 w-4 accent-[var(--accent)]"
                       />
                       <span className="text-[11px] leading-relaxed text-muted">
-                        Explicitly include the Livedot branding badge in shared embeds.
+                        Enable branding
                       </span>
                     </label>
                   )}
 
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p className="text-xs font-medium text-foreground">Map Widget</p>
-                      <button
-                        onClick={() => handleCopy(mapEmbed, "map")}
-                        className="text-muted hover:text-foreground transition-colors"
-                      >
-                        <HugeiconsIcon icon={copied === "map" ? Tick02Icon : CopyIcon} size={14} />
-                      </button>
+                    <div>
+                      <div className="flex justify-center">
+                      <div className="inline-flex rounded-full bg-surface-secondary p-1">
+                        {(["map", "chart", "live"] as EmbedTab[]).map((tab) => (
+                          <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            data-selected={activeTab === tab}
+                            className="relative rounded-full px-3 py-1.5 text-xs font-medium text-muted transition-colors data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
+                          >
+                            {embeds[tab].title.replace(" Widget", "")}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <pre className="bg-default rounded-xl p-3 text-[10px] font-mono text-foreground overflow-x-auto select-all leading-relaxed">
-                      {mapEmbed}
-                    </pre>
                   </div>
 
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p className="text-xs font-medium text-foreground">Chart Widget</p>
+                  <div className="rounded-2xl border border-white/8 bg-default p-4">
+                    <div className="mb-4 overflow-hidden rounded-xl border border-white/8 bg-surface-secondary">
+                      <img
+                        src={embedPreviewImages[activeTab].src}
+                        alt={embedPreviewImages[activeTab].alt}
+                        className={`w-full object-cover ${
+                          activeTab === "map" ? "aspect-[16/9]" : activeTab === "chart" ? "aspect-[2/1]" : "aspect-[5/2]"
+                        }`}
+                      />
+                    </div>
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{activeEmbed.title}</p>
+                        <p className="mt-1 text-xs text-muted">{activeEmbed.description}</p>
+                        <p className="mt-2 text-[10px] uppercase tracking-[0.18em] text-muted/70">
+                          Suggested embed size {activeEmbed.width} × {activeEmbed.height}
+                        </p>
+                      </div>
                       <button
-                        onClick={() => handleCopy(chartEmbed, "chart")}
+                        onClick={() => handleCopy(activeEmbed.snippet, activeTab)}
                         className="text-muted hover:text-foreground transition-colors"
                       >
-                        <HugeiconsIcon icon={copied === "chart" ? Tick02Icon : CopyIcon} size={14} />
+                        <HugeiconsIcon icon={copied === activeTab ? Tick02Icon : CopyIcon} size={14} />
                       </button>
                     </div>
-                    <pre className="bg-default rounded-xl p-3 text-[10px] font-mono text-foreground overflow-x-auto select-all leading-relaxed">
-                      {chartEmbed}
+
+                    <pre className="rounded-xl bg-surface-secondary px-3 py-3 text-[10px] font-mono text-foreground overflow-x-auto select-all leading-relaxed">
+                      {activeEmbed.snippet}
                     </pre>
                   </div>
-
                   <p className="text-[10px] text-muted">
-                    Customize with URL params: <code className="text-foreground/60">bg</code> (background color), <code className="text-foreground/60">accent</code> (chart color).
+                    Need embed options or docs?{" "}
+                    <a
+                      href="https://livedot.dev/help"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-foreground underline underline-offset-2"
+                    >
+                      Learn more
+                    </a>
                   </p>
-                  {showBrandingNotice && (
-                    <p className="text-[10px] text-muted">
-                      Your {planLabel(user?.plan ?? "free")} plan adds a Livedot branding badge to shared embeds.
-                    </p>
-                  )}
-                  {!isFreePlan && brandingOptIn && (
-                    <p className="text-[10px] text-muted">
-                      Branding is enabled here via <code className="text-foreground/60">branding=1</code> in the embed URL.
-                    </p>
-                  )}
                 </div>
               )}
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="outline" onPress={onClose} className="flex-1">
-                Close
-              </Button>
               {isSharing && (
                 <Button variant="outline" className="flex-1 text-danger" onPress={toggleSharing} isDisabled={loading}>
                   {loading ? "Disabling..." : "Disable Sharing"}

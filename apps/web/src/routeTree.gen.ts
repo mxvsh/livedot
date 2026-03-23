@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WebsitesWebsiteIdRouteImport } from './routes/websites.$websiteId'
 import { Route as EmbedMapRouteImport } from './routes/embed/map'
+import { Route as EmbedLiveRouteImport } from './routes/embed/live'
 import { Route as EmbedChartRouteImport } from './routes/embed/chart'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -29,6 +30,11 @@ const WebsitesWebsiteIdRoute = WebsitesWebsiteIdRouteImport.update({
 const EmbedMapRoute = EmbedMapRouteImport.update({
   id: '/embed/map',
   path: '/embed/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmbedLiveRoute = EmbedLiveRouteImport.update({
+  id: '/embed/live',
+  path: '/embed/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmbedChartRoute = EmbedChartRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/embed/chart': typeof EmbedChartRoute
+  '/embed/live': typeof EmbedLiveRoute
   '/embed/map': typeof EmbedMapRoute
   '/websites/$websiteId': typeof WebsitesWebsiteIdRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/embed/chart': typeof EmbedChartRoute
+  '/embed/live': typeof EmbedLiveRoute
   '/embed/map': typeof EmbedMapRoute
   '/websites/$websiteId': typeof WebsitesWebsiteIdRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/embed/chart': typeof EmbedChartRoute
+  '/embed/live': typeof EmbedLiveRoute
   '/embed/map': typeof EmbedMapRoute
   '/websites/$websiteId': typeof WebsitesWebsiteIdRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/embed/chart'
+    | '/embed/live'
     | '/embed/map'
     | '/websites/$websiteId'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/embed/chart'
+    | '/embed/live'
     | '/embed/map'
     | '/websites/$websiteId'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/embed/chart'
+    | '/embed/live'
     | '/embed/map'
     | '/websites/$websiteId'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   EmbedChartRoute: typeof EmbedChartRoute
+  EmbedLiveRoute: typeof EmbedLiveRoute
   EmbedMapRoute: typeof EmbedMapRoute
   WebsitesWebsiteIdRoute: typeof WebsitesWebsiteIdRoute
 }
@@ -129,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/embed/map'
       fullPath: '/embed/map'
       preLoaderRoute: typeof EmbedMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embed/live': {
+      id: '/embed/live'
+      path: '/embed/live'
+      fullPath: '/embed/live'
+      preLoaderRoute: typeof EmbedLiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/embed/chart': {
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   EmbedChartRoute: EmbedChartRoute,
+  EmbedLiveRoute: EmbedLiveRoute,
   EmbedMapRoute: EmbedMapRoute,
   WebsitesWebsiteIdRoute: WebsitesWebsiteIdRoute,
 }
