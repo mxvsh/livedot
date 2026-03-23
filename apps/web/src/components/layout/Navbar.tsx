@@ -28,6 +28,11 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <img src="/logo.svg" alt="Logo" className="h-6 rounded-md" />
           <span className="text-lg font-semibold text-foreground font-chillax">livedot</span>
+          {user?.plan && (
+            <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.08] text-muted">
+              {user.plan}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
