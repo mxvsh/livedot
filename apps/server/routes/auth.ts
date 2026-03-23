@@ -229,6 +229,12 @@ export const authRoutes = new Hono()
     if (!email) return c.json({ error: "Email required" }, 400);
     const cooldown = checkEmailCooldown(email);
     if (!cooldown.allowed) return c.json({ error: `Please wait ${cooldown.retryAfter}s before requesting another email` }, 429);
+
+    const found = await db.select({ emailVerified: user.emailVerified }).from(user).where(eq(user.email, email)).limit(1);
+    if (!found.length || !found[0].emailVerified) {
+      return c.json({ error: "Please verify your email before resetting your password." }, 400);
+    }
+
     try {
       await auth.api.requestPasswordReset({
         body: { email, redirectTo: `${env.APP_URL}/auth/reset-password` },
@@ -237,7 +243,6 @@ export const authRoutes = new Hono()
       markEmailSent(email);
     } catch (err) {
       log.error(err, "Failed to request password reset");
-      // Don't reveal if email exists
     }
     return c.json({ ok: true });
   })
