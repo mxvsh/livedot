@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.0-beta.19](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.18...v0.1.0-beta.19) (2026-03-23)
+
+* Fix dockerfile ([](https://github.com/mxvsh/livedot/commit/cd48b5537620661dccdb0d023fdfacc6db50bfbe))
+* Create netlify.toml ([](https://github.com/mxvsh/livedot/commit/6dabb56ac2379d822f65d1e81846587f55e02135))
+* Add pricing page ([](https://github.com/mxvsh/livedot/commit/582803ff3dcfadb1532b0aa15cdc7b1a253a1d6c))
+
 ## [0.1.0-beta.18](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.17...v0.1.0-beta.18) (2026-03-23)
 
 ## [0.1.0-beta.17](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.16...v0.1.0-beta.17) (2026-03-23)
