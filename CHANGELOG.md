@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.5](https://github.com/mxvsh/livedot/compare/v0.1.4...v0.1.5) (2026-03-23)
+
+* Add privacy+terms and improve ui ([](https://github.com/mxvsh/livedot/commit/8903aeab1b34ec1b857573e13e04cbf8b15222f4))
+* Setup polar.sh ([](https://github.com/mxvsh/livedot/commit/e5d470e1d41b5f9ad68d6b03e37eb3736a5dcfb8))
+* Add user usage tracking and display in profile modal ([](https://github.com/mxvsh/livedot/commit/161ce636f52701a4f753085dfa197659ff5a67d8))
+* Add monthly event limit enforcement for custom events ([](https://github.com/mxvsh/livedot/commit/167a6764275e461c8cfcc4603d999786df9ded39))
+* Improve profile modal ([](https://github.com/mxvsh/livedot/commit/fa4ceec9c33c19664d2fce6bd90dad7108b7b059))
+* Require email verification for password reset requests ([](https://github.com/mxvsh/livedot/commit/237734ed0311e5b15d8c3aac79800dcb135affa1))
+* Track website create ([](https://github.com/mxvsh/livedot/commit/c76958efe568bf4668a419a549851901595d0d06))
+* Setup forgot pass flow ([](https://github.com/mxvsh/livedot/commit/1e7a5bfaf780075a52fd5fe84620392dfa17ab83))
+* Add email+pass signup flow ([](https://github.com/mxvsh/livedot/commit/141bffae3ad9c962bd6b0c2130eab7a4542984b0))
+
 ## [0.1.4](https://github.com/mxvsh/livedot/compare/v0.1.3...v0.1.4) (2026-03-23)
 
 * Fix widget styling ([](https://github.com/mxvsh/livedot/commit/1e4ba6a75ead8b0d25ecb8768dc091771977d827))
