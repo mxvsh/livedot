@@ -57,13 +57,13 @@ export const formatRetention = (eventRetentionMs: number) => {
   if (eventRetentionMs === 0) return "Unlimited event retention";
 
   const minutes = eventRetentionMs / 60_000;
-  if (minutes < 60) return `${minutes} minutes of event retention`;
+  if (minutes < 60) return `${minutes} ${minutes === 1 ? "minute" : "minutes"} of event retention`;
 
   const hours = eventRetentionMs / 3_600_000;
-  if (hours < 24) return `${hours} hours of event retention`;
+  if (hours < 24) return `${hours} ${hours === 1 ? "hour" : "hours"} of event retention`;
 
   const days = eventRetentionMs / 86_400_000;
-  return `${days} days of event retention`;
+  return `${days} ${days === 1 ? "day" : "days"} of event retention`;
 };
 
 export const formatHistory = (historyMax: number) => {
@@ -71,14 +71,17 @@ export const formatHistory = (historyMax: number) => {
 
   const totalSeconds = historyMax * 5;
   if (totalSeconds < 3600) {
-    return `${Math.round(totalSeconds / 60)} minutes of live traffic`;
+    const minutes = Math.round(totalSeconds / 60);
+    return `${minutes} ${minutes === 1 ? "minute" : "minutes"} of live traffic`;
   }
 
   if (totalSeconds < 86_400) {
-    return `${Math.round(totalSeconds / 3600)} hours of live traffic`;
+    const hours = Math.round(totalSeconds / 3600);
+    return `${hours} ${hours === 1 ? "hour" : "hours"} of live traffic`;
   }
 
-  return `${Math.round(totalSeconds / 86_400)} days of live traffic`;
+  const days = Math.round(totalSeconds / 86_400);
+  return `${days} ${days === 1 ? "day" : "days"} of live traffic`;
 };
 
 export const pricingPlans: PricingPlan[] = orderedPlanIds.map((id) => ({
