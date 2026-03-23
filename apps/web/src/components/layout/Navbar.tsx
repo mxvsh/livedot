@@ -7,11 +7,13 @@ import {
   Settings01Icon,
   UserIcon,
   HelpCircleIcon,
+  CreditCardIcon,
   Github,
 } from "@hugeicons/core-free-icons";
 import { useAuthStore } from "@/stores/auth";
 import { planLabel } from "@livedot/shared/plans";
 import ProfileModal from "./ProfileModal";
+import BillingModal from "./BillingModal";
 
 function getInitials(username: string) {
   return username.slice(0, 2).toUpperCase();
@@ -21,6 +23,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [billingOpen, setBillingOpen] = useState(false);
 
   return (
     <>
@@ -69,6 +72,7 @@ export default function Navbar() {
             <Dropdown.Menu
               onAction={async (key) => {
                 if (key === "profile") setProfileOpen(true);
+                if (key === "billing") setBillingOpen(true);
                 if (key === "logout") {
                   await logout();
                   navigate({ to: "/auth/login" });
@@ -80,6 +84,12 @@ export default function Navbar() {
                   <HugeiconsIcon icon={UserIcon} size={16} />
                   My Account
                 </Dropdown.Item>
+                {user?.plan !== "ce" && (
+                  <Dropdown.Item id="billing" textValue="Billing">
+                    <HugeiconsIcon icon={CreditCardIcon} size={16} />
+                    Billing
+                  </Dropdown.Item>
+                )}
                 <Dropdown.Item id="settings" textValue="Settings">
                   <HugeiconsIcon icon={Settings01Icon} size={16} />
                   Settings
@@ -104,6 +114,7 @@ export default function Navbar() {
     </nav>
 
     <ProfileModal isOpen={profileOpen} onOpenChange={setProfileOpen} />
+    <BillingModal isOpen={billingOpen} onOpenChange={setBillingOpen} />
     </>
   );
 }
