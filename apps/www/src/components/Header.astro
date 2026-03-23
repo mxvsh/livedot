@@ -1,0 +1,103 @@
+---
+const navLinks = [
+  { label: "Features", href: "#features" },
+  { label: "Installation", href: "#installation" },
+  { label: "FAQ", href: "#faq" },
+  { label: "GitHub", href: "https://github.com/mxvsh/livedot", external: true },
+];
+---
+
+<header class="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-surface/80 backdrop-blur-md">
+  <nav class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+    <a href="#" class="flex items-center gap-3 text-lg font-bold text-primary md:text-xl">
+      <img src="/logo.svg" alt="Livedot logo" class="h-8 w-8 rounded-md" />
+      <span class="brand-wordmark">livedot</span>
+    </a>
+
+    <div class="hidden items-center gap-8 font-headline tracking-tight md:flex">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          data-section-link={link.external ? undefined : link.href.slice(1)}
+          class:list={[
+            "border-b-2 pb-1 transition-colors",
+            link.external
+              ? "border-transparent text-on-surface-variant hover:text-white"
+              : "border-transparent text-on-surface-variant hover:text-white",
+          ]}
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+
+    <a
+      href="https://cloud.livedot.dev"
+      class="font-headline rounded-md bg-primary px-5 py-2 text-sm font-semibold tracking-[-0.03em] text-on-primary-container transition-transform hover:bg-primary-container active:scale-95"
+    >
+      Cloud
+    </a>
+  </nav>
+</header>
+
+<script>
+  const initSectionNav = () => {
+    const sectionLinks = Array.from(document.querySelectorAll("[data-section-link]"));
+    const sections = sectionLinks
+      .map((link) => {
+        const id = link.getAttribute("data-section-link");
+        return id ? document.getElementById(id) : null;
+      })
+      .filter(Boolean);
+
+    const setActiveLink = (activeId) => {
+      sectionLinks.forEach((link) => {
+        const isActive = link.getAttribute("data-section-link") === activeId;
+        link.classList.toggle("border-primary", isActive);
+        link.classList.toggle("text-primary", isActive);
+        link.classList.toggle("border-transparent", !isActive);
+        link.classList.toggle("text-on-surface-variant", !isActive);
+      });
+    };
+
+    const pickActiveSection = () => {
+      const offset = window.innerHeight * 0.32;
+      let activeId;
+
+      for (const section of sections) {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= offset && rect.bottom >= offset) {
+          activeId = section.id;
+        }
+      }
+
+      setActiveLink(activeId);
+    };
+
+    if (sections.length === 0) {
+      return;
+    }
+
+    pickActiveSection();
+
+    const observer = new IntersectionObserver(
+      () => {
+        pickActiveSection();
+      },
+      {
+        rootMargin: "-20% 0px -55% 0px",
+        threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
+      },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    window.addEventListener("scroll", pickActiveSection, { passive: true });
+    window.addEventListener("resize", pickActiveSection);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSectionNav, { once: true });
+  } else {
+    initSectionNav();
+  }
+</script>

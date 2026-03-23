@@ -1,0 +1,20 @@
+---
+import FaqSection from "../components/FaqSection.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import HeroSection from "../components/HeroSection.astro";
+import InstallationSection from "../components/InstallationSection.astro";
+import FeaturesSection from "../components/FeaturesSection.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+---
+
+<MainLayout title="Livedot - Real-time User Visualization" pathname={Astro.url.pathname}>
+  <Header />
+  <main>
+    <HeroSection />
+    <FeaturesSection />
+    <InstallationSection />
+    <FaqSection />
+  </main>
+  <Footer />
+</MainLayout>

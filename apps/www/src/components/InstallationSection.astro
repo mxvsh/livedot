@@ -1,0 +1,64 @@
+---
+const deploymentTargets = ["Docker", "Source Code"];
+const installCommand = [
+  "docker run -d \\",
+  "  -p 5500:80 \\",
+  "  -v ./data:/data \\",
+  "  ghcr.io/mxvsh/livedot",
+];
+---
+
+<section id="installation" class="overflow-hidden bg-surface-container-low py-32">
+  <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 lg:grid-cols-2">
+    <div>
+      <span class="mb-6 inline-block bg-surface-container-highest px-3 py-1 font-mono text-xs tracking-[0.35em] text-primary">
+        DEPLOYMENT
+      </span>
+      <h2 class="mb-6 font-headline text-4xl font-bold tracking-tight md:text-5xl">
+        Up and running in seconds.
+      </h2>
+      <p class="mb-8 max-w-lg text-lg text-on-surface-variant">
+        Livedot is designed for developers who value speed. Self-host with total data sovereignty using an optimized Docker image and a setup path that stays short.
+      </p>
+      <div class="flex flex-wrap items-center gap-4 font-mono text-sm text-outline">
+        {deploymentTargets.map((target) => (
+          <span class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-primary pulse-dot"></span>
+            {target}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <div class="group relative">
+      <div class="absolute -inset-1 bg-primary/20 blur opacity-25 transition-opacity group-hover:opacity-40"></div>
+      <div class="shell-window relative rounded-lg p-1">
+        <div class="flex items-center justify-between border-b border-outline-variant/20 bg-surface-container px-4 py-2">
+          <div class="flex gap-1.5">
+            <div class="h-3 w-3 rounded-full bg-error-dim/40"></div>
+            <div class="h-3 w-3 rounded-full bg-secondary-dim/40"></div>
+            <div class="h-3 w-3 rounded-full bg-primary-dim/40"></div>
+          </div>
+          <span class="font-mono text-[10px] uppercase tracking-[0.35em] text-outline">Terminal</span>
+        </div>
+
+        <div class="p-8 font-mono text-sm leading-relaxed">
+          {installCommand.map((line, index) => (
+            <div class="grid grid-cols-[1.5rem_1fr] gap-4">
+              <span class="select-none pt-0.5 text-outline-variant">{index + 1}</span>
+              <pre class="overflow-x-auto whitespace-pre text-on-surface">{line}</pre>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          class="absolute bottom-4 right-4 flex items-center gap-2 border border-outline-variant/30 bg-surface-container-highest px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-primary transition-all hover:bg-primary hover:text-on-primary-container"
+        >
+          <span class="h-2 w-2 rounded-full bg-current"></span>
+          Copy
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,102 @@
+---
+type Feature = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  highlight?: boolean;
+  size: string;
+};
+
+const features: Feature[] = [
+  {
+    eyebrow: "LIVE_FEED",
+    title: "Real-time visitor tracking",
+    description: "Stream raw visitor data as it happens with zero latency. No polling, just persistent live transport.",
+    size: "md:col-span-3",
+  },
+  {
+    eyebrow: "VISUAL_ENGINE",
+    title: "Live world map visualization",
+    description: "Render global activity with a sharp, low-noise visual layer instead of a crowded analytics cockpit.",
+    size: "md:col-span-3",
+  },
+  {
+    eyebrow: "PERF_METRICS",
+    title: "Lightweight and fast",
+    description: "Built to stay out of the way, with a minimal client footprint and a direct path to live insight.",
+    size: "md:col-span-2",
+  },
+  {
+    eyebrow: "DEV_READY",
+    title: "Simple script integration",
+    description: "One script tag, fast setup, and no buried configuration before you can see traffic move.",
+    size: "md:col-span-2",
+  },
+  {
+    eyebrow: "USER_FIRST",
+    title: "No complex setup",
+    description: "Focus on what matters: seeing your users. No warehouse, no ceremony, no analytics sprawl.",
+    highlight: true,
+    size: "md:col-span-2",
+  },
+];
+---
+
+<section id="features" class="mx-auto max-w-7xl px-6 py-32">
+  <div class="mb-20 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+    <div class="max-w-2xl">
+      <h2 class="mb-4 font-headline text-4xl font-bold tracking-tight text-on-surface md:text-5xl">
+        Everything you need, nothing you don't.
+      </h2>
+      <p class="text-lg text-on-surface-variant">
+        Obsidian-grade analytics that prioritize clarity over complexity.
+      </p>
+    </div>
+    <div class="mx-12 mb-6 hidden h-px flex-1 bg-outline-variant/20 md:block"></div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:h-[600px] md:grid-cols-6 md:grid-rows-2">
+    {features.map((feature) => (
+      <article
+        class:list={[
+          "grid-panel group flex flex-col justify-between border p-8 transition-all",
+          feature.size,
+          feature.highlight
+            ? "bg-primary text-on-primary-container border-primary/30"
+            : "bg-surface-container border-transparent hover:border-primary/20",
+          !feature.highlight && feature.size === "md:col-span-2" ? "md:bg-surface-container-high" : "",
+        ]}
+      >
+        <div class="flex items-start justify-between">
+          <span class:list={[
+            "text-xs font-mono tracking-[0.35em]",
+            feature.highlight ? "text-on-primary-container/70" : "text-outline-variant",
+          ]}>
+            {feature.eyebrow}
+          </span>
+          <span
+            class:list={[
+              "h-3 w-3 rounded-full",
+              feature.highlight ? "bg-on-primary-container/70" : "bg-primary pulse-dot",
+            ]}
+          ></span>
+        </div>
+
+        <div class="relative z-10">
+          <h3 class:list={[
+            "mb-2 font-headline font-bold",
+            feature.size === "md:col-span-2" ? "text-xl" : "text-2xl",
+          ]}>
+            {feature.title}
+          </h3>
+          <p class:list={[
+            "max-w-xs text-sm leading-6",
+            feature.highlight ? "text-on-primary-container/80" : "text-on-surface-variant",
+          ]}>
+            {feature.description}
+          </p>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

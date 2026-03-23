@@ -1,0 +1,96 @@
+---
+import "../styles/global.css";
+import { siteMetadata, faqItems } from "../data/site";
+
+interface Props {
+  title: string;
+  description?: string;
+  pathname?: string;
+}
+
+const {
+  title,
+  description = siteMetadata.description,
+  pathname = "/",
+} = Astro.props;
+
+const canonicalUrl = new URL(pathname, Astro.site ?? Astro.url);
+const ogImageUrl = new URL(siteMetadata.ogImage, Astro.site ?? Astro.url);
+
+const pageJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: siteMetadata.name,
+      url: canonicalUrl.origin,
+      description: siteMetadata.description,
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: siteMetadata.name,
+      applicationCategory: "AnalyticsApplication",
+      operatingSystem: "Web",
+      description,
+      url: canonicalUrl.href,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={siteMetadata.keywords.join(", ")} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonicalUrl.href} />
+    <title>{title}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteMetadata.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl.href} />
+    <meta property="og:image" content={ogImageUrl.href} />
+    <meta property="og:image:alt" content="Livedot real-time analytics preview" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl.href} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(pageJsonLd)}></script>
+  </head>
+  <body class="bg-surface text-on-surface font-body antialiased">
+    <slot />
+  </body>
+</html>

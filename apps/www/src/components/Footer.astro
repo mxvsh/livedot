@@ -1,0 +1,26 @@
+---
+const footerLinks = [
+  { label: "Docs", href: "https://github.com/mxvsh/livedot" },
+  { label: "X", href: "https://x.com/monawwarx" },
+  { label: "Discord", href: "http://mxv.sh/discord" },
+];
+---
+
+<footer class="w-full border-t border-surface-variant/30 bg-surface">
+  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-6 py-12 md:flex-row">
+    <div class="flex flex-col items-center gap-2 md:items-start">
+      <div class="text-lg font-bold text-primary">Livedot</div>
+      <p class="text-sm tracking-wide text-on-surface-variant">
+        © 2026 Livedot. Built for the obsidian pulse.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-8 text-sm tracking-wide">
+      {footerLinks.map((link) => (
+        <a href={link.href} class="text-on-surface-variant opacity-80 transition-colors hover:text-white hover:opacity-100">
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</footer>
