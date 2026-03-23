@@ -25,7 +25,7 @@ Watch your users live across the world — fast, minimal, and real-time.
 
 ---
 
-<img width="100%" alt="image" src="https://github.com/user-attachments/assets/0f858d81-637c-46f3-b289-5181aacc2dc6" />
+<img width="100%" alt="image" src="https://github.com/user-attachments/assets/0333a995-a934-4a67-b3bc-f741e3b8087b" />
 
 <br/>
 <br/>
