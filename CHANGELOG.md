@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.0-beta.20](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.19...v0.1.0-beta.20) (2026-03-23)
+
+* Add widget embedding option ([](https://github.com/mxvsh/livedot/commit/d47a012d326919fa8d2bcdf390280cdbf63d6868))
+* Typo ([](https://github.com/mxvsh/livedot/commit/b95763b3c5e41ea9151be17bba4cc46dffa070c6))
+
 ## [0.1.0-beta.19](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.18...v0.1.0-beta.19) (2026-03-23)
 
 * Fix dockerfile ([](https://github.com/mxvsh/livedot/commit/cd48b5537620661dccdb0d023fdfacc6db50bfbe))
