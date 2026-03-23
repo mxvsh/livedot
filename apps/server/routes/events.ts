@@ -6,6 +6,25 @@ import { resolveGeo } from "../geo";
 import { upsertSession, recordCustomEvent } from "../sessions";
 import { env } from "../env";
 
+// --- Monthly event counter: websiteId:YYYY-MM → count ---
+const monthlyEventCount = new Map<string, number>();
+
+function monthKey(websiteId: string) {
+  const now = new Date();
+  return `${websiteId}:${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function incrementEventCount(websiteId: string): number {
+  const key = monthKey(websiteId);
+  const count = (monthlyEventCount.get(key) ?? 0) + 1;
+  monthlyEventCount.set(key, count);
+  return count;
+}
+
+function getEventCount(websiteId: string): number {
+  return monthlyEventCount.get(monthKey(websiteId)) ?? 0;
+}
+
 // --- Rate limiting: max 1 request per 3s per IP+websiteId ---
 const rateMap = new Map<string, number>();
 
@@ -113,6 +132,11 @@ export const eventRoutes = new Hono()
       }
 
       if (geo) {
+        // Enforce monthly event limit
+        if (cached.eventsPerMonth > 0 && getEventCount(websiteId) >= cached.eventsPerMonth) {
+          return c.body(null, 204); // silently drop
+        }
+        incrementEventCount(websiteId);
         upsertSession(
           {
             sessionId,
@@ -123,7 +147,6 @@ export const eventRoutes = new Hono()
             lastSeen: Date.now(),
           },
           server,
-          cached.maxConcurrent
         );
       }
 

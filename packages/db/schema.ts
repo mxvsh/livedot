@@ -3,7 +3,7 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 export interface UserMetadata {
   // Optional per-user overrides (take precedence over plan defaults)
   maxWebsites?: number;
-  maxConnectionsPerSite?: number;
+  eventsPerMonth?: number;
   eventRetentionMs?: number;
 }
 

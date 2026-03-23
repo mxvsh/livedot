@@ -19,8 +19,8 @@ const orderedPlanIds: PlanId[] = ["ce", "free", "pro", "max"];
 const planDetails: Record<PlanId, Omit<PricingPlan, "id" | "label" | "config">> = {
   ce: {
     mode: "Open source",
-    headline: "Unlimited limits for self-hosted teams.",
-    summary: "Run Livedot yourself with no built-in caps on sites, concurrency, or retention.",
+    headline: "Self-managed infrastructure for teams that run it themselves.",
+    summary: "Deploy Livedot on your own stack and control how far you want to scale sites, event volume, retention, and history.",
     ctaLabel: "View on GitHub",
     ctaHref: "https://github.com/mxvsh/livedot",
   },
@@ -34,7 +34,7 @@ const planDetails: Record<PlanId, Omit<PricingPlan, "id" | "label" | "config">> 
   pro: {
     mode: "Cloud",
     headline: "More headroom for growing products.",
-    summary: "Built for teams that need deeper retention, higher concurrency, and room for a few sites.",
+    summary: "Built for teams that need more monthly event volume, deeper retention, and room for a few sites.",
     ctaLabel: "Open Cloud",
     ctaHref: "https://cloud.livedot.dev",
     featured: true,
@@ -42,19 +42,21 @@ const planDetails: Record<PlanId, Omit<PricingPlan, "id" | "label" | "config">> 
   max: {
     mode: "Cloud",
     headline: "High-capacity limits for larger traffic.",
-    summary: "Built for teams monitoring more sites, heavier bursts of traffic, and a full week of events.",
+    summary: "Built for teams monitoring more sites, heavier event volume, and a full week of retained live traffic.",
     ctaLabel: "Talk to Us",
     ctaHref: "mailto:hello@livedot.dev",
   },
 };
 
 export const formatCount = (value: number, unit: string) => {
-  if (value === 0) return `Unlimited ${unit}`;
-  return `${new Intl.NumberFormat("en-US").format(value)} ${unit}`;
+  if (value === 0) return `Self-managed ${unit}`;
+  const singular = unit.endsWith("s") ? unit.slice(0, -1) : unit;
+  const label = value === 1 ? singular : unit;
+  return `${new Intl.NumberFormat("en-US").format(value)} ${label}`;
 };
 
 export const formatRetention = (eventRetentionMs: number) => {
-  if (eventRetentionMs === 0) return "Unlimited event retention";
+  if (eventRetentionMs === 0) return "Self-managed event retention";
 
   const minutes = eventRetentionMs / 60_000;
   if (minutes < 60) return `${minutes} ${minutes === 1 ? "minute" : "minutes"} of event retention`;
@@ -67,7 +69,7 @@ export const formatRetention = (eventRetentionMs: number) => {
 };
 
 export const formatHistory = (historyMax: number) => {
-  if (historyMax === 0) return "Unlimited live traffic history";
+  if (historyMax === 0) return "Self-managed live traffic history";
 
   const totalSeconds = historyMax * 5;
   if (totalSeconds < 3600) {
@@ -90,3 +92,6 @@ export const pricingPlans: PricingPlan[] = orderedPlanIds.map((id) => ({
   config: PLANS[id],
   ...planDetails[id],
 }));
+
+export const cloudPricingPlans = pricingPlans.filter((plan) => plan.mode === "Cloud");
+export const selfHostedPlan = pricingPlans.find((plan) => plan.id === "ce")!;

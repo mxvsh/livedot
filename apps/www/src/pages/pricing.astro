@@ -49,7 +49,7 @@ const pricingStructuredData = [
         "@type": "Service",
         name: `${siteMetadata.name} ${plan.label}`,
         serviceType: `${plan.mode} plan`,
-        description: `${plan.summary} Includes ${formatCount(plan.config.maxWebsites, "websites")}, ${formatCount(plan.config.maxConnectionsPerSite, "connections per site")}, ${formatRetention(plan.config.eventRetentionMs).toLowerCase()}, and ${formatHistory(plan.config.historyMax).toLowerCase()}.`,
+        description: `${plan.summary} Includes ${formatCount(plan.config.maxWebsites, "websites")}, ${formatCount(plan.config.eventsPerMonth, "events per month")}, ${formatRetention(plan.config.eventRetentionMs).toLowerCase()}, and ${formatHistory(plan.config.historyMax).toLowerCase()}.`,
         url: pricingUrl,
       },
     })),

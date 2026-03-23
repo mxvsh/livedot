@@ -73,7 +73,6 @@ function updateBucketAverage(previousAverage: number, nextValue: number, sampleI
 function getLimitsForWebsite(websiteId: string) {
   const cached = websiteCache.get(websiteId);
   return {
-    maxConcurrent: cached?.maxConcurrent ?? 0,
     eventRetentionMs: cached?.eventRetentionMs ?? 0,
     historyMax: cached?.historyMax ?? 0,
   };
@@ -140,14 +139,9 @@ async function allStoredHistoryZero(websiteId: string, rawHistory: HistoryPoint[
   return true;
 }
 
-export async function upsertSession(session: VisitorSession, server: Server | null, maxConcurrent = 0) {
+export async function upsertSession(session: VisitorSession, server: Server | null) {
   const prev = await store.getSession(session.websiteId, session.sessionId);
   const isNew = !prev;
-
-  if (isNew && maxConcurrent > 0) {
-    const current = await store.getSessionsForWebsite(session.websiteId);
-    if (current.length >= maxConcurrent) return;
-  }
 
   await store.setSession(session);
 

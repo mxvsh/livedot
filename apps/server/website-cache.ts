@@ -1,6 +1,6 @@
 export interface WebsiteCacheEntry {
   hostname: string;
-  maxConcurrent: number; // 0 = unlimited
+  eventsPerMonth: number; // 0 = unlimited
   eventRetentionMs: number; // 0 = unlimited
   historyMax: number; // 0 = unlimited
   shareToken: string | null;

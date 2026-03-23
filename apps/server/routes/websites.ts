@@ -7,12 +7,12 @@ import { websiteCache } from "../website-cache";
 import { getUserLimits } from "../limits";
 import { trackEvent } from "../tracking";
 
-function cacheEntryFromLimits(url: string, limits: { maxConnectionsPerSite: number; eventRetentionMs: number; historyMax: number }, shareToken: string | null = null) {
+function cacheEntryFromLimits(url: string, limits: { eventsPerMonth: number; eventRetentionMs: number; historyMax: number }, shareToken: string | null = null) {
   try {
     const hostname = url ? new URL(url).hostname : "";
-    return { hostname, maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
+    return { hostname, eventsPerMonth: limits.eventsPerMonth, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
   } catch {
-    return { hostname: "", maxConcurrent: limits.maxConnectionsPerSite, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
+    return { hostname: "", eventsPerMonth: limits.eventsPerMonth, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
   }
 }
 
