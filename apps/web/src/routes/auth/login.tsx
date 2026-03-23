@@ -15,11 +15,11 @@ const PROVIDER_LABELS: Record<string, string> = {
   google: "Google",
 };
 
-type Step = "login" | "forgot" | "reset";
+type Step = "login" | "forgot" | "forgot-sent" | "reset";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { setUser, providers, registrationOpen, emailSignup, cloud, check, checked } = useAuthStore();
+  const { setUser, providers, cloud, check, checked } = useAuthStore();
   const [step, setStep] = useState<Step>("login");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,11 +60,17 @@ function LoginPage() {
     setError("");
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const username = formData.get("username")?.toString() || "";
+    const value = formData.get("value")?.toString() || "";
     try {
-      await api.forgotPassword(username);
-      setForgotUsername(username);
-      setStep("reset");
+      if (cloud) {
+        await api.forgotPasswordEmail(value);
+        setForgotUsername(value);
+        setStep("forgot-sent");
+      } else {
+        await api.forgotPassword(value);
+        setForgotUsername(value);
+        setStep("reset");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -140,67 +146,79 @@ function LoginPage() {
                 </div>
               )}
 
-              <>
-                <Form className="flex flex-col gap-4" onSubmit={handleLogin}>
-                  <TextField isRequired name="username" type={cloud ? "email" : "text"} variant="secondary">
-                    <Label>{cloud ? "Email" : "Username"}</Label>
-                    <Input placeholder={cloud ? "you@example.com" : "Username"} autoFocus />
-                    <FieldError />
-                  </TextField>
+              <Form className="flex flex-col gap-4" onSubmit={handleLogin}>
+                <TextField isRequired name="username" type={cloud ? "email" : "text"} variant="secondary">
+                  <Label>{cloud ? "Email" : "Username"}</Label>
+                  <Input placeholder={cloud ? "you@example.com" : "Username"} autoFocus />
+                  <FieldError />
+                </TextField>
 
-                  <TextField isRequired name="password" type="password" variant="secondary">
-                    <Label>Password</Label>
-                    <Input placeholder="Password" />
-                    <FieldError />
-                  </TextField>
+                <TextField isRequired name="password" type="password" variant="secondary">
+                  <Label>Password</Label>
+                  <Input placeholder="Password" />
+                  <FieldError />
+                </TextField>
 
-                  {error && <p className="text-danger text-sm">{error}</p>}
+                {error && <p className="text-danger text-sm">{error}</p>}
 
-                  <Button type="submit" isDisabled={loading} className="w-full" data-umami-event="sign-in">
-                    {loading ? "Signing in..." : "Sign In"}
-                  </Button>
-                </Form>
+                <Button type="submit" isDisabled={loading} className="w-full" data-umami-event="sign-in">
+                  {loading ? "Signing in..." : "Sign In"}
+                </Button>
+              </Form>
 
-                <div className="mt-4 flex flex-col items-center gap-2">
-                  {!cloud && (
-                    <button
-                      onClick={() => { setStep("forgot"); setError(""); }}
-                      className="text-xs text-muted hover:text-foreground w-full text-center transition-colors"
-                    >
-                      Forgot password?
-                    </button>
-                  )}
-                  <p className="text-xs text-muted text-center">
-                    Don't have an account?{" "}
-                    <Link to="/auth/signup" className="text-foreground hover:underline">
-                      Sign up
-                    </Link>
-                  </p>
-                </div>
-              </>
+              <div className="mt-4 flex flex-col items-center gap-2">
+                <button
+                  onClick={() => { setStep("forgot"); setError(""); }}
+                  className="text-xs text-muted hover:text-foreground w-full text-center transition-colors"
+                >
+                  Forgot password?
+                </button>
+                <p className="text-xs text-muted text-center">
+                  Don't have an account?{" "}
+                  <Link to="/auth/signup" className="text-foreground hover:underline">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
             </>
           )}
 
           {step === "forgot" && (
             <>
               <h1 className="text-2xl font-bold text-foreground mb-1">Reset password</h1>
-              <p className="text-muted text-sm mb-6">Enter your username to receive an OTP in the server console.</p>
+              <p className="text-muted text-sm mb-6">
+                {cloud
+                  ? "Enter your email and we'll send you a reset link."
+                  : "Enter your username to receive an OTP in the server console."}
+              </p>
 
               <Form className="flex flex-col gap-4" onSubmit={handleForgot}>
-                <TextField isRequired name="username" variant="secondary">
-                  <Label>Username</Label>
-                  <Input placeholder="Username" autoFocus />
+                <TextField isRequired name="value" type={cloud ? "email" : "text"} variant="secondary">
+                  <Label>{cloud ? "Email" : "Username"}</Label>
+                  <Input placeholder={cloud ? "you@example.com" : "Username"} autoFocus />
                   <FieldError />
                 </TextField>
 
                 {error && <p className="text-danger text-sm">{error}</p>}
 
                 <Button type="submit" isDisabled={loading} className="w-full">
-                  {loading ? "Sending..." : "Send OTP"}
+                  {loading ? "Sending..." : cloud ? "Send Reset Link" : "Send OTP"}
                 </Button>
               </Form>
 
               <button onClick={goBack} className="mt-4 text-xs text-muted hover:text-foreground w-full text-center transition-colors">
+                Back to sign in
+              </button>
+            </>
+          )}
+
+          {step === "forgot-sent" && (
+            <>
+              <h1 className="text-2xl font-bold text-foreground mb-1">Check your email</h1>
+              <p className="text-muted text-sm mb-6">
+                We sent a password reset link to <span className="text-foreground">{forgotUsername}</span>. Click it to set a new password.
+              </p>
+              <button onClick={goBack} className="text-xs text-muted hover:text-foreground w-full text-center transition-colors">
                 Back to sign in
               </button>
             </>

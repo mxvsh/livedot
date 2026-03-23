@@ -73,6 +73,11 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ username }),
     }),
+  forgotPasswordEmail: (email: string) =>
+    request<{ ok: boolean }>("/api/forgot-password-email", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
   resetPassword: (username: string, otp: string, newPassword: string) =>
     request<{ ok: boolean }>("/api/reset-password", {
       method: "POST",

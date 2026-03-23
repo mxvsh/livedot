@@ -1,29 +1,22 @@
-import { getClient } from "@umami/api-client";
+import umami from "@umami/node";
 import { createLogger } from "@livedot/logger";
 import { env } from "./env";
 
 const log = createLogger("tracking");
 
-let client: ReturnType<typeof getClient> | null = null;
+let initialized = false;
 
-function getTracker() {
-  if (!env.UMAMI_URL || !env.UMAMI_WEBSITE_ID || !env.UMAMI_API_TOKEN) return null;
-  if (!client) {
-    client = getClient();
-    client.setConfig({ hostUrl: env.UMAMI_URL, apiKey: env.UMAMI_API_TOKEN });
-  }
-  return client;
+function init() {
+  if (initialized || !env.UMAMI_URL || !env.UMAMI_WEBSITE_ID) return false;
+  umami.init({ websiteId: env.UMAMI_WEBSITE_ID, hostUrl: env.UMAMI_URL });
+  initialized = true;
+  return true;
 }
 
 export async function trackEvent(eventName: string, data?: Record<string, string | number | boolean>) {
-  const tracker = getTracker();
-  if (!tracker) return;
+  if (!init()) return;
   try {
-    await tracker.sendEvent({
-      websiteId: env.UMAMI_WEBSITE_ID!,
-      name: eventName,
-      data,
-    });
+    await umami.track(eventName, data);
     log.debug({ eventName, data }, "Event tracked");
   } catch (err) {
     log.warn({ err, eventName }, "Failed to track event");

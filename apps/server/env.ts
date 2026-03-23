@@ -20,7 +20,6 @@ const envSchema = z.object({
   // Analytics (optional)
   UMAMI_URL: z.string().optional(),
   UMAMI_WEBSITE_ID: z.string().optional(),
-  UMAMI_API_TOKEN: z.string().optional(),
   LIVEDOT_URL: z.string().optional(),
   LIVEDOT_WEBSITE_ID: z.string().optional(),
 

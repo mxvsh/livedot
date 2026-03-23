@@ -60,6 +60,77 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: env.LIVEDOT_CLOUD,
+    sendResetPassword: async ({ user, url }) => {
+      log.info({ email: user.email }, "Sending password reset email");
+      await sendEmail(
+        user.email,
+        "Reset your Livedot password",
+        `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset your Livedot password</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0e0e0e;font-family:'Inter',Arial,sans-serif;color:#ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0e0e0e;padding:48px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+          <tr>
+            <td style="padding-bottom:32px;">
+              <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.04em;color:#ffffff;">
+                <span style="color:#aefc2d;">●</span> livedot
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#131313;border:1px solid #2a2a2a;border-radius:12px;padding:40px;">
+              <p style="margin:0 0 8px;font-size:13px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#aefc2d;">
+                Password Reset
+              </p>
+              <h1 style="margin:0 0 16px;font-family:'Space Grotesk',Arial,sans-serif;font-size:26px;font-weight:700;letter-spacing:-0.03em;color:#ffffff;line-height:1.2;">
+                Reset your password
+              </h1>
+              <p style="margin:0 0 32px;font-size:15px;line-height:1.6;color:#adaaaa;">
+                Hi ${user.name}, click the button below to reset your password. This link expires in 1 hour.
+              </p>
+              <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+                <tr>
+                  <td style="background-color:#aefc2d;border-radius:6px;">
+                    <a href="${url}" style="display:inline-block;padding:14px 32px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.01em;color:#314d00;text-decoration:none;">
+                      Reset Password
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0 0 8px;font-size:13px;color:#767575;">Or copy this link into your browser:</p>
+              <p style="margin:0;font-size:12px;color:#484847;word-break:break-all;">
+                <a href="${url}" style="color:#767575;text-decoration:underline;">${url}</a>
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0;">
+                <tr><td style="height:1px;background-color:#2a2a2a;"></td></tr>
+              </table>
+              <p style="margin:0;font-size:13px;color:#767575;line-height:1.6;">
+                If you didn't request a password reset, you can safely ignore this email.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-top:24px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#484847;">
+                © ${new Date().getFullYear()} Livedot · Real-time visitor tracking
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
+      );
+    },
   },
   emailVerification: env.LIVEDOT_CLOUD ? {
     sendVerificationEmail: async ({ user, url }) => {

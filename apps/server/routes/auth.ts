@@ -224,6 +224,24 @@ export const authRoutes = new Hono()
     return c.json({ ok: true });
   })
 
+  .post("/forgot-password-email", async (c) => {
+    const { email } = await c.req.json();
+    if (!email) return c.json({ error: "Email required" }, 400);
+    const cooldown = checkEmailCooldown(email);
+    if (!cooldown.allowed) return c.json({ error: `Please wait ${cooldown.retryAfter}s before requesting another email` }, 429);
+    try {
+      await auth.api.requestPasswordReset({
+        body: { email, redirectTo: `${env.APP_URL}/auth/reset-password` },
+        headers: c.req.raw.headers,
+      });
+      markEmailSent(email);
+    } catch (err) {
+      log.error(err, "Failed to request password reset");
+      // Don't reveal if email exists
+    }
+    return c.json({ ok: true });
+  })
+
   .post("/reset-password", async (c) => {
     const { username, otp, newPassword } = await c.req.json();
     if (!newPassword || newPassword.length < 6) return c.json({ error: "Password must be at least 6 characters" }, 400);
