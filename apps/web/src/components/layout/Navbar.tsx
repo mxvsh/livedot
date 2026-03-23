@@ -76,9 +76,9 @@ export default function Navbar() {
               }}
             >
               <Dropdown.Section>
-                <Dropdown.Item id="profile" textValue="Profile">
+                <Dropdown.Item id="profile" textValue="My Account">
                   <HugeiconsIcon icon={UserIcon} size={16} />
-                  Profile
+                  My Account
                 </Dropdown.Item>
                 <Dropdown.Item id="settings" textValue="Settings">
                   <HugeiconsIcon icon={Settings01Icon} size={16} />

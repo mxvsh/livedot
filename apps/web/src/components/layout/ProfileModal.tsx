@@ -20,7 +20,7 @@ interface Props {
 type Tab = "profile" | "password";
 
 export default function ProfileModal({ isOpen, onOpenChange }: Props) {
-  const { user } = useAuthStore();
+  const { user, cloud } = useAuthStore();
   const [tab, setTab] = useState<Tab>("profile");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -61,22 +61,24 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
           <Modal.Dialog className="sm:max-w-[420px]">
             <Modal.CloseTrigger />
             <Modal.Header>
-              <Modal.Heading>Profile</Modal.Heading>
+              <Modal.Heading>My Account</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
-              <div className="flex gap-1 p-1 rounded-xl bg-default mb-4">
-                {(["profile", "password"] as Tab[]).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => { setTab(t); setError(""); setSuccess(""); }}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize ${
-                      tab === t ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
-                    }`}
-                  >
-                    {t === "profile" ? "Profile" : "Change Password"}
-                  </button>
-                ))}
-              </div>
+              {!cloud && (
+                <div className="flex gap-1 p-1 rounded-xl bg-default mb-4">
+                  {(["profile", "password"] as Tab[]).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => { setTab(t); setError(""); setSuccess(""); }}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize ${
+                        tab === t ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
+                      }`}
+                    >
+                      {t === "profile" ? "Profile" : "Change Password"}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {tab === "profile" && (
                 <div className="flex flex-col gap-3">
