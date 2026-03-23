@@ -16,15 +16,15 @@ type EmbedTab = "map" | "chart" | "live";
 
 const embedPreviewImages: Record<EmbedTab, { src: string; alt: string }> = {
   map: {
-    src: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&h=675&q=80",
+    src: "/images/widget-map.png",
     alt: "Map widget placeholder preview",
   },
   chart: {
-    src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&h=600&q=80",
+    src: "/images/widget-chart.png",
     alt: "Chart widget placeholder preview",
   },
   live: {
-    src: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&h=320&q=80",
+    src: "/images/widget-live.png",
     alt: "Live count widget placeholder preview",
   },
 };
