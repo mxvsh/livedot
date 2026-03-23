@@ -56,6 +56,10 @@ export class MemoryStore implements StoreAdapter {
     this.history.set(websiteId, arr);
   }
 
+  setHistory(websiteId: string, history: HistoryPoint[]): void {
+    this.history.set(websiteId, [...history]);
+  }
+
   deleteHistory(websiteId: string): void {
     this.history.delete(websiteId);
   }

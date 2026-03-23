@@ -11,6 +11,7 @@ export interface StoreAdapter {
   // ── History ──
   getHistory(websiteId: string): Promise<HistoryPoint[]> | HistoryPoint[];
   pushHistory(websiteId: string, point: HistoryPoint, maxLength: number): Promise<void> | void;
+  setHistory(websiteId: string, history: HistoryPoint[]): Promise<void> | void;
   deleteHistory(websiteId: string): Promise<void> | void;
   getHistoryWebsiteIds(): Promise<Set<string>> | Set<string>;
 

@@ -39,7 +39,7 @@ function WebsiteDashboard() {
     })();
   }, [websiteId]);
 
-  const { sessions, connected, count, activityLog, history } = useWebSocket(websiteId);
+  const { sessions, connected, count, activityLog, history } = useWebSocket(websiteId, { recent: "10m" });
   const sessionArray = Array.from(sessions.values());
 
   const selectedSession = selectedSessionId ? sessions.get(selectedSessionId) ?? null : null;

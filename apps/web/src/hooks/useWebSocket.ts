@@ -1,5 +1,5 @@
 import { useCallback, useSyncExternalStore } from "react";
-import type { VisitorSession, WSMessage, HistoryPoint, ActivityEvent } from "@livedot/shared";
+import { type VisitorSession, type WSMessage, type HistoryPoint, type ActivityEvent } from "@livedot/shared";
 
 export type { VisitorSession, WSMessage, HistoryPoint, ActivityEvent };
 
@@ -18,6 +18,7 @@ interface Conn {
   reconnectTimer?: ReturnType<typeof setTimeout>;
   snapshot: Snapshot;
   _token?: string;
+  _recent?: string;
 }
 
 interface Snapshot {
@@ -56,14 +57,27 @@ function addEvent(c: Conn, event: ActivityEvent) {
   c.activityLog = next;
 }
 
-function connKey(websiteId: string, token?: string) {
-  return token ? `${websiteId}:${token}` : websiteId;
+export interface UseWebSocketOptions {
+  token?: string;
+  recent?: string;
 }
 
-function openWS(websiteId: string, c: Conn, token?: string) {
+function normalizeOptions(tokenOrOptions?: string | UseWebSocketOptions): UseWebSocketOptions {
+  if (typeof tokenOrOptions === "string") {
+    return { token: tokenOrOptions };
+  }
+  return tokenOrOptions ?? {};
+}
+
+function connKey(websiteId: string, token?: string, recent?: string) {
+  return [websiteId, token ?? "", recent ?? ""].join(":");
+}
+
+function openWS(websiteId: string, c: Conn, token?: string, recent?: string) {
   const protocol = location.protocol === "https:" ? "wss:" : "ws:";
   let url = `${protocol}//${location.host}/ws?website=${websiteId}`;
   if (token) url += `&token=${encodeURIComponent(token)}`;
+  if (recent) url += `&recent=${encodeURIComponent(recent)}`;
   const ws = new WebSocket(url);
   c.ws = ws;
 
@@ -112,15 +126,15 @@ function openWS(websiteId: string, c: Conn, token?: string) {
     c.connected = false;
     notify(c);
     if (c.ws === ws && c.refCount > 0) {
-      c.reconnectTimer = setTimeout(() => openWS(websiteId, c, c._token), 2000);
+      c.reconnectTimer = setTimeout(() => openWS(websiteId, c, c._token, c._recent), 2000);
     }
   };
 
   ws.onerror = () => ws.close();
 }
 
-function sub(websiteId: string, listener: () => void, token?: string): () => void {
-  const key = connKey(websiteId, token);
+function sub(websiteId: string, listener: () => void, token?: string, recent?: string): () => void {
+  const key = connKey(websiteId, token, recent);
   let c = conns.get(key);
   if (!c) {
     c = {
@@ -133,6 +147,7 @@ function sub(websiteId: string, listener: () => void, token?: string): () => voi
       listeners: new Set(),
       snapshot: EMPTY,
       _token: token,
+      _recent: recent,
     };
     conns.set(key, c);
   }
@@ -140,7 +155,7 @@ function sub(websiteId: string, listener: () => void, token?: string): () => voi
   c.refCount++;
   c.listeners.add(listener);
 
-  if (c.refCount === 1) openWS(websiteId, c, token);
+  if (c.refCount === 1) openWS(websiteId, c, token, recent);
 
   return () => {
     c.listeners.delete(listener);
@@ -154,21 +169,23 @@ function sub(websiteId: string, listener: () => void, token?: string): () => voi
   };
 }
 
-function snap(websiteId: string, token?: string): Snapshot {
-  return conns.get(connKey(websiteId, token))?.snapshot ?? EMPTY;
+function snap(websiteId: string, token?: string, recent?: string): Snapshot {
+  return conns.get(connKey(websiteId, token, recent))?.snapshot ?? EMPTY;
 }
 
 // ─── React hook ───
 
-export function useWebSocket(websiteId: string | null, token?: string) {
+export function useWebSocket(websiteId: string | null, tokenOrOptions?: string | UseWebSocketOptions) {
+  const { token, recent } = normalizeOptions(tokenOrOptions);
+
   const subscribe = useCallback(
-    (listener: () => void) => (websiteId ? sub(websiteId, listener, token) : () => {}),
-    [websiteId, token]
+    (listener: () => void) => (websiteId ? sub(websiteId, listener, token, recent) : () => {}),
+    [websiteId, token, recent]
   );
 
   const getSnapshot = useCallback(
-    () => (websiteId ? snap(websiteId, token) : EMPTY),
-    [websiteId, token]
+    () => (websiteId ? snap(websiteId, token, recent) : EMPTY),
+    [websiteId, token, recent]
   );
 
   return useSyncExternalStore(subscribe, getSnapshot);

@@ -6,6 +6,7 @@
   "exports": {
     ".": "./index.ts",
     "./types": "./types.ts",
-    "./plans": "./plans.ts"
+    "./plans": "./plans.ts",
+    "./recent": "./recent.ts"
   }
 }

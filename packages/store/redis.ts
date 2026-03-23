@@ -72,6 +72,16 @@ export class RedisStore implements StoreAdapter {
     await pipe.exec();
   }
 
+  async setHistory(websiteId: string, history: HistoryPoint[]): Promise<void> {
+    const key = this.hk(websiteId);
+    const pipe = this.redis.pipeline();
+    pipe.del(key);
+    if (history.length > 0) {
+      pipe.rpush(key, ...history.map((point) => JSON.stringify(point)));
+    }
+    await pipe.exec();
+  }
+
   async deleteHistory(websiteId: string): Promise<void> {
     await this.redis.del(this.hk(websiteId));
   }

@@ -3,6 +3,13 @@ import type { VisitorSession, WSMessage, HistoryPoint, ActivityEvent } from "@li
 import type { StoreAdapter } from "@livedot/store";
 import { MemoryStore } from "@livedot/store";
 import { createLogger } from "@livedot/logger";
+import {
+  durationForRecent,
+  resolutionForRecent,
+  ROLLUP_RECENT_WINDOWS,
+  type RollupRecentWindow,
+  type SupportedRecentWindow,
+} from "@livedot/shared/recent";
 import { websiteCache } from "./website-cache";
 import { env } from "./env";
 
@@ -30,6 +37,39 @@ export { store };
 
 // ── Helpers ──
 
+const HISTORY_SAMPLE_MS = 5_000;
+const RAW_HISTORY_MAX = (10 * 60_000) / HISTORY_SAMPLE_MS;
+
+function rawHistoryKey(websiteId: string) {
+  return websiteId;
+}
+
+function rollupHistoryKey(websiteId: string, recent: SupportedRecentWindow) {
+  return `${websiteId}::rollup:${recent}`;
+}
+
+function baseWebsiteIdFromHistoryKey(historyKey: string) {
+  return historyKey.split("::rollup:")[0] ?? historyKey;
+}
+
+function historyChannel(websiteId: string, recent?: SupportedRecentWindow | null) {
+  return recent ? `website:${websiteId}:history:${recent}` : `website:${websiteId}:history`;
+}
+
+function historySeriesLength(recent: RollupRecentWindow) {
+  const resolutionMs = resolutionForRecent(recent)!;
+  return Math.max(1, Math.ceil(durationForRecent(recent) / resolutionMs));
+}
+
+function bucketStart(time: number, resolutionMs: number) {
+  return Math.floor(time / resolutionMs) * resolutionMs;
+}
+
+function updateBucketAverage(previousAverage: number, nextValue: number, sampleIndex: number) {
+  if (sampleIndex <= 1) return nextValue;
+  return Math.round(((previousAverage * (sampleIndex - 1)) + nextValue) / sampleIndex);
+}
+
 function getLimitsForWebsite(websiteId: string) {
   const cached = websiteCache.get(websiteId);
   return {
@@ -51,8 +91,53 @@ export async function getSessionsForWebsite(websiteId: string): Promise<VisitorS
   return store.getSessionsForWebsite(websiteId);
 }
 
-export async function getHistoryForWebsite(websiteId: string): Promise<HistoryPoint[]> {
-  return store.getHistory(websiteId);
+export async function getHistoryForWebsite(websiteId: string, recent?: SupportedRecentWindow | null): Promise<HistoryPoint[]> {
+  const key = !recent || recent === "10m" ? rawHistoryKey(websiteId) : rollupHistoryKey(websiteId, recent);
+  return store.getHistory(key);
+}
+
+async function deleteAllHistoryForWebsite(websiteId: string) {
+  await store.deleteHistory(rawHistoryKey(websiteId));
+  for (const recent of ROLLUP_RECENT_WINDOWS) {
+    await store.deleteHistory(rollupHistoryKey(websiteId, recent));
+  }
+}
+
+async function updateRollupHistory(websiteId: string, recent: RollupRecentWindow, point: HistoryPoint) {
+  const resolutionMs = resolutionForRecent(recent)!;
+  const maxLength = historySeriesLength(recent);
+  const key = rollupHistoryKey(websiteId, recent);
+  const history = await store.getHistory(key);
+  const currentBucketStart = bucketStart(point.time, resolutionMs);
+  const nextHistory = [...history];
+  const last = nextHistory[nextHistory.length - 1];
+
+  if (last && bucketStart(last.time, resolutionMs) === currentBucketStart) {
+    const sampleIndex = Math.max(1, Math.floor((point.time - currentBucketStart) / HISTORY_SAMPLE_MS) + 1);
+    nextHistory[nextHistory.length - 1] = {
+      time: point.time,
+      count: updateBucketAverage(last.count, point.count, sampleIndex),
+    };
+  } else {
+    nextHistory.push({ time: point.time, count: point.count });
+  }
+
+  await store.setHistory(key, maxLength > 0 ? nextHistory.slice(-maxLength) : nextHistory);
+}
+
+async function updateRollupHistories(websiteId: string, point: HistoryPoint) {
+  for (const recent of ROLLUP_RECENT_WINDOWS) {
+    await updateRollupHistory(websiteId, recent, point);
+  }
+}
+
+async function allStoredHistoryZero(websiteId: string, rawHistory: HistoryPoint[]) {
+  if (!rawHistory.every((point) => point.count === 0)) return false;
+  for (const recent of ROLLUP_RECENT_WINDOWS) {
+    const history = await store.getHistory(rollupHistoryKey(websiteId, recent));
+    if (!history.every((point) => point.count === 0)) return false;
+  }
+  return true;
 }
 
 export async function upsertSession(session: VisitorSession, server: Server | null, maxConcurrent = 0) {
@@ -86,21 +171,26 @@ export function startTick(getServer: () => Server | null) {
     // ── 1. Sample history ──
     const activeIds = await store.getActiveWebsiteIds();
     const historyIds = await store.getHistoryWebsiteIds();
-    for (const id of historyIds) activeIds.add(id);
+    for (const id of historyIds) activeIds.add(baseWebsiteIdFromHistoryKey(id));
 
     for (const websiteId of activeIds) {
-      const { historyMax } = getLimitsForWebsite(websiteId);
       const sessions = await store.getSessionsForWebsite(websiteId);
       const count = sessions.length;
 
-      await store.pushHistory(websiteId, { time: now, count }, historyMax);
-      const history = await store.getHistory(websiteId);
+      const point = { time: now, count };
+      await store.pushHistory(rawHistoryKey(websiteId), point, RAW_HISTORY_MAX);
+      const history = await store.getHistory(rawHistoryKey(websiteId));
+      await updateRollupHistories(websiteId, point);
 
-      const msg: WSMessage = { type: "history", history };
-      server?.publish(`website:${websiteId}`, JSON.stringify(msg));
+      server?.publish(historyChannel(websiteId), JSON.stringify({ type: "history", history } satisfies WSMessage));
+      server?.publish(historyChannel(websiteId, "10m"), JSON.stringify({ type: "history", history } satisfies WSMessage));
+      for (const recent of ROLLUP_RECENT_WINDOWS) {
+        const rollup = await getHistoryForWebsite(websiteId, recent);
+        server?.publish(historyChannel(websiteId, recent), JSON.stringify({ type: "history", history: rollup } satisfies WSMessage));
+      }
 
-      if (count === 0 && history.every((h) => h.count === 0)) {
-        await store.deleteHistory(websiteId);
+      if (count === 0 && await allStoredHistoryZero(websiteId, history)) {
+        await deleteAllHistoryForWebsite(websiteId);
       }
     }
 
@@ -138,5 +228,5 @@ export function startTick(getServer: () => Server | null) {
   }
 
   tick();
-  setInterval(tick, 5_000);
+  setInterval(tick, HISTORY_SAMPLE_MS);
 }

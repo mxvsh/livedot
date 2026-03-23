@@ -12,6 +12,7 @@ import { websiteRoutes } from "./routes/websites";
 import { eventRoutes } from "./routes/events";
 import { wsHandler, type WSData } from "./ws";
 import { startTick } from "./sessions";
+import { supportedRecentWindow } from "@livedot/shared/recent";
 
 import { websiteCache } from "./website-cache";
 export { websiteCache };
@@ -99,6 +100,7 @@ const server = Bun.serve({
       }
 
       const token = url.searchParams.get("token");
+      const recent = supportedRecentWindow(url.searchParams.get("recent"));
 
       // Token-based auth for embeds
       if (token) {
@@ -107,7 +109,7 @@ const server = Bun.serve({
           return new Response("Invalid share token", { status: 401 });
         }
         const upgraded = server.upgrade<WSData>(req, {
-          data: { websiteId, userId: "__embed__" },
+          data: { websiteId, userId: "__embed__", recent },
         });
         if (!upgraded) {
           return new Response("WebSocket upgrade failed", { status: 400 });
@@ -121,7 +123,7 @@ const server = Bun.serve({
           return new Response("Unauthorized", { status: 401 });
         }
         const upgraded = server.upgrade<WSData>(req, {
-          data: { websiteId, userId: session.user.id },
+          data: { websiteId, userId: session.user.id, recent },
         });
         if (!upgraded) {
           return new Response("WebSocket upgrade failed", { status: 400 });
