@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.3](https://github.com/mxvsh/livedot/compare/v0.1.2...v0.1.3) (2026-03-23)
+
+* Improve widgets ([](https://github.com/mxvsh/livedot/commit/7489cdb9dcec4fe224371f7ed3e352e7ead552b3))
+* Widget preview ([](https://github.com/mxvsh/livedot/commit/040df5016f0b82654a41434cb6fd75b121b845e8))
+* Add live widget and other widget improvements ([](https://github.com/mxvsh/livedot/commit/f5db90229cac82960cf425dcac86afa0bc4d44f1))
+
 ## [0.1.2](https://github.com/mxvsh/livedot/compare/v0.1.1...v0.1.2) (2026-03-23)
 
 * Backend rollups for recent history windows ([](https://github.com/mxvsh/livedot/commit/5a938f7e1c6330e6a3cae1ea72c2de7f491959ab))
