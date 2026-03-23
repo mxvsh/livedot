@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.2](https://github.com/mxvsh/livedot/compare/v0.1.1...v0.1.2) (2026-03-23)
+
+* Backend rollups for recent history windows ([](https://github.com/mxvsh/livedot/commit/5a938f7e1c6330e6a3cae1ea72c2de7f491959ab))
+* Aggregate data for better visibility ([](https://github.com/mxvsh/livedot/commit/78924a377a54684c1976fa51ab44b6008ca02492))
+
 ## [0.1.1](https://github.com/mxvsh/livedot/compare/v0.1.0...v0.1.1) (2026-03-23)
 
 * Setup branding in widget ([](https://github.com/mxvsh/livedot/commit/e384ab5bf21efc3aa345567ecaa1566952c1292b))
