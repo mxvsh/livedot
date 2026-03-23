@@ -72,11 +72,11 @@ function openWS(websiteId: string, c: Conn) {
     if (msg.type === "snapshot") {
       c.sessions = new Map<string, VisitorSession>();
       for (const s of msg.sessions) c.sessions.set(s.sessionId, s);
-      c.history = msg.history;
+      c.history = msg.history ?? [];
       // Load events from server
       c.activityLog = new Map(msg.events ?? []);
     } else if (msg.type === "history") {
-      c.history = msg.history;
+      c.history = msg.history ?? [];
     } else if (msg.type === "upsert") {
       const isNew = !c.sessions.has(msg.session.sessionId);
       const prevUrl = c.sessions.get(msg.session.sessionId)?.pageUrl;
