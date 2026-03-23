@@ -13,7 +13,7 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { planLabel } from "@livedot/shared/plans";
 import ProfileModal from "./ProfileModal";
-import BillingModal from "./BillingModal";
+import SubscriptionModal from "./SubscriptionModal";
 
 function getInitials(username: string) {
   return username.slice(0, 2).toUpperCase();
@@ -85,9 +85,9 @@ export default function Navbar() {
                   My Account
                 </Dropdown.Item>
                 {user?.plan !== "ce" && (
-                  <Dropdown.Item id="billing" textValue="Billing">
+                  <Dropdown.Item id="billing" textValue="Subscription">
                     <HugeiconsIcon icon={CreditCardIcon} size={16} />
-                    Billing
+                    Subscription
                   </Dropdown.Item>
                 )}
                 <Dropdown.Item id="settings" textValue="Settings">
@@ -114,7 +114,7 @@ export default function Navbar() {
     </nav>
 
     <ProfileModal isOpen={profileOpen} onOpenChange={setProfileOpen} />
-    <BillingModal isOpen={billingOpen} onOpenChange={setBillingOpen} />
+    <SubscriptionModal isOpen={billingOpen} onOpenChange={setBillingOpen} />
     </>
   );
 }

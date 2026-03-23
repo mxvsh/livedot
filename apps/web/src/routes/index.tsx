@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Button, Surface } from "@heroui/react";
+import { Button, Modal, Surface } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
+import confetti from "canvas-confetti";
 import { api, type Website } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 import { getPlan } from "@livedot/shared/plans";
@@ -29,6 +30,7 @@ function HomePage() {
   const [editTarget, setEditTarget] = useState<Website | null>(null);
   const [snippetTarget, setSnippetTarget] = useState<Website | null>(null);
   const [shareTarget, setShareTarget] = useState<Website | null>(null);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   async function load(showSpinner = false) {
     if (showSpinner) setLoading(true);
@@ -53,6 +55,13 @@ function HomePage() {
         navigate({ to: "/auth/login" });
       } else {
         load(true);
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("upgraded")) {
+          setUpgradeOpen(true);
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+          window.history.replaceState({}, "", "/");
+          await check(); // refresh user plan
+        }
       }
     })();
     return () => { cancelled = true; };
@@ -146,6 +155,24 @@ function HomePage() {
           onDeleted={load}
         />
       </div>
+
+      <Modal isOpen={upgradeOpen} onOpenChange={setUpgradeOpen}>
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-[360px]">
+              <Modal.CloseTrigger />
+              <Modal.Body className="flex flex-col items-center text-center gap-3 py-8">
+                <p className="text-3xl">🎉</p>
+                <h2 className="text-lg font-semibold text-foreground">You're upgraded!</h2>
+                <p className="text-sm text-muted">Your plan has been updated. Enjoy your new limits.</p>
+                <Button className="mt-2 w-full" onPress={() => setUpgradeOpen(false)}>
+                  Let's go
+                </Button>
+              </Modal.Body>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
 
       <div className="max-w-2xl mx-auto px-4 pb-8 flex items-center justify-center">
         <span className="text-xs text-muted/50">

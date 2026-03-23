@@ -103,4 +103,9 @@ export const api = {
     request<{ shareToken: string }>(`/api/websites/${id}/share`, { method: "POST" }),
   disableSharing: (id: string) =>
     request<{ ok: boolean }>(`/api/websites/${id}/share`, { method: "DELETE" }),
+  createCheckout: (plan: string) =>
+    request<{ url: string }>("/api/polar/checkout", {
+      method: "POST",
+      body: JSON.stringify({ plan }),
+    }),
 };

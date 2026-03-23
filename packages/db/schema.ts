@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, unique } from "drizzle-orm/sqlite-core";
 
 export interface UserMetadata {
   // Optional per-user overrides (take precedence over plan defaults)

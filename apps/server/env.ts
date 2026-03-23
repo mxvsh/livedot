@@ -38,6 +38,11 @@ const envSchema = z.object({
   SMTP_FROM: z.string().optional().default("noreply@livedot.dev"),
   APP_URL: z.string().optional().default("http://localhost:5173"),
 
+  // Polar.sh billing (cloud only)
+  POLAR_ACCESS_TOKEN: z.string().optional(),
+  POLAR_ORGANIZATION_ID: z.string().optional(),
+  POLAR_WEBHOOK_SECRET: z.string().optional(),
+
   // Global limits
   DEFAULT_MAX_USER_SIGNUP: z.coerce.number().int().positive().default(1),
 });

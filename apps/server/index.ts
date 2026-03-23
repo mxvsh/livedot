@@ -10,6 +10,7 @@ import { auth } from "./auth";
 import { authRoutes } from "./routes/auth";
 import { websiteRoutes } from "./routes/websites";
 import { eventRoutes } from "./routes/events";
+import { polarRoutes } from "./routes/polar";
 import { wsHandler, type WSData } from "./ws";
 import { startTick } from "./sessions";
 import { supportedRecentWindow } from "@livedot/shared/recent";
@@ -69,6 +70,7 @@ app.on(["GET", "POST"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 // App routes
 app.route("/api", eventRoutes);
 app.route("/api", authRoutes);
+app.route("/api", polarRoutes);
 app.route("/api", websiteRoutes);
 
 // Serve tracker script

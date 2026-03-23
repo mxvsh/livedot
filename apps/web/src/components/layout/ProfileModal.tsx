@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Button,
   Form,
@@ -17,13 +17,9 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-type Tab = "profile" | "usage" | "password";
+type Tab = "profile" | "password";
 
 const PROVIDER_LABELS: Record<string, string> = { github: "GitHub", google: "Google", credential: "Email & Password" };
-
-function fmt(n: number) {
-  return n.toLocaleString();
-}
 
 export default function ProfileModal({ isOpen, onOpenChange }: Props) {
   const { user } = useAuthStore();
@@ -32,13 +28,6 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [usage, setUsage] = useState<{ eventsUsed: number; eventsLimit: number } | null>(null);
-
-  useEffect(() => {
-    if (isOpen && tab === "usage") {
-      api.getUsage().then(setUsage).catch(() => {});
-    }
-  }, [isOpen, tab]);
 
   function handleOpenChange(open: boolean) {
     if (!open) {
@@ -70,7 +59,6 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
 
   const tabs: { key: Tab; label: string; disabled?: boolean }[] = [
     { key: "profile", label: "Profile" },
-    { key: "usage", label: "Usage" },
     { key: "password", label: "Password", disabled: !hasPassword },
   ];
 
@@ -121,45 +109,6 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
                         ))}
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
-
-              {tab === "usage" && (
-                <div className="flex flex-col gap-4">
-                  {!usage ? (
-                    <div className="flex justify-center py-4">
-                      <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex flex-col gap-1">
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-muted">Events this month</span>
-                          <span className="text-foreground font-medium">
-                            {fmt(usage.eventsUsed)}
-                            {usage.eventsLimit > 0 && <span className="text-muted"> / {fmt(usage.eventsLimit)}</span>}
-                          </span>
-                        </div>
-                        {usage.eventsLimit > 0 && (
-                          <>
-                            <div className="h-2 rounded-full bg-default overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-accent transition-all"
-                                style={{ width: `${Math.min(100, (usage.eventsUsed / usage.eventsLimit) * 100)}%` }}
-                              />
-                            </div>
-                            <p className="text-xs text-muted mt-1">
-                              {fmt(Math.max(0, usage.eventsLimit - usage.eventsUsed))} remaining
-                            </p>
-                          </>
-                        )}
-                        {usage.eventsLimit === 0 && (
-                          <p className="text-xs text-muted">Unlimited (Community Edition)</p>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted">Resets on the 1st of each month.</p>
-                    </>
                   )}
                 </div>
               )}
