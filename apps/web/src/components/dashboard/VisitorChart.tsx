@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import type { HistoryPoint } from "@livedot/shared";
+import { aggregateHistoryPoints } from "@/lib/chart";
 
 interface Props {
   websiteName: string;
@@ -38,8 +39,9 @@ function buildPath(points: HistoryPoint[], close: boolean): string {
 }
 
 export default function VisitorChart({ websiteName, count, connected, history }: Props) {
-  const linePath = buildPath(history, false);
-  const areaPath = buildPath(history, true);
+  const aggregatedHistory = aggregateHistoryPoints(history);
+  const linePath = buildPath(aggregatedHistory, false);
+  const areaPath = buildPath(aggregatedHistory, true);
 
   return (
     <motion.div
@@ -90,7 +92,7 @@ export default function VisitorChart({ websiteName, count, connected, history }:
             </filter>
           </defs>
 
-          {history.length > 1 && (
+          {aggregatedHistory.length > 1 && (
             <>
               <path d={areaPath} fill="url(#area-fill)" />
               <path
@@ -104,8 +106,8 @@ export default function VisitorChart({ websiteName, count, connected, history }:
               />
               {/* Current value dot */}
               {(() => {
-                const max = Math.max(...history.map((p) => p.count), 1);
-                const last = history[history.length - 1];
+                const max = Math.max(...aggregatedHistory.map((p) => p.count), 1);
+                const last = aggregatedHistory[aggregatedHistory.length - 1]!;
                 const yRange = H - PAD_TOP - PAD_BOT;
                 const cx = W;
                 const cy = PAD_TOP + yRange - (last.count / max) * yRange;
@@ -114,7 +116,7 @@ export default function VisitorChart({ websiteName, count, connected, history }:
             </>
           )}
 
-          {history.length <= 1 && (
+          {aggregatedHistory.length <= 1 && (
             <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke="#96E421" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="4 4" />
           )}
         </svg>

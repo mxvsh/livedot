@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import BrandingBadge from "@/components/embed/BrandingBadge";
+import { aggregateHistoryPoints } from "@/lib/chart";
 
 export const Route = createFileRoute("/embed/chart")({
   component: EmbedChart,
@@ -77,8 +78,9 @@ function EmbedChart() {
     return null;
   }
 
-  const linePath = buildPath(history, false);
-  const areaPath = buildPath(history, true);
+  const aggregatedHistory = aggregateHistoryPoints(history);
+  const linePath = buildPath(aggregatedHistory, false);
+  const areaPath = buildPath(aggregatedHistory, true);
 
   return (
     <div
@@ -126,7 +128,7 @@ function EmbedChart() {
             </filter>
           </defs>
 
-          {history.length > 1 ? (
+          {aggregatedHistory.length > 1 ? (
             <>
               <path d={areaPath} fill="url(#embed-area-fill)" />
               <path
@@ -139,8 +141,8 @@ function EmbedChart() {
                 filter="url(#embed-line-glow)"
               />
               {(() => {
-                const max = Math.max(...history.map((p) => p.count), 1);
-                const last = history[history.length - 1]!;
+                const max = Math.max(...aggregatedHistory.map((p) => p.count), 1);
+                const last = aggregatedHistory[aggregatedHistory.length - 1]!;
                 const yRange = H - PAD_TOP - PAD_BOT;
                 const cx = W;
                 const cy = PAD_TOP + yRange - (last.count / max) * yRange;
