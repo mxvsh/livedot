@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.0-beta.16](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.15...v0.1.0-beta.16) (2026-03-23)
+
+* Add website copy button ([](https://github.com/mxvsh/livedot/commit/2a099f969fa623758902c20649f055fc21577dc5))
+* Add billing modal ([](https://github.com/mxvsh/livedot/commit/0700b7c27a0ef08f9c4fa144878328e07138b4df))
+* Improve profile menu ([](https://github.com/mxvsh/livedot/commit/73fbbbb4126d63da537adc1f82c1bcfe3cefd873))
+* Add support for turso db ([](https://github.com/mxvsh/livedot/commit/a33fa6e2cb4c1c10e24046c6cd5307b64d59862d))
+* Move plans to shared package ([](https://github.com/mxvsh/livedot/commit/515def28747cc98b14ed36c963bae055146a5bc1))
+* Show plan in the header ([](https://github.com/mxvsh/livedot/commit/d82b91a7f2c4ee4dad79639f737fdd92d80e8183))
+* Setup store adaptor (with redis) ([](https://github.com/mxvsh/livedot/commit/6c4602de02e07d0e51da7f74820605217756beec))
+* Implement plan system ([](https://github.com/mxvsh/livedot/commit/9045b57b2bf9d37eee8f1d2ff7bbc0863833cdf1))
+* Setup analytics in www ([](https://github.com/mxvsh/livedot/commit/5255c501d76677049783a52ced32de9f4c12f209))
+* Add landing app ([](https://github.com/mxvsh/livedot/commit/916ba5d746d402b52a642bdadc169c05aa2a1286))
+
 ## [0.1.0-beta.15](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.14...v0.1.0-beta.15) (2026-03-23)
 
 * Changed from 30m to 10m ([](https://github.com/mxvsh/livedot/commit/0bfa732a1349e16a16ccca7bc69e59889353e5f9))
