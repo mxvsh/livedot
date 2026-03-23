@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.20...v0.1.0) (2026-03-23)
+
+* DB migrations ([](https://github.com/mxvsh/livedot/commit/19b38d90a91a84be4024a702b50da23555d4a9f1))
+
 ## [0.1.0-beta.20](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.19...v0.1.0-beta.20) (2026-03-23)
 
 * Add widget embedding option ([](https://github.com/mxvsh/livedot/commit/d47a012d326919fa8d2bcdf390280cdbf63d6868))
