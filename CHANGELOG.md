@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.1.0-beta.14](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.13...v0.1.0-beta.14) (2026-03-23)
+
 ## [0.1.0-beta.13](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.12...v0.1.0-beta.13) (2026-03-23)
 
 * Fix cannot read properties of undefined ([](https://github.com/mxvsh/livedot/commit/417f29f2babfcca22cf20c1ea562c49ecefcb9c6))
