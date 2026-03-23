@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.4](https://github.com/mxvsh/livedot/compare/v0.1.3...v0.1.4) (2026-03-23)
+
+* Fix widget styling ([](https://github.com/mxvsh/livedot/commit/1e4ba6a75ead8b0d25ecb8768dc091771977d827))
+
 ## [0.1.3](https://github.com/mxvsh/livedot/compare/v0.1.2...v0.1.3) (2026-03-23)
 
 * Improve widgets ([](https://github.com/mxvsh/livedot/commit/7489cdb9dcec4fe224371f7ed3e352e7ead552b3))
