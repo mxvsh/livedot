@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useWebSocket } from "@/hooks/useWebSocket";
+import BrandingBadge from "@/components/embed/BrandingBadge";
 
 export const Route = createFileRoute("/embed/chart")({
   component: EmbedChart,
@@ -8,6 +10,7 @@ export const Route = createFileRoute("/embed/chart")({
     token: (search.token as string) ?? "",
     bg: (search.bg as string) ?? "transparent",
     accent: (search.accent as string) ?? "#96E421",
+    branding: (search.branding as string) ?? "",
   }),
 });
 
@@ -28,9 +31,11 @@ function buildPath(points: { count: number }[], close: boolean): string {
     return { x, y };
   });
 
-  let d = `M${coords[0].x},${coords[0].y}`;
+  const first = coords[0]!;
+  let d = `M${first.x},${first.y}`;
   for (let i = 1; i < coords.length; i++) {
-    d += ` L${coords[i].x},${coords[i].y}`;
+    const coord = coords[i]!;
+    d += ` L${coord.x},${coord.y}`;
   }
 
   if (close) {
@@ -41,8 +46,32 @@ function buildPath(points: { count: number }[], close: boolean): string {
 }
 
 function EmbedChart() {
-  const { website, token, bg, accent } = Route.useSearch();
+  const { website, token, bg, accent, branding } = Route.useSearch();
   const { count, connected, history } = useWebSocket(website || null, token || undefined);
+  const [showBranding, setShowBranding] = useState(false);
+  const explicitBranding = branding === "1" || branding === "true";
+
+  useEffect(() => {
+    if (!website || !token) {
+      setShowBranding(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    fetch(`/api/embed/meta?website=${encodeURIComponent(website)}&token=${encodeURIComponent(token)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { branding?: boolean } | null) => {
+        if (!cancelled) setShowBranding(Boolean(data?.branding) || explicitBranding);
+      })
+      .catch(() => {
+        if (!cancelled) setShowBranding(explicitBranding);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [website, token, explicitBranding]);
 
   if (!website || !token) {
     return null;
@@ -63,6 +92,7 @@ function EmbedChart() {
         justifyContent: "center",
         fontFamily: "system-ui, -apple-system, sans-serif",
         overflow: "hidden",
+        position: "relative",
       }}
     >
       <div style={{ width: "100%", maxWidth: 600, padding: "0 16px" }}>
@@ -110,7 +140,7 @@ function EmbedChart() {
               />
               {(() => {
                 const max = Math.max(...history.map((p) => p.count), 1);
-                const last = history[history.length - 1];
+                const last = history[history.length - 1]!;
                 const yRange = H - PAD_TOP - PAD_BOT;
                 const cx = W;
                 const cy = PAD_TOP + yRange - (last.count / max) * yRange;
@@ -122,6 +152,7 @@ function EmbedChart() {
           )}
         </svg>
       </div>
+      {showBranding && <BrandingBadge />}
     </div>
   );
 }

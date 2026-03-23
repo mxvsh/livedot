@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { eq } from "drizzle-orm";
 import { db } from "@livedot/db";
-import { websites } from "@livedot/db/schema";
+import { user, websites } from "@livedot/db/schema";
 import { requireAuth } from "../middleware/auth";
 import { websiteCache } from "../website-cache";
 import { getUserLimits } from "../limits";
@@ -16,6 +16,34 @@ function cacheEntryFromLimits(url: string, limits: { maxConnectionsPerSite: numb
 }
 
 export const websiteRoutes = new Hono()
+  .get("/embed/meta", async (c) => {
+    const websiteId = c.req.query("website");
+    const token = c.req.query("token");
+
+    if (!websiteId || !token) {
+      return c.json({ error: "Missing website or token" }, 400);
+    }
+
+    const [website] = await db
+      .select({ userId: websites.userId })
+      .from(websites)
+      .where(eq(websites.id, websiteId))
+      .limit(1);
+
+    const cached = websiteCache.get(websiteId);
+    if (!website || !cached?.shareToken || cached.shareToken !== token) {
+      return c.json({ error: "Invalid share token" }, 401);
+    }
+
+    const [owner] = await db
+      .select({ plan: user.plan })
+      .from(user)
+      .where(eq(user.id, website.userId))
+      .limit(1);
+
+    return c.json({ branding: (owner?.plan ?? "free") === "free" });
+  })
+
   .use(requireAuth)
 
   .get("/websites", async (c) => {

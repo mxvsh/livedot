@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Button, Modal } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Share01Icon, CopyIcon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { planLabel } from "@livedot/shared/plans";
 import { api, type Website } from "@/lib/api";
+import { useAuthStore } from "@/stores/auth";
 
 interface Props {
   website: Website | null;
@@ -11,20 +13,25 @@ interface Props {
 }
 
 export default function ShareModal({ website, onClose, onUpdated }: Props) {
+  const user = useAuthStore((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [localToken, setLocalToken] = useState<string | null | undefined>(undefined);
+  const [brandingOptIn, setBrandingOptIn] = useState(false);
 
   const shareToken = localToken !== undefined ? localToken : website?.shareToken;
   const isSharing = !!shareToken;
+  const isFreePlan = user?.plan === "free";
+  const showBrandingNotice = isFreePlan;
   const origin = window.location.origin;
+  const brandingParam = !isFreePlan && brandingOptIn ? "&branding=1" : "";
 
   const mapEmbed = shareToken
-    ? `<iframe src="${origin}/embed/map?website=${website?.id}&token=${shareToken}" width="100%" height="400" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
+    ? `<iframe src="${origin}/embed/map?website=${website?.id}&token=${shareToken}${brandingParam}" width="100%" height="400" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
     : "";
 
   const chartEmbed = shareToken
-    ? `<iframe src="${origin}/embed/chart?website=${website?.id}&token=${shareToken}" width="100%" height="200" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
+    ? `<iframe src="${origin}/embed/chart?website=${website?.id}&token=${shareToken}${brandingParam}" width="100%" height="200" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
     : "";
 
   async function toggleSharing() {
@@ -57,6 +64,7 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
         if (!open) {
           setCopied(null);
           setLocalToken(undefined);
+          setBrandingOptIn(false);
           onClose();
         }
       }}
@@ -77,12 +85,31 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
                   <p className="text-sm text-muted">
                     Enable sharing to get embeddable map and chart widgets for your website.
                   </p>
+                  {showBrandingNotice && (
+                    <p className="text-xs text-muted max-w-[24rem]">
+                      Free plan embeds include a Livedot branding badge in the bottom-left corner.
+                    </p>
+                  )}
                   <Button onPress={toggleSharing} isDisabled={loading}>
                     {loading ? "Enabling..." : "Enable Sharing"}
                   </Button>
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
+                  {!isFreePlan && (
+                    <label className="flex items-start gap-3 rounded-xl border border-white/8 bg-default px-3 py-2.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={brandingOptIn}
+                        onChange={(e) => setBrandingOptIn(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 accent-[var(--accent)]"
+                      />
+                      <span className="text-[11px] leading-relaxed text-muted">
+                        Explicitly include the Livedot branding badge in shared embeds.
+                      </span>
+                    </label>
+                  )}
+
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <p className="text-xs font-medium text-foreground">Map Widget</p>
@@ -116,6 +143,16 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
                   <p className="text-[10px] text-muted">
                     Customize with URL params: <code className="text-foreground/60">bg</code> (background color), <code className="text-foreground/60">accent</code> (chart color).
                   </p>
+                  {showBrandingNotice && (
+                    <p className="text-[10px] text-muted">
+                      Your {planLabel(user?.plan ?? "free")} plan adds a Livedot branding badge to shared embeds.
+                    </p>
+                  )}
+                  {!isFreePlan && brandingOptIn && (
+                    <p className="text-[10px] text-muted">
+                      Branding is enabled here via <code className="text-foreground/60">branding=1</code> in the embed URL.
+                    </p>
+                  )}
                 </div>
               )}
             </Modal.Body>
