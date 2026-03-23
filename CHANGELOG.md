@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.0-beta.13](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.12...v0.1.0-beta.13) (2026-03-23)
+
+* Fix cannot read properties of undefined ([](https://github.com/mxvsh/livedot/commit/417f29f2babfcca22cf20c1ea562c49ecefcb9c6))
+* Create guide.md ([](https://github.com/mxvsh/livedot/commit/cfec0a833f23fafd0aa97ddf2365de0388f05ab0))
+
 ## [0.1.0-beta.12](https://github.com/mxvsh/livedot/compare/v0.1.0-beta.11...v0.1.0-beta.12) (2026-03-23)
 
 * Add realtime visitor chart ([](https://github.com/mxvsh/livedot/commit/ead395e596e4721b4a73b61b8e3315efc13edf71))
