@@ -15,6 +15,13 @@
       "when": 1774244198197,
       "tag": "0001_add-user-plan-column",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774275810212,
+      "tag": "0002_add-share-token",
+      "breakpoints": true
     }
   ]
 }
