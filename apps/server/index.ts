@@ -34,6 +34,7 @@ async function loadWebsiteCache() {
       const hostname = w.url ? new URL(w.url).hostname : "";
       websiteCache.set(w.id, {
         hostname,
+        userId: w.userId,
         eventsPerMonth: limits.eventsPerMonth,
         eventRetentionMs: limits.eventRetentionMs,
         historyMax: limits.historyMax,
@@ -42,6 +43,7 @@ async function loadWebsiteCache() {
     } catch {
       websiteCache.set(w.id, {
         hostname: "",
+        userId: w.userId,
         eventsPerMonth: limits.eventsPerMonth,
         eventRetentionMs: limits.eventRetentionMs,
         historyMax: limits.historyMax,

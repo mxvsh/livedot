@@ -85,6 +85,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ username, otp, newPassword }),
     }),
+  getUsage: () => request<{ eventsUsed: number; eventsLimit: number }>("/api/usage"),
   getWebsites: () => request<Website[]>("/api/websites"),
   createWebsite: (name: string, url: string) =>
     request<Website>("/api/websites", {

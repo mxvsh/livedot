@@ -7,12 +7,12 @@ import { websiteCache } from "../website-cache";
 import { getUserLimits } from "../limits";
 import { trackEvent } from "../tracking";
 
-function cacheEntryFromLimits(url: string, limits: { eventsPerMonth: number; eventRetentionMs: number; historyMax: number }, shareToken: string | null = null) {
+function cacheEntryFromLimits(url: string, userId: string, limits: { eventsPerMonth: number; eventRetentionMs: number; historyMax: number }, shareToken: string | null = null) {
   try {
     const hostname = url ? new URL(url).hostname : "";
-    return { hostname, eventsPerMonth: limits.eventsPerMonth, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
+    return { hostname, userId, eventsPerMonth: limits.eventsPerMonth, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
   } catch {
-    return { hostname: "", eventsPerMonth: limits.eventsPerMonth, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
+    return { hostname: "", userId, eventsPerMonth: limits.eventsPerMonth, eventRetentionMs: limits.eventRetentionMs, historyMax: limits.historyMax, shareToken };
   }
 }
 
@@ -74,7 +74,7 @@ export const websiteRoutes = new Hono()
       .values({ name: name.trim(), url: url?.trim() || "", userId: user.id })
       .returning();
 
-    websiteCache.set(website.id, cacheEntryFromLimits(website.url, limits, website.shareToken));
+    websiteCache.set(website.id, cacheEntryFromLimits(website.url, user.id, limits, website.shareToken));
     trackEvent("website_create");
     return c.json(website);
   })
@@ -95,7 +95,7 @@ export const websiteRoutes = new Hono()
       .returning();
 
     const limits = await getUserLimits(user.id);
-    websiteCache.set(updated.id, cacheEntryFromLimits(updated.url, limits, updated.shareToken));
+    websiteCache.set(updated.id, cacheEntryFromLimits(updated.url, user.id, limits, updated.shareToken));
     return c.json(updated);
   })
 

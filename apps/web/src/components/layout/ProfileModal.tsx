@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   Form,
@@ -17,9 +17,13 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-type Tab = "profile" | "password";
+type Tab = "profile" | "usage" | "password";
 
 const PROVIDER_LABELS: Record<string, string> = { github: "GitHub", google: "Google", credential: "Email & Password" };
+
+function fmt(n: number) {
+  return n.toLocaleString();
+}
 
 export default function ProfileModal({ isOpen, onOpenChange }: Props) {
   const { user } = useAuthStore();
@@ -28,6 +32,13 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [usage, setUsage] = useState<{ eventsUsed: number; eventsLimit: number } | null>(null);
+
+  useEffect(() => {
+    if (isOpen && tab === "usage") {
+      api.getUsage().then(setUsage).catch(() => {});
+    }
+  }, [isOpen, tab]);
 
   function handleOpenChange(open: boolean) {
     if (!open) {
@@ -57,6 +68,12 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
     }
   }
 
+  const tabs: { key: Tab; label: string; disabled?: boolean }[] = [
+    { key: "profile", label: "Profile" },
+    { key: "usage", label: "Usage" },
+    { key: "password", label: "Password", disabled: !hasPassword },
+  ];
+
   return (
     <Modal isOpen={isOpen} onOpenChange={handleOpenChange}>
       <Modal.Backdrop>
@@ -68,15 +85,15 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
             </Modal.Header>
             <Modal.Body>
               <div className="flex gap-1 p-1 rounded-xl bg-default mb-4">
-                {(["profile", "password"] as Tab[]).map((t) => (
+                {tabs.map((t) => (
                   <button
-                    key={t}
-                    onClick={() => { if (t === "password" && !hasPassword) return; setTab(t); setError(""); setSuccess(""); }}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize ${
-                      tab === t ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
-                    } ${t === "password" && !hasPassword ? "opacity-40 cursor-not-allowed" : ""}`}
+                    key={t.key}
+                    onClick={() => { if (t.disabled) return; setTab(t.key); setError(""); setSuccess(""); }}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      tab === t.key ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
+                    } ${t.disabled ? "opacity-40 cursor-not-allowed" : ""}`}
                   >
-                    {t === "profile" ? "Profile" : "Change Password"}
+                    {t.label}
                   </button>
                 ))}
               </div>
@@ -108,6 +125,45 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
                 </div>
               )}
 
+              {tab === "usage" && (
+                <div className="flex flex-col gap-4">
+                  {!usage ? (
+                    <div className="flex justify-center py-4">
+                      <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-muted">Events this month</span>
+                          <span className="text-foreground font-medium">
+                            {fmt(usage.eventsUsed)}
+                            {usage.eventsLimit > 0 && <span className="text-muted"> / {fmt(usage.eventsLimit)}</span>}
+                          </span>
+                        </div>
+                        {usage.eventsLimit > 0 && (
+                          <>
+                            <div className="h-2 rounded-full bg-default overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-accent transition-all"
+                                style={{ width: `${Math.min(100, (usage.eventsUsed / usage.eventsLimit) * 100)}%` }}
+                              />
+                            </div>
+                            <p className="text-xs text-muted mt-1">
+                              {fmt(Math.max(0, usage.eventsLimit - usage.eventsUsed))} remaining
+                            </p>
+                          </>
+                        )}
+                        {usage.eventsLimit === 0 && (
+                          <p className="text-xs text-muted">Unlimited (Community Edition)</p>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted">Resets on the 1st of each month.</p>
+                    </>
+                  )}
+                </div>
+              )}
+
               {tab === "password" && (
                 <Form className="flex flex-col gap-4" onSubmit={handleChangePassword}>
                   <TextField isRequired name="currentPassword" type="password" variant="secondary">
@@ -118,7 +174,7 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
 
                   <TextField isRequired name="newPassword" type="password" minLength={6} variant="secondary">
                     <Label>New Password</Label>
-                    <Input placeholder="Min 6 characters"  className="ring-inset" />
+                    <Input placeholder="Min 6 characters" className="ring-inset" />
                     <Description>At least 6 characters</Description>
                     <FieldError />
                   </TextField>
@@ -130,13 +186,6 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
                     {loading ? "Updating..." : "Update Password"}
                   </Button>
                 </Form>
-              )}
-
-              {tab === "profile" && (error || success) && (
-                <>
-                  {error && <p className="text-danger text-sm mt-2">{error}</p>}
-                  {success && <p className="text-success text-sm mt-2">{success}</p>}
-                </>
               )}
             </Modal.Body>
           </Modal.Dialog>

@@ -6,23 +6,27 @@ import { resolveGeo } from "../geo";
 import { upsertSession, recordCustomEvent } from "../sessions";
 import { env } from "../env";
 
-// --- Monthly event counter: websiteId:YYYY-MM → count ---
+// --- Monthly event counter: userId:YYYY-MM → count ---
 const monthlyEventCount = new Map<string, number>();
 
-function monthKey(websiteId: string) {
+function currentMonth() {
   const now = new Date();
-  return `${websiteId}:${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function incrementEventCount(websiteId: string): number {
-  const key = monthKey(websiteId);
+function userMonthKey(userId: string) {
+  return `${userId}:${currentMonth()}`;
+}
+
+function incrementEventCount(userId: string): number {
+  const key = userMonthKey(userId);
   const count = (monthlyEventCount.get(key) ?? 0) + 1;
   monthlyEventCount.set(key, count);
   return count;
 }
 
-function getEventCount(websiteId: string): number {
-  return monthlyEventCount.get(monthKey(websiteId)) ?? 0;
+export function getEventCount(userId: string): number {
+  return monthlyEventCount.get(userMonthKey(userId)) ?? 0;
 }
 
 // --- Rate limiting: max 1 request per 3s per IP+websiteId ---
@@ -99,10 +103,10 @@ export const eventRoutes = new Hono()
 
       // Named events (data-livedot-event clicks): store + publish, no rate limit, no geo
       if (typeof eventName === "string" && eventName) {
-        if (cached.eventsPerMonth > 0 && getEventCount(websiteId) >= cached.eventsPerMonth) {
+        if (cached.eventsPerMonth > 0 && getEventCount(cached.userId) >= cached.eventsPerMonth) {
           return c.body(null, 204);
         }
-        incrementEventCount(websiteId);
+        incrementEventCount(cached.userId);
         const timestamp = Date.now();
         recordCustomEvent(websiteId, { type: "event", sessionId, eventName, pageUrl: url || "", timestamp });
         const msg: import("@livedot/shared").WSMessage = {
@@ -137,10 +141,10 @@ export const eventRoutes = new Hono()
 
       if (geo) {
         // Enforce monthly event limit
-        if (cached.eventsPerMonth > 0 && getEventCount(websiteId) >= cached.eventsPerMonth) {
+        if (cached.eventsPerMonth > 0 && getEventCount(cached.userId) >= cached.eventsPerMonth) {
           return c.body(null, 204); // silently drop
         }
-        incrementEventCount(websiteId);
+        incrementEventCount(cached.userId);
         upsertSession(
           {
             sessionId,

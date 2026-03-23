@@ -1,5 +1,6 @@
 export interface WebsiteCacheEntry {
   hostname: string;
+  userId: string;
   eventsPerMonth: number; // 0 = unlimited
   eventRetentionMs: number; // 0 = unlimited
   historyMax: number; // 0 = unlimited

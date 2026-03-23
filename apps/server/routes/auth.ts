@@ -8,6 +8,7 @@ import { env } from "../env";
 import { getSessionFromRequest } from "../middleware/auth";
 import { defaultPlan } from "../limits";
 import { trackEvent } from "../tracking";
+import { getEventCount } from "./events";
 
 const log = createLogger("auth");
 
@@ -291,6 +292,17 @@ export const authRoutes = new Hono()
       const message = err?.body?.message ?? err?.message ?? "Failed to resend";
       return c.json({ error: message }, 400);
     }
+  })
+
+  .get("/usage", async (c) => {
+    const session = await getSessionFromRequest(c.req.raw);
+    if (!session) return c.json({ error: "Unauthorized" }, 401);
+    const limits = await import("../limits").then(m => m.getUserLimits(session.user.id));
+    const used = getEventCount(session.user.id);
+    return c.json({
+      eventsUsed: used,
+      eventsLimit: limits.eventsPerMonth,
+    });
   })
 
   .post("/logout", async (c) => {
