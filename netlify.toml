@@ -1,0 +1,4 @@
+[build]
+  command = "bun run --filter www build"
+  publish = "apps/www/dist"
+
