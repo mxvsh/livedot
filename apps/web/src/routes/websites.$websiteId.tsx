@@ -10,6 +10,7 @@ import { useAuthStore } from "@/stores/auth";
 import Map from "@/components/dashboard/Map";
 import Dock from "@/components/dashboard/Dock";
 import ActivityPanel from "@/components/dashboard/ActivityPanel";
+import VisitorChart from "@/components/dashboard/VisitorChart";
 
 export const Route = createFileRoute("/websites/$websiteId")({
   component: WebsiteDashboard,
@@ -38,7 +39,7 @@ function WebsiteDashboard() {
     })();
   }, [websiteId]);
 
-  const { sessions, connected, count, activityLog } = useWebSocket(websiteId);
+  const { sessions, connected, count, activityLog, history } = useWebSocket(websiteId);
   const sessionArray = Array.from(sessions.values());
 
   const selectedSession = selectedSessionId ? sessions.get(selectedSessionId) ?? null : null;
@@ -104,11 +105,13 @@ function WebsiteDashboard() {
         </motion.div>
       </div>
 
-      {/* Website name top left */}
-      <div className="fixed top-3 left-3 z-40 md:top-4 md:left-4">
-        <p className="text-xs text-muted/60">{websiteName}</p>
-        <p className="text-[10px] text-muted/60">{websiteId}</p>
-      </div>
+      {/* Visitor chart top left */}
+      <VisitorChart
+        websiteName={websiteName}
+        count={count}
+        connected={connected}
+        history={history}
+      />
 
       {/* Activity panel (bottom left) — shown when a session is selected */}
       <AnimatePresence>

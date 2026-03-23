@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import type { VisitorSession } from "@livedot/shared";
-import type { ActivityEvent } from "@/hooks/useWebSocket";
+import type { VisitorSession, ActivityEvent } from "@livedot/shared";
 
 function DiceBearAvatar({ sessionId, size = 32 }: { sessionId: string; size?: number }) {
   return (
@@ -36,7 +35,7 @@ interface EventRowProps {
 
 function EventRow({ event }: EventRowProps) {
   const dot = {
-    join: "bg-emerald-400",
+    join: "bg-[#96E421]",
     navigate: "bg-blue-400",
     leave: "bg-zinc-500",
     event: "bg-amber-400",

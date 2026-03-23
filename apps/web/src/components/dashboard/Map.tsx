@@ -132,7 +132,7 @@ export default function Map({ sessions, selectedSessionId, onSessionSelect }: Pr
         source: "visitors",
         paint: {
           "circle-radius": 18,
-          "circle-color": "#00ffcc",
+          "circle-color": "#96E421",
           "circle-opacity": 0.12,
           "circle-blur": 1,
         },
@@ -144,7 +144,7 @@ export default function Map({ sessions, selectedSessionId, onSessionSelect }: Pr
         source: "visitors",
         paint: {
           "circle-radius": 8,
-          "circle-color": "#00ffcc",
+          "circle-color": "#96E421",
           "circle-opacity": 0.25,
           "circle-blur": 0.6,
         },
@@ -156,7 +156,7 @@ export default function Map({ sessions, selectedSessionId, onSessionSelect }: Pr
         source: "visitors",
         paint: {
           "circle-radius": 3,
-          "circle-color": "#00ffcc",
+          "circle-color": "#96E421",
           "circle-opacity": 0.9,
         },
       });

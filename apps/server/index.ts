@@ -8,7 +8,7 @@ import { authRoutes } from "./routes/auth";
 import { websiteRoutes } from "./routes/websites";
 import { eventRoutes } from "./routes/events";
 import { wsHandler, type WSData } from "./ws";
-import { startSweep } from "./sessions";
+import { startTick } from "./sessions";
 
 interface WebsiteCacheEntry {
   hostname: string;
@@ -94,6 +94,6 @@ const server = Bun.serve({
 });
 
 _server = server;
-startSweep(getServer);
+startTick(getServer);
 
 console.log(`Server running at ${server.url}`);

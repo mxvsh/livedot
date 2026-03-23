@@ -13,7 +13,7 @@ export default function LiveCount({ count, connected }: Props) {
     >
       <span
         className={`w-2 h-2 rounded-full ${
-          connected ? "bg-success animate-pulse" : "bg-muted"
+          connected ? "bg-[#96E421] animate-pulse" : "bg-muted"
         }`}
       />
       <span className="text-sm font-mono text-foreground tabular-nums">

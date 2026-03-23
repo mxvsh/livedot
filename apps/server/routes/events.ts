@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { websiteCache, getServer } from "../index";
 import { resolveGeo } from "../geo";
-import { upsertSession } from "../sessions";
+import { upsertSession, recordCustomEvent } from "../sessions";
 import { env } from "../env";
 
 // --- Rate limiting: max 1 request per 3s per IP+websiteId ---
@@ -77,14 +77,16 @@ export const eventRoutes = new Hono()
         return c.body(null, 403);
       }
 
-      // Named events (data-umami-event clicks): publish and return — no rate limit, no geo
+      // Named events (data-umami-event clicks): store + publish, no rate limit, no geo
       if (typeof eventName === "string" && eventName) {
+        const timestamp = Date.now();
+        recordCustomEvent(websiteId, { type: "event", sessionId, eventName, pageUrl: url || "", timestamp });
         const msg: import("@livedot/shared").WSMessage = {
           type: "event",
           sessionId,
           eventName,
           pageUrl: url || "",
-          timestamp: Date.now(),
+          timestamp,
         };
         server?.publish(`website:${websiteId}`, JSON.stringify(msg));
         return c.body(null, 204);

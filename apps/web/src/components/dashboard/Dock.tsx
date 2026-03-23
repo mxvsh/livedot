@@ -38,7 +38,7 @@ export default function Dock({ websiteName, count, connected }: Props) {
                 <div className="flex items-center gap-1.5 px-2">
                   <span
                     className={`w-2 h-2 rounded-full ${
-                      connected ? "bg-success animate-pulse" : "bg-muted"
+                      connected ? "bg-[#96E421] animate-pulse" : "bg-muted"
                     }`}
                   />
                   <AnimatedNumber value={count} className="text-sm text-foreground tabular-nums" />
