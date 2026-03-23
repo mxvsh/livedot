@@ -1,0 +1,176 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+
+const pathname = Astro.url.pathname;
+const pageUrl = new URL(pathname, Astro.site ?? Astro.url).href;
+const homeUrl = new URL("/", Astro.site ?? Astro.url).href;
+
+const structuredData = [
+  {
+    "@type": "WebPage",
+    name: "Livedot Terms of Service",
+    description: "Read the Livedot terms covering accounts, billing, acceptable use, and service limitations.",
+    url: pageUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Livedot",
+      url: homeUrl,
+    },
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
+      { "@type": "ListItem", position: 2, name: "Terms of Service", item: pageUrl },
+    ],
+  },
+];
+
+const sections = [
+  {
+    title: "Acceptance",
+    paragraphs: [
+      "By creating an account or using Livedot, you agree to these Terms of Service. If you do not agree, do not use the service.",
+    ],
+  },
+  {
+    title: "The Service",
+    paragraphs: [
+      "Livedot provides real-time website visitor tracking. We offer a cloud-hosted service (cloud.livedot.dev) and an open-source self-hosted edition (Community Edition) available on GitHub.",
+    ],
+  },
+  {
+    title: "Your Account",
+    paragraphs: [
+      "You are responsible for maintaining the security of your account credentials. You must not share your account or allow others to access it. You must provide accurate information when creating your account.",
+      "We reserve the right to suspend or terminate accounts that violate these terms, engage in abuse, or use the service in a way that disrupts others.",
+    ],
+  },
+  {
+    title: "Acceptable Use",
+    intro: "You may not use Livedot to:",
+    items: [
+      "Track websites you do not own or have permission to track",
+      "Violate any applicable laws or regulations",
+      "Attempt to circumvent plan limits or access controls",
+      "Resell or sublicense the service without our written permission",
+      "Interfere with or disrupt the service or its infrastructure",
+    ],
+  },
+  {
+    title: "Plans and Billing",
+    paragraphs: [
+      "Paid plans (Pro, Max) are billed monthly through Polar.sh. Payments are non-refundable except where required by law. You may cancel your subscription at any time; access continues until the end of the current billing period.",
+      "We reserve the right to change pricing with 30 days notice. Continued use after a price change constitutes acceptance of the new pricing.",
+    ],
+  },
+  {
+    title: "Plan Limits",
+    paragraphs: [
+      "Each plan includes a monthly event limit. Events exceeding your plan limit are silently dropped. We do not charge overages. If you consistently exceed your limit, consider upgrading.",
+    ],
+  },
+  {
+    title: "Data and Privacy",
+    paragraphs: [
+      "Your use of the service is also governed by our Privacy Policy, which is incorporated into these terms by reference.",
+    ],
+  },
+  {
+    title: "Uptime and Availability",
+    paragraphs: [
+      "We strive for high availability but do not guarantee any specific uptime SLA on the free plan. Pro and Max plans are given priority in the event of resource constraints. We are not liable for losses caused by downtime.",
+    ],
+  },
+  {
+    title: "Intellectual Property",
+    paragraphs: [
+      "Livedot is open-source software licensed under the MIT License. The cloud service, branding, and domain are owned by Livedot. You retain all ownership of your data.",
+    ],
+  },
+  {
+    title: "Disclaimer of Warranties",
+    paragraphs: [
+      "The service is provided \"as is\" without warranty of any kind. We disclaim all warranties, express or implied, including merchantability and fitness for a particular purpose.",
+    ],
+  },
+  {
+    title: "Limitation of Liability",
+    paragraphs: [
+      "To the maximum extent permitted by law, Livedot shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service. Our total liability shall not exceed the amount you paid us in the last 3 months.",
+    ],
+  },
+  {
+    title: "Changes to Terms",
+    paragraphs: [
+      "We may update these terms from time to time. We will notify users of significant changes via email or in-app notice. Continued use after changes constitutes acceptance.",
+    ],
+  },
+];
+---
+
+<MainLayout
+  title="Livedot Terms of Service"
+  description="Read the Livedot terms covering accounts, billing, acceptable use, and service limitations."
+  pathname={pathname}
+  structuredData={structuredData}
+>
+  <Header pathname={pathname} />
+  <main class="pt-20">
+    <section class="mx-auto max-w-4xl px-6 py-24">
+      <div class="grid-panel border border-white/8 bg-surface-container p-8 md:p-12">
+        <a href="/" class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-on-surface-variant transition-colors hover:text-white">
+          Back to home
+        </a>
+        <div class="mt-8 max-w-3xl">
+          <p class="text-xs uppercase tracking-[0.32em] text-primary">Legal</p>
+          <h1 class="mt-4 font-headline text-4xl font-bold tracking-[-0.06em] text-white md:text-6xl">Terms of Service</h1>
+          <p class="mt-4 text-sm text-on-surface-variant">Last updated: March 2026</p>
+          <p class="mt-6 text-lg leading-8 text-on-surface-variant">
+            Review the rules, billing terms, acceptable use boundaries, and liability limits that govern Livedot.
+          </p>
+        </div>
+
+        <div class="mt-14 space-y-10">
+          {sections.map((section) => (
+            <section class="border-t border-white/8 pt-8">
+              <h2 class="font-headline text-2xl font-bold tracking-[-0.04em] text-white">{section.title}</h2>
+              {section.paragraphs?.map((paragraph) => (
+                <p class="mt-4 text-base leading-7 text-on-surface-variant">
+                  {section.title === "Data and Privacy" ? (
+                    <>
+                      Your use of the service is also governed by our{" "}
+                      <a href="/privacy" class="text-white underline underline-offset-2">Privacy Policy</a>, which is incorporated into these terms by reference.
+                    </>
+                  ) : paragraph}
+                </p>
+              ))}
+              {section.intro && <p class="mt-4 text-base leading-7 text-on-surface-variant">{section.intro}</p>}
+              {section.items && (
+                <ul class="mt-4 space-y-3 text-base leading-7 text-on-surface-variant">
+                  {section.items.map((item) => (
+                    <li class="flex gap-3">
+                      <span class="mt-2 h-1.5 w-1.5 rounded-full bg-primary"></span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+
+          <section class="border-t border-white/8 pt-8">
+            <h2 class="font-headline text-2xl font-bold tracking-[-0.04em] text-white">Contact</h2>
+            <p class="mt-4 text-base leading-7 text-on-surface-variant">
+              For questions about these terms, contact us at{" "}
+              <a href="mailto:hello@livedot.dev" class="text-white underline underline-offset-2">hello@livedot.dev</a>.
+            </p>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</MainLayout>

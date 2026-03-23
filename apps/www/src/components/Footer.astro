@@ -1,17 +1,22 @@
 ---
 const footerLinks = [
   { label: "Docs", href: "https://github.com/mxvsh/livedot" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
   { label: "X", href: "https://x.com/monawwarx" },
   { label: "Discord", href: "http://mxv.sh/discord" },
 ];
 ---
 
-<footer class="w-full border-t border-surface-variant/30 bg-surface">
-  <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-6 py-12 md:flex-row">
+<footer class="relative w-full overflow-hidden border-t border-surface-variant/30 bg-surface">
+  <div class="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-6 py-12 md:flex-row">
     <div class="flex flex-col items-center gap-2 md:items-start">
-      <div class="text-lg font-bold text-primary">Livedot</div>
+      <a href="/" class="flex items-center gap-3 text-2xl font-bold text-primary">
+        <img src="/logo.svg" alt="Livedot logo" class="h-8 w-8 rounded-md" />
+        <span class="brand-wordmark">livedot</span>
+      </a>
       <p class="text-sm tracking-wide text-on-surface-variant">
-        © 2026 Livedot. Built for the obsidian pulse.
+        © 2026 Livedot. Built for live traffic.
       </p>
     </div>
 
