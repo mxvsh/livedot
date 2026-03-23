@@ -14,6 +14,7 @@ import { Route as WebsitesWebsiteIdRouteImport } from './routes/websites.$websit
 import { Route as EmbedMapRouteImport } from './routes/embed/map'
 import { Route as EmbedLiveRouteImport } from './routes/embed/live'
 import { Route as EmbedChartRouteImport } from './routes/embed/chart'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
@@ -42,6 +43,11 @@ const EmbedChartRoute = EmbedChartRouteImport.update({
   path: '/embed/chart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/auth/register',
   path: '/auth/register',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/embed/chart': typeof EmbedChartRoute
   '/embed/live': typeof EmbedLiveRoute
   '/embed/map': typeof EmbedMapRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/embed/chart': typeof EmbedChartRoute
   '/embed/live': typeof EmbedLiveRoute
   '/embed/map': typeof EmbedMapRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/embed/chart': typeof EmbedChartRoute
   '/embed/live': typeof EmbedLiveRoute
   '/embed/map': typeof EmbedMapRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth/login'
     | '/auth/register'
+    | '/auth/signup'
     | '/embed/chart'
     | '/embed/live'
     | '/embed/map'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth/login'
     | '/auth/register'
+    | '/auth/signup'
     | '/embed/chart'
     | '/embed/live'
     | '/embed/map'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth/login'
     | '/auth/register'
+    | '/auth/signup'
     | '/embed/chart'
     | '/embed/live'
     | '/embed/map'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthSignupRoute: typeof AuthSignupRoute
   EmbedChartRoute: typeof EmbedChartRoute
   EmbedLiveRoute: typeof EmbedLiveRoute
   EmbedMapRoute: typeof EmbedMapRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmbedChartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/register': {
       id: '/auth/register'
       path: '/auth/register'
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  AuthSignupRoute: AuthSignupRoute,
   EmbedChartRoute: EmbedChartRoute,
   EmbedLiveRoute: EmbedLiveRoute,
   EmbedMapRoute: EmbedMapRoute,

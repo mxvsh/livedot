@@ -8,6 +8,7 @@ interface AuthState {
   cloud: boolean;
   providers: string[];
   registrationOpen: boolean;
+  emailSignup: boolean;
   check: () => Promise<void>;
   setUser: (user: User) => void;
   logout: () => Promise<void>;
@@ -20,6 +21,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   cloud: false,
   providers: [],
   registrationOpen: true,
+  emailSignup: false,
 
   check: async () => {
     try {
@@ -31,6 +33,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         cloud: meta.cloud,
         providers: meta.providers,
         registrationOpen: meta.registrationOpen,
+        emailSignup: meta.emailSignup ?? false,
       });
     } catch {
       // Server error (e.g. DB not initialized) — treat as needs setup

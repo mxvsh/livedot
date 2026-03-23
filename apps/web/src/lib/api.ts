@@ -17,6 +17,7 @@ export interface MetaResponse {
   cloud: boolean;
   providers: string[];
   registrationOpen: boolean;
+  emailSignup: boolean;
   analytics: {
     umami: { url: string; websiteId: string } | null;
     livedot: { url: string; websiteId: string } | null;
@@ -49,11 +50,18 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ username, password }),
     }),
-  login: (username: string, password: string) =>
+  login: (usernameOrEmail: string, password: string, isEmail = false) =>
     request<{ ok: boolean; user: User }>("/api/login", {
       method: "POST",
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify(isEmail ? { email: usernameOrEmail, password } : { username: usernameOrEmail, password }),
     }),
+  register: (email: string, password: string, name?: string) =>
+    request<{ ok: boolean; emailVerificationRequired: boolean; user?: { id: string; username: string; plan: string } }>("/api/register", {
+      method: "POST",
+      body: JSON.stringify({ email, password, name }),
+    }),
+  resendVerification: (email: string) =>
+    request<{ ok: boolean }>("/api/resend-verification", { method: "POST", body: JSON.stringify({ email }) }),
   logout: () => request<{ ok: boolean }>("/api/logout", { method: "POST" }),
   changePassword: (currentPassword: string, newPassword: string) =>
     request<{ ok: boolean }>("/api/change-password", {

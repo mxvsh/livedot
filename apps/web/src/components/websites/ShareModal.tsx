@@ -14,21 +14,6 @@ interface Props {
 
 type EmbedTab = "map" | "chart" | "live";
 
-const embedPreviewImages: Record<EmbedTab, { src: string; alt: string }> = {
-  map: {
-    src: "/images/widget-map.png",
-    alt: "Map widget placeholder preview",
-  },
-  chart: {
-    src: "/images/widget-chart.png",
-    alt: "Chart widget placeholder preview",
-  },
-  live: {
-    src: "/images/widget-live.png",
-    alt: "Live count widget placeholder preview",
-  },
-};
-
 export default function ShareModal({ website, onClose, onUpdated }: Props) {
   const user = useAuthStore((state) => state.user);
   const [loading, setLoading] = useState(false);
@@ -43,17 +28,20 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
   const showBrandingNotice = isFreePlan;
   const origin = window.location.origin;
   const brandingParam = !isFreePlan && brandingOptIn ? "&branding=1" : "";
+  const mapSrc = shareToken ? `${origin}/embed/map?website=${website?.id}&token=${shareToken}${brandingParam}` : "";
+  const chartSrc = shareToken ? `${origin}/embed/chart?website=${website?.id}&token=${shareToken}&scale=0.9${brandingParam}` : "";
+  const liveSrc = shareToken ? `${origin}/embed/live?website=${website?.id}&token=${shareToken}&scale=0.85${brandingParam}` : "";
 
   const mapEmbed = shareToken
-    ? `<iframe src="${origin}/embed/map?website=${website?.id}&token=${shareToken}${brandingParam}" width="100%" height="400" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
+    ? `<iframe src="${mapSrc}" width="100%" height="400" frameborder="0" style="border:0;border-radius:12px;"></iframe>`
     : "";
 
   const chartEmbed = shareToken
-    ? `<iframe src="${origin}/embed/chart?website=${website?.id}&token=${shareToken}&scale=0.9${brandingParam}" width="260" height="128" frameborder="0" style="border:0;overflow:hidden;"></iframe>`
+    ? `<iframe src="${chartSrc}" width="260" height="128" frameborder="0" style="border:0;overflow:hidden;"></iframe>`
     : "";
 
   const liveEmbed = shareToken
-    ? `<iframe src="${origin}/embed/live?website=${website?.id}&token=${shareToken}&scale=0.85${brandingParam}" width="260" height="84" frameborder="0" style="border:0;overflow:hidden;"></iframe>`
+    ? `<iframe src="${liveSrc}" width="260" height="84" frameborder="0" style="border:0;overflow:hidden;"></iframe>`
     : "";
 
   const embeds = {
@@ -63,6 +51,7 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
       snippet: mapEmbed,
       height: "400px",
       width: "100%",
+      previewSrc: mapSrc,
     },
     chart: {
       title: "Chart Widget",
@@ -70,6 +59,7 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
       snippet: chartEmbed,
       height: "128px",
       width: "260px",
+      previewSrc: chartSrc,
     },
     live: {
       title: "Live Count Widget",
@@ -77,8 +67,9 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
       snippet: liveEmbed,
       height: "84px",
       width: "260px",
+      previewSrc: liveSrc,
     },
-  } satisfies Record<EmbedTab, { title: string; description: string; snippet: string; height: string; width: string }>;
+  } satisfies Record<EmbedTab, { title: string; description: string; snippet: string; height: string; width: string; previewSrc: string }>;
 
   const activeEmbed = embeds[activeTab];
 
@@ -178,12 +169,13 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
 
                   <div className="rounded-2xl border border-white/8 bg-default p-4">
                     <div className="mb-4 overflow-hidden rounded-xl border border-white/8 bg-surface-secondary">
-                      <img
-                        src={embedPreviewImages[activeTab].src}
-                        alt={embedPreviewImages[activeTab].alt}
-                        className={`w-full object-cover ${
-                          activeTab === "map" ? "aspect-[16/9]" : activeTab === "chart" ? "aspect-[2/1]" : "aspect-[5/2]"
-                        }`}
+                      <iframe
+                        src={activeEmbed.previewSrc}
+                        title={`${activeEmbed.title} preview`}
+                        width="100%"
+                        height={activeTab === "map" ? 180 : activeTab === "chart" ? 128 : 84}
+                        className="block w-full border-0 bg-transparent"
+                        style={{ pointerEvents: "none" }}
                       />
                     </div>
                     <div className="flex items-start justify-between gap-4 mb-3">

@@ -7,10 +7,28 @@ import { auth } from "../auth";
 import { env } from "../env";
 import { getSessionFromRequest } from "../middleware/auth";
 import { defaultPlan } from "../limits";
+import { trackEvent } from "../tracking";
 
 const log = createLogger("auth");
 
 const otpStore = new Map<string, { otp: string; expires: number }>();
+
+const EMAIL_COOLDOWN_MS = 60_000; // 60 seconds between sends
+const emailCooldown = new Map<string, number>(); // email -> last sent timestamp
+
+function checkEmailCooldown(email: string): { allowed: boolean; retryAfter: number } {
+  const last = emailCooldown.get(email);
+  if (!last) return { allowed: true, retryAfter: 0 };
+  const elapsed = Date.now() - last;
+  if (elapsed < EMAIL_COOLDOWN_MS) {
+    return { allowed: false, retryAfter: Math.ceil((EMAIL_COOLDOWN_MS - elapsed) / 1000) };
+  }
+  return { allowed: true, retryAfter: 0 };
+}
+
+function markEmailSent(email: string) {
+  emailCooldown.set(email, Date.now());
+}
 
 async function getUserCount() {
   const result = await db.select({ count: count() }).from(user);
@@ -30,6 +48,7 @@ export const authRoutes = new Hono()
       cloud: env.LIVEDOT_CLOUD,
       providers,
       registrationOpen,
+      emailSignup: env.LIVEDOT_CLOUD && !!env.SMTP_HOST,
       analytics: {
         umami: env.UMAMI_URL && env.UMAMI_WEBSITE_ID ? { url: env.UMAMI_URL, websiteId: env.UMAMI_WEBSITE_ID } : null,
         livedot: env.LIVEDOT_URL && env.LIVEDOT_WEBSITE_ID ? { url: env.LIVEDOT_URL, websiteId: env.LIVEDOT_WEBSITE_ID } : null,
@@ -92,13 +111,64 @@ export const authRoutes = new Hono()
     }
   })
 
+  .post("/register", async (c) => {
+    const userCount = await getUserCount();
+    if (userCount >= env.DEFAULT_MAX_USER_SIGNUP) {
+      return c.json({ error: "Registration is closed" }, 400);
+    }
+
+    const { email, password, name } = await c.req.json();
+    if (!email || !password || password.length < 6) {
+      return c.json({ error: "Email and password (min 6 chars) required" }, 400);
+    }
+
+    try {
+      const res = await auth.api.signUpEmail({
+        asResponse: true,
+        body: { email, password, name: name || email.split("@")[0] },
+        headers: c.req.raw.headers,
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const message: string = (body as any).message ?? "";
+        // If user already exists, just resend verification email instead of erroring
+        if (message.toLowerCase().includes("user already exists")) {
+          return c.json({ error: "An account with this email already exists. Please sign in." }, 400);
+        }
+        return c.json({ error: message || "Registration failed" }, 400);
+      }
+
+      const emailVerificationRequired = env.LIVEDOT_CLOUD && !!env.SMTP_HOST;
+      const data = await res.json();
+      const userId = data.user?.id;
+
+      if (!emailVerificationRequired) {
+        // CE mode: forward session cookie so user is auto-logged in
+        const setCookie = res.headers.get("set-cookie");
+        if (setCookie) c.header("set-cookie", setCookie);
+        trackEvent("signup", { method: "email", plan: defaultPlan() });
+        return c.json({ ok: true, emailVerificationRequired: false, user: { id: userId, username: email, plan: defaultPlan() } });
+      }
+
+      trackEvent("signup", { method: "email", plan: defaultPlan() });
+      return c.json({ ok: true, emailVerificationRequired: true });
+    } catch (err: any) {
+      const message = err?.body?.message ?? err?.message ?? "Registration failed";
+      return c.json({ error: message }, 400);
+    }
+  })
+
   .post("/login", async (c) => {
-    const { username, password } = await c.req.json();
+    const { username, password, email } = await c.req.json();
+    // Cloud uses real email; self-hosted uses username@livedot.local
+    const loginEmail = env.LIVEDOT_CLOUD ? email : `${username}@livedot.local`;
+    const displayName = env.LIVEDOT_CLOUD ? (email as string) : username;
 
     try {
       const res = await auth.api.signInEmail({
         asResponse: true,
-        body: { email: `${username}@livedot.local`, password },
+        body: { email: loginEmail, password },
         headers: c.req.raw.headers,
       });
 
@@ -117,7 +187,8 @@ export const authRoutes = new Hono()
         const found = await db.select({ plan: user.plan }).from(user).where(eq(user.id, userId)).limit(1);
         plan = found[0]?.plan ?? "free";
       }
-      return c.json({ ok: true, user: { id: userId, username, plan } });
+      trackEvent("login", { method: "email", plan });
+      return c.json({ ok: true, user: { id: userId, username: displayName, plan } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Invalid credentials";
       return c.json({ error: message }, 401);
@@ -172,6 +243,28 @@ export const authRoutes = new Hono()
 
     otpStore.delete(username);
     return c.json({ ok: true });
+  })
+
+  .post("/resend-verification", async (c) => {
+    const { email } = await c.req.json();
+    if (!email) return c.json({ error: "Email required" }, 400);
+    const cooldown = checkEmailCooldown(email);
+    if (!cooldown.allowed) return c.json({ error: `Please wait ${cooldown.retryAfter}s before requesting another email` }, 429);
+    try {
+      await auth.api.sendVerificationEmail({
+        body: { email, callbackURL: env.APP_URL },
+        headers: c.req.raw.headers,
+      });
+      markEmailSent(email);
+      return c.json({ ok: true });
+    } catch (err: any) {
+      const code = err?.body?.code ?? err?.code ?? "";
+      if (code === "EMAIL_ALREADY_VERIFIED") {
+        return c.json({ error: "Email is already verified. Please sign in." }, 400);
+      }
+      const message = err?.body?.message ?? err?.message ?? "Failed to resend";
+      return c.json({ error: message }, 400);
+    }
   })
 
   .post("/logout", async (c) => {

@@ -11,10 +11,13 @@
     "@livedot/logger": "workspace:*",
     "@livedot/shared": "workspace:*",
     "@livedot/store": "workspace:*",
+    "@types/nodemailer": "^7.0.11",
+    "@umami/api-client": "^0.80.0",
     "drizzle-orm": "^0.45.1",
     "fast-geoip": "^1.1.88",
     "hono": "^4",
     "mmdb-lib": "^3.0.2",
+    "nodemailer": "^8.0.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Button, Form, Input, Label, TextField, FieldError, Surface } from "@heroui/react";
@@ -19,7 +19,7 @@ type Step = "login" | "forgot" | "reset";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { setUser, providers, registrationOpen, check, checked } = useAuthStore();
+  const { setUser, providers, registrationOpen, emailSignup, cloud, check, checked } = useAuthStore();
   const [step, setStep] = useState<Step>("login");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ function LoginPage() {
     const username = formData.get("username")?.toString() || "";
     const password = formData.get("password")?.toString() || "";
     try {
-      const { user } = await api.login(username, password);
+      const { user } = await api.login(username, password, cloud);
       setUser(user);
       navigate({ to: "/" });
     } catch (err: any) {
@@ -118,13 +118,8 @@ function LoginPage() {
               <h1 className="text-2xl font-bold text-foreground mb-1">Livedot</h1>
               <p className="text-muted text-sm mb-6">Sign in to your dashboard.</p>
 
-              {providers.length > 0 ? (
-                <div className="flex flex-col gap-2">
-                  {!registrationOpen && (
-                    <p className="text-muted text-xs text-center mb-1">
-                      Registration is closed. Existing accounts only.
-                    </p>
-                  )}
+              {providers.length > 0 && (
+                <div className="flex flex-col gap-2 mb-4">
                   {providers.map((provider) => (
                     <Button
                       key={provider}
@@ -137,37 +132,52 @@ function LoginPage() {
                       Continue with {PROVIDER_LABELS[provider] ?? provider}
                     </Button>
                   ))}
+                  <div className="flex items-center gap-3 my-1">
+                    <div className="flex-1 h-px bg-divider" />
+                    <span className="text-xs text-muted">or</span>
+                    <div className="flex-1 h-px bg-divider" />
+                  </div>
                 </div>
-              ) : (
-                <>
-                  <Form className="flex flex-col gap-4" onSubmit={handleLogin}>
-                    <TextField isRequired name="username" variant="secondary">
-                      <Label>Username</Label>
-                      <Input placeholder="Username" autoFocus />
-                      <FieldError />
-                    </TextField>
-
-                    <TextField isRequired name="password" type="password" variant="secondary">
-                      <Label>Password</Label>
-                      <Input placeholder="Password" />
-                      <FieldError />
-                    </TextField>
-
-                    {error && <p className="text-danger text-sm">{error}</p>}
-
-                    <Button type="submit" isDisabled={loading} className="w-full" data-umami-event="sign-in">
-                      {loading ? "Signing in..." : "Sign In"}
-                    </Button>
-                  </Form>
-
-                  <button
-                    onClick={() => { setStep("forgot"); setError(""); }}
-                    className="mt-4 text-xs text-muted hover:text-foreground w-full text-center transition-colors"
-                  >
-                    Forgot password?
-                  </button>
-                </>
               )}
+
+              <>
+                <Form className="flex flex-col gap-4" onSubmit={handleLogin}>
+                  <TextField isRequired name="username" type={cloud ? "email" : "text"} variant="secondary">
+                    <Label>{cloud ? "Email" : "Username"}</Label>
+                    <Input placeholder={cloud ? "you@example.com" : "Username"} autoFocus />
+                    <FieldError />
+                  </TextField>
+
+                  <TextField isRequired name="password" type="password" variant="secondary">
+                    <Label>Password</Label>
+                    <Input placeholder="Password" />
+                    <FieldError />
+                  </TextField>
+
+                  {error && <p className="text-danger text-sm">{error}</p>}
+
+                  <Button type="submit" isDisabled={loading} className="w-full" data-umami-event="sign-in">
+                    {loading ? "Signing in..." : "Sign In"}
+                  </Button>
+                </Form>
+
+                <div className="mt-4 flex flex-col items-center gap-2">
+                  {!cloud && (
+                    <button
+                      onClick={() => { setStep("forgot"); setError(""); }}
+                      className="text-xs text-muted hover:text-foreground w-full text-center transition-colors"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                  <p className="text-xs text-muted text-center">
+                    Don't have an account?{" "}
+                    <Link to="/auth/signup" className="text-foreground hover:underline">
+                      Sign up
+                    </Link>
+                  </p>
+                </div>
+              </>
             </>
           )}
 

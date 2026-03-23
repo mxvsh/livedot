@@ -20,11 +20,20 @@ const envSchema = z.object({
   // Analytics (optional)
   UMAMI_URL: z.string().optional(),
   UMAMI_WEBSITE_ID: z.string().optional(),
+  UMAMI_API_TOKEN: z.string().optional(),
   LIVEDOT_URL: z.string().optional(),
   LIVEDOT_WEBSITE_ID: z.string().optional(),
 
   // Store adapter — if set, uses Redis instead of in-memory
   REDIS_URL: z.string().optional(),
+
+  // Email — SMTP (for cloud email verification)
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().optional().default(587),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().optional().default("noreply@livedot.dev"),
+  APP_URL: z.string().optional().default("http://localhost:5173"),
 
   // Global limits
   DEFAULT_MAX_USER_SIGNUP: z.coerce.number().int().positive().default(1),
