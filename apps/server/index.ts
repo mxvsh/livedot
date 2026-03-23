@@ -50,7 +50,7 @@ const trackerScript = Bun.file(new URL("./tracker.js", import.meta.url).pathname
 app.get("/t.js", async (c) => {
   return c.body(await trackerScript.text(), 200, {
     "Content-Type": "application/javascript",
-    "Cache-Control": "public, max-age=3600",
+    "Cache-Control": "public, max-age=300",
     "Access-Control-Allow-Origin": "*",
   });
 });
