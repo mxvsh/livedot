@@ -1,7 +1,9 @@
 export interface User {
   id: string;
   username: string;
+  email?: string;
   plan: string;
+  providers?: string[];
 }
 
 export interface Website {

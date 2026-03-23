@@ -61,15 +61,18 @@ export const authRoutes = new Hono()
     const session = await getSessionFromRequest(c.req.raw);
 
     let plan: string | undefined;
+    let providers: string[] = [];
     if (session) {
       const found = await db.select({ plan: user.plan }).from(user).where(eq(user.id, session.user.id)).limit(1);
       plan = found[0]?.plan;
+      const accounts = await db.select({ providerId: account.providerId }).from(account).where(eq(account.userId, session.user.id));
+      providers = accounts.map(a => a.providerId);
     }
 
     return c.json({
       needsSetup: userCount === 0,
       authenticated: !!session,
-      user: session ? { id: session.user.id, username: session.user.username ?? session.user.name, plan: plan ?? "free" } : null,
+      user: session ? { id: session.user.id, username: session.user.username ?? session.user.name, email: session.user.email, plan: plan ?? "free", providers } : null,
     });
   })
 

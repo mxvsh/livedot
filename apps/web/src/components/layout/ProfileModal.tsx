@@ -19,8 +19,11 @@ interface Props {
 
 type Tab = "profile" | "password";
 
+const PROVIDER_LABELS: Record<string, string> = { github: "GitHub", google: "Google", credential: "Email & Password" };
+
 export default function ProfileModal({ isOpen, onOpenChange }: Props) {
-  const { user, cloud } = useAuthStore();
+  const { user } = useAuthStore();
+  const hasPassword = user?.providers?.includes("credential") ?? true;
   const [tab, setTab] = useState<Tab>("profile");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -64,21 +67,19 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
               <Modal.Heading>My Account</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
-              {!cloud && (
-                <div className="flex gap-1 p-1 rounded-xl bg-default mb-4">
-                  {(["profile", "password"] as Tab[]).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => { setTab(t); setError(""); setSuccess(""); }}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize ${
-                        tab === t ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
-                      }`}
-                    >
-                      {t === "profile" ? "Profile" : "Change Password"}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="flex gap-1 p-1 rounded-xl bg-default mb-4">
+                {(["profile", "password"] as Tab[]).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => { if (t === "password" && !hasPassword) return; setTab(t); setError(""); setSuccess(""); }}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize ${
+                      tab === t ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
+                    } ${t === "password" && !hasPassword ? "opacity-40 cursor-not-allowed" : ""}`}
+                  >
+                    {t === "profile" ? "Profile" : "Change Password"}
+                  </button>
+                ))}
+              </div>
 
               {tab === "profile" && (
                 <div className="flex flex-col gap-3">
@@ -86,6 +87,24 @@ export default function ProfileModal({ isOpen, onOpenChange }: Props) {
                     <p className="text-xs text-muted">Username</p>
                     <p className="text-sm font-medium text-foreground">{user?.username}</p>
                   </div>
+                  {user?.email && (
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs text-muted">Email</p>
+                      <p className="text-sm font-medium text-foreground">{user.email}</p>
+                    </div>
+                  )}
+                  {user?.providers && user.providers.filter(p => p !== "credential").length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs text-muted">Connected accounts</p>
+                      <div className="flex flex-wrap gap-2">
+                        {user.providers.filter(p => p !== "credential").map(p => (
+                          <span key={p} className="text-xs px-2 py-1 rounded-md bg-default text-foreground capitalize">
+                            {PROVIDER_LABELS[p] ?? p}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
