@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7](https://github.com/mxvsh/livedot/compare/v0.1.6...v0.1.7) (2026-03-24)
+
+* Fix var name ([](https://github.com/mxvsh/livedot/commit/b0a635f141b216a5d8596492c88773a06415ee37))
+* Remove username logic ([](https://github.com/mxvsh/livedot/commit/33e81ba4a272eeec321ddda3965157f5dc75a811))
+* Add terms and policy link ([](https://github.com/mxvsh/livedot/commit/43b50310c49e9131b053eaf250698f0c1b1f6002))
+* Add help page ([](https://github.com/mxvsh/livedot/commit/3fd6b6820d8669f4203cfbf3301a963884bb3e7c))
+* Enable branding on landing page ([](https://github.com/mxvsh/livedot/commit/47840d92e2359793d9d7bb08deaa72e4dde0617a))
+
 ## [0.1.6](https://github.com/mxvsh/livedot/compare/v0.1.5...v0.1.6) (2026-03-24)
 
 * Cache events count ([](https://github.com/mxvsh/livedot/commit/5d19df0419b6a142273ad40d9c32c9b2574f9701))
