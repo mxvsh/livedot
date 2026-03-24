@@ -52,10 +52,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ username, password }),
     }),
-  login: (usernameOrEmail: string, password: string, isEmail = false) =>
+  login: (email: string, password: string) =>
     request<{ ok: boolean; user: User }>("/api/login", {
       method: "POST",
-      body: JSON.stringify(isEmail ? { email: usernameOrEmail, password } : { username: usernameOrEmail, password }),
+      body: JSON.stringify({ email, password }),
     }),
   register: (email: string, password: string, name?: string) =>
     request<{ ok: boolean; emailVerificationRequired: boolean; user?: { id: string; username: string; plan: string } }>("/api/register", {

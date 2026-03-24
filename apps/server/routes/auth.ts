@@ -164,10 +164,8 @@ export const authRoutes = new Hono()
   })
 
   .post("/login", async (c) => {
-    const { username, password, email } = await c.req.json();
-    // Cloud uses real email; self-hosted uses username@livedot.local
-    const loginEmail = env.LIVEDOT_CLOUD ? email : `${username}@livedot.local`;
-    const displayName = env.LIVEDOT_CLOUD ? (email as string) : username;
+    const { email, password } = await c.req.json();
+    const loginEmail = email;
 
     try {
       const res = await auth.api.signInEmail({

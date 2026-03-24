@@ -23,7 +23,7 @@ function LoginPage() {
   const [step, setStep] = useState<Step>("login");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [forgotUsername, setForgotUsername] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
 
   useEffect(() => {
     if (!checked) check();
@@ -42,10 +42,10 @@ function LoginPage() {
     setError("");
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const username = formData.get("username")?.toString() || "";
+    const email = formData.get("email")?.toString() || "";
     const password = formData.get("password")?.toString() || "";
     try {
-      const { user } = await api.login(username, password, cloud);
+      const { user } = await api.login(email, password);
       setUser(user);
       navigate({ to: "/" });
     } catch (err: any) {
@@ -64,11 +64,11 @@ function LoginPage() {
     try {
       if (cloud) {
         await api.forgotPasswordEmail(value);
-        setForgotUsername(value);
+        setForgotEmail(value);
         setStep("forgot-sent");
       } else {
         await api.forgotPassword(value);
-        setForgotUsername(value);
+        setForgotEmail(value);
         setStep("reset");
       }
     } catch (err: any) {
@@ -86,7 +86,7 @@ function LoginPage() {
     const otp = formData.get("otp")?.toString() || "";
     const newPassword = formData.get("newPassword")?.toString() || "";
     try {
-      await api.resetPassword(forgotUsername, otp, newPassword);
+      await api.resetPassword(forgotEmail, otp, newPassword);
       setStep("login");
       setError("");
     } catch (err: any) {
@@ -147,9 +147,9 @@ function LoginPage() {
               )}
 
               <Form className="flex flex-col gap-4" onSubmit={handleLogin}>
-                <TextField isRequired name="username" type={cloud ? "email" : "text"} variant="secondary">
-                  <Label>{cloud ? "Email" : "Username"}</Label>
-                  <Input placeholder={cloud ? "you@example.com" : "Username"} autoFocus />
+                <TextField isRequired name="email" type="email" variant="secondary">
+                  <Label>Email</Label>
+                  <Input placeholder="you@example.com" autoFocus />
                   <FieldError />
                 </TextField>
 
@@ -193,9 +193,9 @@ function LoginPage() {
               </p>
 
               <Form className="flex flex-col gap-4" onSubmit={handleForgot}>
-                <TextField isRequired name="value" type={cloud ? "email" : "text"} variant="secondary">
-                  <Label>{cloud ? "Email" : "Username"}</Label>
-                  <Input placeholder={cloud ? "you@example.com" : "Username"} autoFocus />
+                <TextField isRequired name="value" type="email" variant="secondary">
+                  <Label>Email</Label>
+                  <Input placeholder="you@example.com" autoFocus />
                   <FieldError />
                 </TextField>
 
@@ -216,7 +216,7 @@ function LoginPage() {
             <>
               <h1 className="text-2xl font-bold text-foreground mb-1">Check your email</h1>
               <p className="text-muted text-sm mb-6">
-                We sent a password reset link to <span className="text-foreground">{forgotUsername}</span>. Click it to set a new password.
+                We sent a password reset link to <span className="text-foreground">{forgotEmail}</span>. Click it to set a new password.
               </p>
               <button onClick={goBack} className="text-xs text-muted hover:text-foreground w-full text-center transition-colors">
                 Back to sign in
