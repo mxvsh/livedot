@@ -44,11 +44,56 @@ const navLinks = [
 
     <a
       href="https://cloud.livedot.dev"
-      class="font-headline rounded-md bg-primary px-5 py-2 text-sm font-semibold tracking-[-0.03em] text-on-primary-container transition-transform hover:bg-primary-container active:scale-95"
+      class="hidden font-headline rounded-md bg-primary px-5 py-2 text-sm font-semibold tracking-[-0.03em] text-on-primary-container transition-transform hover:bg-primary-container active:scale-95 md:inline-flex"
     >
       Cloud
     </a>
+
+    <button
+      type="button"
+      data-mobile-menu-toggle
+      aria-expanded="false"
+      aria-controls="mobile-nav"
+      class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-white/10 text-on-surface-variant transition-colors hover:border-white/20 hover:text-white md:hidden"
+    >
+      <span class="sr-only">Toggle navigation menu</span>
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M4 7h16" />
+        <path d="M4 12h16" />
+        <path d="M4 17h16" />
+      </svg>
+    </button>
   </nav>
+
+  <div
+    id="mobile-nav"
+    data-mobile-menu
+    class="hidden border-t border-white/5 bg-surface/95 px-6 pb-6 pt-4 backdrop-blur-md md:hidden"
+  >
+    <div class="flex flex-col gap-3 font-headline tracking-tight">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          data-mobile-menu-link
+          aria-current={pathname === link.href ? "page" : undefined}
+          class:list={[
+            "rounded-lg border border-white/8 px-4 py-3 text-on-surface-variant transition-colors hover:border-white/15 hover:text-white",
+            pathname === link.href ? "border-primary/40 bg-primary/8 text-primary" : "",
+          ]}
+        >
+          {link.label}
+        </a>
+      ))}
+
+      <a
+        href="https://cloud.livedot.dev"
+        data-mobile-menu-link
+        class="mt-2 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-semibold tracking-[-0.03em] text-on-primary-container transition-transform hover:bg-primary-container active:scale-95"
+      >
+        Cloud
+      </a>
+    </div>
+  </div>
 </header>
 
 <script>
@@ -110,5 +155,41 @@ const navLinks = [
     document.addEventListener("DOMContentLoaded", initSectionNav, { once: true });
   } else {
     initSectionNav();
+  }
+
+  const initMobileMenu = () => {
+    const toggle = document.querySelector("[data-mobile-menu-toggle]");
+    const menu = document.querySelector("[data-mobile-menu]");
+    const menuLinks = Array.from(document.querySelectorAll("[data-mobile-menu-link]"));
+
+    if (!(toggle instanceof HTMLButtonElement) || !(menu instanceof HTMLElement)) {
+      return;
+    }
+
+    const setOpen = (open) => {
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      menu.classList.toggle("hidden", !open);
+    };
+
+    toggle.addEventListener("click", () => {
+      const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      setOpen(!isOpen);
+    });
+
+    menuLinks.forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 768) {
+        setOpen(false);
+      }
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMobileMenu, { once: true });
+  } else {
+    initMobileMenu();
   }
 </script>
