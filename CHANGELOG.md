@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.6](https://github.com/mxvsh/livedot/compare/v0.1.5...v0.1.6) (2026-03-24)
+
+* Cache events count ([](https://github.com/mxvsh/livedot/commit/5d19df0419b6a142273ad40d9c32c9b2574f9701))
+* Fix sitemap ([](https://github.com/mxvsh/livedot/commit/4d51c2f5d55409f35a09fd28ad0ab73a8a501a9d))
+
 ## [0.1.5](https://github.com/mxvsh/livedot/compare/v0.1.4...v0.1.5) (2026-03-23)
 
 * Add privacy+terms and improve ui ([](https://github.com/mxvsh/livedot/commit/8903aeab1b34ec1b857573e13e04cbf8b15222f4))
