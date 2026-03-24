@@ -201,7 +201,7 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
                   <p className="text-[10px] text-muted">
                     Need embed options or docs?{" "}
                     <a
-                      href="https://livedot.dev/help"
+                      href="https://livedot.dev/help/embed"
                       target="_blank"
                       rel="noreferrer"
                       className="text-foreground underline underline-offset-2"

@@ -1,0 +1,182 @@
+---
+import Footer from "../../components/Footer.astro";
+import Header from "../../components/Header.astro";
+import MainLayout from "../../layouts/MainLayout.astro";
+
+const pathname = Astro.url.pathname;
+const pageUrl = new URL(pathname, Astro.site ?? Astro.url).href;
+const homeUrl = new URL("/", Astro.site ?? Astro.url).href;
+const helpUrl = new URL("/help", Astro.site ?? Astro.url).href;
+
+const structuredData = [
+  {
+    "@type": "TechArticle",
+    headline: "Livedot embed widgets",
+    description: "Learn how to embed Livedot widgets and customize them with supported query parameters.",
+    url: pageUrl,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Livedot",
+      url: homeUrl,
+    },
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
+      { "@type": "ListItem", position: 2, name: "Help", item: helpUrl },
+      { "@type": "ListItem", position: 3, name: "Embed widgets", item: pageUrl },
+    ],
+  },
+];
+
+const commonParams = [
+  { name: "website", type: "string", required: "Yes", description: "Your website id." },
+  { name: "token", type: "string", required: "Yes", description: "The share token generated when sharing is enabled." },
+  { name: "bg", type: "string", required: "No", description: "Embed background. Defaults to transparent." },
+  { name: "branding", type: "1 | true", required: "No", description: "Explicitly show branding for non-free plans." },
+];
+
+const widgetParams = [
+  {
+    title: "Map Widget",
+    path: "/embed/map",
+    description: "Full live map with active visitor sessions.",
+    params: [],
+    example:
+      '<iframe src="https://cloud.livedot.dev/embed/map?website=YOUR_WEBSITE_ID&token=YOUR_SHARE_TOKEN&bg=transparent" width="100%" height="400" frameborder="0" style="border:0;border-radius:12px;"></iframe>',
+  },
+  {
+    title: "Chart Widget",
+    path: "/embed/chart",
+    description: "Compact live visitor count with a recent traffic trend.",
+    params: [
+      { name: "accent", type: "string", description: "Line and status color. Defaults to #96E421." },
+      { name: "scale", type: "number", description: "Scales the entire card. Defaults to 0.9." },
+    ],
+    example:
+      '<iframe src="https://cloud.livedot.dev/embed/chart?website=YOUR_WEBSITE_ID&token=YOUR_SHARE_TOKEN&accent=%2396E421&scale=0.9" width="260" height="128" frameborder="0" style="border:0;overflow:hidden;"></iframe>',
+  },
+  {
+    title: "Live Count Widget",
+    path: "/embed/live",
+    description: "Minimal live dot and current visitor count.",
+    params: [
+      { name: "accent", type: "string", description: "Status dot color. Defaults to #96E421." },
+      { name: "scale", type: "number", description: "Scales the entire counter. Defaults to 0.85." },
+    ],
+    example:
+      '<iframe src="https://cloud.livedot.dev/embed/live?website=YOUR_WEBSITE_ID&token=YOUR_SHARE_TOKEN&accent=%2396E421&scale=0.85" width="260" height="84" frameborder="0" style="border:0;overflow:hidden;"></iframe>',
+  },
+];
+---
+
+<MainLayout
+  title="Livedot Help - Embed Widgets"
+  description="Learn how to embed Livedot widgets and customize them with supported query parameters."
+  pathname={pathname}
+  structuredData={structuredData}
+>
+  <Header pathname={pathname} />
+  <main class="pt-20">
+    <section class="mx-auto max-w-6xl px-6 py-24">
+      <div class="grid-panel border border-white/8 bg-surface-container p-8 md:p-12">
+        <a href="/help" class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-on-surface-variant transition-colors hover:text-white">
+          Back to help
+        </a>
+
+        <div class="mt-8 max-w-3xl">
+          <p class="text-xs uppercase tracking-[0.32em] text-primary">Help</p>
+          <h1 class="mt-4 font-headline text-4xl font-bold tracking-[-0.06em] text-white md:text-6xl">Embed widgets</h1>
+          <p class="mt-6 text-lg leading-8 text-on-surface-variant">
+            Use Livedot embeds to place a live map, traffic chart, or visitor counter directly on your site.
+          </p>
+        </div>
+
+        <section class="mt-14 border-t border-white/8 pt-8">
+          <h2 class="font-headline text-2xl font-bold tracking-[-0.04em] text-white">Getting started</h2>
+          <ol class="mt-5 space-y-3 text-base leading-7 text-on-surface-variant">
+            <li>Enable sharing for your website in the dashboard.</li>
+            <li>Copy the embed snippet for the widget you want.</li>
+            <li>Paste the iframe into your site or documentation.</li>
+            <li>Adjust the supported query parameters if you want a different background, accent, or scale.</li>
+          </ol>
+        </section>
+
+        <section class="mt-12 border-t border-white/8 pt-8">
+          <h2 class="font-headline text-2xl font-bold tracking-[-0.04em] text-white">Common query parameters</h2>
+          <div class="mt-5 overflow-hidden rounded-2xl border border-white/8">
+            <table class="w-full border-collapse text-left text-sm text-on-surface-variant">
+              <thead class="bg-white/4 text-white">
+                <tr>
+                  <th class="px-4 py-3 font-medium">Param</th>
+                  <th class="px-4 py-3 font-medium">Type</th>
+                  <th class="px-4 py-3 font-medium">Required</th>
+                  <th class="px-4 py-3 font-medium">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {commonParams.map((param) => (
+                  <tr class="border-t border-white/8">
+                    <td class="px-4 py-3 font-mono text-white">{param.name}</td>
+                    <td class="px-4 py-3">{param.type}</td>
+                    <td class="px-4 py-3">{param.required}</td>
+                    <td class="px-4 py-3">{param.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="mt-12 border-t border-white/8 pt-8">
+          <h2 class="font-headline text-2xl font-bold tracking-[-0.04em] text-white">Widget-specific options</h2>
+          <div class="mt-6 space-y-8">
+            {widgetParams.map((widget) => (
+              <article class="rounded-3xl border border-white/8 bg-white/[0.02] p-6">
+                <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <h3 class="font-headline text-xl font-semibold tracking-[-0.04em] text-white">{widget.title}</h3>
+                    <p class="mt-2 text-sm text-on-surface-variant">{widget.description}</p>
+                  </div>
+                  <code class="text-xs text-primary">{widget.path}</code>
+                </div>
+
+                {widget.params.length > 0 ? (
+                  <div class="mt-5 overflow-hidden rounded-2xl border border-white/8">
+                    <table class="w-full border-collapse text-left text-sm text-on-surface-variant">
+                      <thead class="bg-white/4 text-white">
+                        <tr>
+                          <th class="px-4 py-3 font-medium">Param</th>
+                          <th class="px-4 py-3 font-medium">Type</th>
+                          <th class="px-4 py-3 font-medium">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {widget.params.map((param) => (
+                          <tr class="border-t border-white/8">
+                            <td class="px-4 py-3 font-mono text-white">{param.name}</td>
+                            <td class="px-4 py-3">{param.type}</td>
+                            <td class="px-4 py-3">{param.description}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p class="mt-5 text-sm text-on-surface-variant">This widget only uses the common query parameters.</p>
+                )}
+
+                <div class="mt-5 rounded-2xl bg-surface px-4 py-4">
+                  <p class="text-[11px] uppercase tracking-[0.24em] text-on-surface-variant">Example embed</p>
+                  <pre class="mt-3 overflow-x-auto text-[11px] leading-6 text-white"><code>{widget.example}</code></pre>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</MainLayout>
