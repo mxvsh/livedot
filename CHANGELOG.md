@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.8](https://github.com/mxvsh/livedot/compare/v0.1.7...v0.1.8) (2026-03-24)
+
+* Fix explicitBranding ([](https://github.com/mxvsh/livedot/commit/33248b655ebbc4176d49f0a82977173bc6580ac9))
+
 ## [0.1.7](https://github.com/mxvsh/livedot/compare/v0.1.6...v0.1.7) (2026-03-24)
 
 * Fix var name ([](https://github.com/mxvsh/livedot/commit/b0a635f141b216a5d8596492c88773a06415ee37))
