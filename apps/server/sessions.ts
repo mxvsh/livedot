@@ -17,7 +17,7 @@ const log = createLogger("store");
 
 export { type VisitorSession, type WSMessage, type HistoryPoint, type ActivityEvent };
 
-const SESSION_TIMEOUT = 10_000;
+const SESSION_TIMEOUT = 60_000; // 60s — beacons send every 25s, give plenty of buffer
 const MAX_EVENTS_PER_SESSION = 50;
 
 // ── Store initialization ──
