@@ -202,11 +202,16 @@ export const eventRoutes = new Hono()
       }
 
       if (geo) {
-        // Enforce monthly event limit
-        if (cached.eventsPerMonth > 0 && await getEventCount(cached.userId) >= cached.eventsPerMonth) {
-          return c.body(null, 204); // silently drop
+        const isNewSession = !(await store.getSession(websiteId, sessionId));
+
+        // Count only new sessions (1 visitor = 1 event)
+        if (isNewSession) {
+          if (cached.eventsPerMonth > 0 && await getEventCount(cached.userId) >= cached.eventsPerMonth) {
+            return c.body(null, 204); // silently drop
+          }
+          await incrementEventCount(cached.userId, websiteId);
         }
-        await incrementEventCount(cached.userId, websiteId);
+
         upsertSession(
           {
             sessionId,
