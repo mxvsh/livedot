@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export function useEmbedBranding(website: string, token: string, explicitBranding: boolean) {
-  const [showBranding, setShowBranding] = useState(false);
+  const [showBranding, setShowBranding] = useState(explicitBranding);
 
   useEffect(() => {
     if (!website || !token) {
