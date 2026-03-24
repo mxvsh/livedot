@@ -22,6 +22,11 @@ export interface StoreAdapter {
   deleteWebsiteEvents(websiteId: string): Promise<void> | void;
   getEventWebsiteIds(): Promise<Set<string>> | Set<string>;
   getLatestEventTimestamp(websiteId: string, sessionId: string): Promise<number> | number;
+
+  // ── Monthly counters (persist across restarts) ──
+  incrementCounter(key: string): Promise<number>;
+  getCounter(key: string): Promise<number>;
+  getCountersByPattern(pattern: string): Promise<Map<string, number>>;
 }
 
 export type { VisitorSession, HistoryPoint, ActivityEvent };

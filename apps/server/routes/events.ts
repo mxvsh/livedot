@@ -1,33 +1,95 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { and, eq } from "drizzle-orm";
+import { db } from "@livedot/db";
+import { websiteUsage } from "@livedot/db/schema";
+import { createLogger } from "@livedot/logger";
 import { websiteCache } from "../website-cache";
 import { getServer } from "../index";
 import { resolveGeo } from "../geo";
-import { upsertSession, recordCustomEvent } from "../sessions";
+import { upsertSession, recordCustomEvent, store } from "../sessions";
 import { env } from "../env";
 
-// --- Monthly event counter: userId:YYYY-MM → count ---
-const monthlyEventCount = new Map<string, number>();
+const log = createLogger("events");
 
 function currentMonth() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function userMonthKey(userId: string) {
-  return `${userId}:${currentMonth()}`;
+function userMonthKey(userId: string) { return `user:${userId}:${currentMonth()}`; }
+function websiteMonthKey(websiteId: string) { return `website:${websiteId}:${currentMonth()}`; }
+
+async function incrementEventCount(userId: string, websiteId: string): Promise<number> {
+  const [uCount] = await Promise.all([
+    store.incrementCounter(userMonthKey(userId)),
+    store.incrementCounter(websiteMonthKey(websiteId)),
+  ]);
+  return uCount;
 }
 
-function incrementEventCount(userId: string): number {
-  const key = userMonthKey(userId);
-  const count = (monthlyEventCount.get(key) ?? 0) + 1;
-  monthlyEventCount.set(key, count);
-  return count;
+export async function getEventCount(userId: string): Promise<number> {
+  return store.getCounter(userMonthKey(userId));
 }
 
-export function getEventCount(userId: string): number {
-  return monthlyEventCount.get(userMonthKey(userId)) ?? 0;
+// On startup: seed store from DB for current month (only needed for MemoryStore)
+async function seedFromDB() {
+  try {
+    const now = new Date();
+    const rows = await db
+      .select()
+      .from(websiteUsage)
+      .where(and(eq(websiteUsage.year, now.getFullYear()), eq(websiteUsage.month, now.getMonth() + 1)));
+
+    // Only seed if store has no data yet (avoids double-counting on Redis)
+    for (const row of rows) {
+      const wKey = websiteMonthKey(row.websiteId);
+      const existing = await store.getCounter(wKey);
+      if (existing === 0) {
+        // MemoryStore: set directly; RedisStore: SET NX
+        if ("setCounter" in store) {
+          (store as any).setCounter(wKey, row.eventCount);
+          (store as any).setCounter(userMonthKey(row.userId),
+            (await store.getCounter(userMonthKey(row.userId))) + row.eventCount);
+        }
+      }
+    }
+    log.info({ rows: rows.length }, "Seeded event counts from DB");
+  } catch (err) {
+    log.error(err, "Failed to seed event counts from DB");
+  }
 }
+
+// Flush store counts to DB every 60s for analytics
+async function flushCountsToDB() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const counts = await store.getCountersByPattern(`website:`)
+    .then(m => new Map([...m].filter(([k]) => k.includes(`:${currentMonth()}`))));
+
+  for (const [key, count] of counts) {
+    // key: website:<websiteId>:<YYYY-MM>
+    const parts = key.split(":");
+    const websiteId = parts[1];
+    if (!websiteId) continue;
+    const cached = websiteCache.get(websiteId);
+    if (!cached) continue;
+    try {
+      await db.insert(websiteUsage)
+        .values({ websiteId, userId: cached.userId, year, month, eventCount: count, updatedAt: new Date() })
+        .onConflictDoUpdate({
+          target: [websiteUsage.websiteId, websiteUsage.year, websiteUsage.month],
+          set: { eventCount: count, updatedAt: new Date() },
+        });
+    } catch (err) {
+      log.error(err, "Failed to flush event count");
+    }
+  }
+}
+
+seedFromDB();
+setInterval(() => { flushCountsToDB().catch(() => {}); }, 60_000);
 
 // --- Rate limiting: max 1 request per 3s per IP+websiteId ---
 const rateMap = new Map<string, number>();
@@ -103,10 +165,10 @@ export const eventRoutes = new Hono()
 
       // Named events (data-livedot-event clicks): store + publish, no rate limit, no geo
       if (typeof eventName === "string" && eventName) {
-        if (cached.eventsPerMonth > 0 && getEventCount(cached.userId) >= cached.eventsPerMonth) {
+        if (cached.eventsPerMonth > 0 && await getEventCount(cached.userId) >= cached.eventsPerMonth) {
           return c.body(null, 204);
         }
-        incrementEventCount(cached.userId);
+        await incrementEventCount(cached.userId, websiteId);
         const timestamp = Date.now();
         recordCustomEvent(websiteId, { type: "event", sessionId, eventName, pageUrl: url || "", timestamp });
         const msg: import("@livedot/shared").WSMessage = {
@@ -141,10 +203,10 @@ export const eventRoutes = new Hono()
 
       if (geo) {
         // Enforce monthly event limit
-        if (cached.eventsPerMonth > 0 && getEventCount(cached.userId) >= cached.eventsPerMonth) {
+        if (cached.eventsPerMonth > 0 && await getEventCount(cached.userId) >= cached.eventsPerMonth) {
           return c.body(null, 204); // silently drop
         }
-        incrementEventCount(cached.userId);
+        await incrementEventCount(cached.userId, websiteId);
         upsertSession(
           {
             sessionId,

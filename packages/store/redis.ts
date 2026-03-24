@@ -139,4 +139,30 @@ export class RedisStore implements StoreAdapter {
     if (!raw) return 0;
     return (JSON.parse(raw) as ActivityEvent).timestamp;
   }
+
+  // ── Monthly counters ──
+
+  private ck(key: string) { return `${P}cnt:${key}`; }
+
+  async incrementCounter(key: string): Promise<number> {
+    return this.redis.incr(this.ck(key));
+  }
+
+  async getCounter(key: string): Promise<number> {
+    const val = await this.redis.get(this.ck(key));
+    return val ? parseInt(val, 10) : 0;
+  }
+
+  async getCountersByPattern(pattern: string): Promise<Map<string, number>> {
+    const prefix = `${P}cnt:`;
+    const keys = await this.redis.keys(`${prefix}*${pattern}*`);
+    const result = new Map<string, number>();
+    if (keys.length === 0) return result;
+    const values = await this.redis.mget(...keys);
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i].slice(prefix.length);
+      result.set(k, values[i] ? parseInt(values[i]!, 10) : 0);
+    }
+    return result;
+  }
 }

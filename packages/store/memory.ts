@@ -5,6 +5,7 @@ export class MemoryStore implements StoreAdapter {
   private sessions = new Map<string, VisitorSession>();
   private history = new Map<string, HistoryPoint[]>();
   private events = new Map<string, Map<string, ActivityEvent[]>>();
+  private counters = new Map<string, number>();
 
   private key(websiteId: string, sessionId: string) {
     return `${websiteId}:${sessionId}`;
@@ -101,5 +102,29 @@ export class MemoryStore implements StoreAdapter {
   getLatestEventTimestamp(websiteId: string, sessionId: string): number {
     const events = this.events.get(websiteId)?.get(sessionId);
     return events?.[0]?.timestamp ?? 0;
+  }
+
+  // ── Monthly counters ──
+
+  incrementCounter(key: string): Promise<number> {
+    const val = (this.counters.get(key) ?? 0) + 1;
+    this.counters.set(key, val);
+    return Promise.resolve(val);
+  }
+
+  getCounter(key: string): Promise<number> {
+    return Promise.resolve(this.counters.get(key) ?? 0);
+  }
+
+  getCountersByPattern(pattern: string): Promise<Map<string, number>> {
+    const result = new Map<string, number>();
+    for (const [key, val] of this.counters) {
+      if (key.includes(pattern)) result.set(key, val);
+    }
+    return Promise.resolve(result);
+  }
+
+  setCounter(key: string, val: number): void {
+    this.counters.set(key, val);
   }
 }

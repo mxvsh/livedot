@@ -58,6 +58,17 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updated_at", { mode: "timestamp" }),
 });
 
+// Monthly event usage per website — persisted for billing and analytics
+export const websiteUsage = sqliteTable("website_usage", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  websiteId: text("website_id").notNull().references(() => websites.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  year: integer("year").notNull(),
+  month: integer("month").notNull(),
+  eventCount: integer("event_count").notNull().default(0),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+}, (t) => [unique("website_usage_period_uniq").on(t.websiteId, t.year, t.month)]);
+
 // App tables
 export const websites = sqliteTable("websites", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
