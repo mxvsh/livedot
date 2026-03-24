@@ -190,7 +190,7 @@ export const authRoutes = new Hono()
         plan = found[0]?.plan ?? "free";
       }
       trackEvent("login", { method: "email", plan });
-      return c.json({ ok: true, user: { id: userId, username: displayName, plan } });
+      return c.json({ ok: true, user: { id: userId, username: loginEmail, plan } });
     } catch (err: any) {
       const message = err?.body?.message ?? err?.message ?? "Invalid credentials";
       return c.json({ error: message }, 401);
