@@ -130,6 +130,13 @@ function SignupPage() {
                 <Button type="submit" isDisabled={loading} className="w-full">
                   {loading ? "Creating account..." : "Create Account"}
                 </Button>
+
+                <p className="text-xs text-muted text-center">
+                  By signing up you agree to our{" "}
+                  <a href="https://livedot.dev/terms" target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline">Terms</a>
+                  {" "}and{" "}
+                  <a href="https://livedot.dev/privacy" target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline">Privacy Policy</a>
+                </p>
               </Form>
 
               <p className="mt-4 text-xs text-muted text-center">
