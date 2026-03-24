@@ -40,4 +40,9 @@ export const faqItems = [
     answer:
       "No. The core setup stays minimal: one script integration, a lightweight client footprint, and fast access to live user signals.",
   },
+  {
+    question: "What counts as an event?",
+    answer:
+      "Each unique visitor session counts as one event, regardless of how long they stay on your site. Custom interactions tracked with the data-livedot-event attribute each count as one additional event. Bots, failed requests, and repeat beacons from the same session do not count.",
+  },
 ];
