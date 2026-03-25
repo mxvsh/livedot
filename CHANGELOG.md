@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.13](https://github.com/mxvsh/livedot/compare/v0.1.12...v0.1.13) (2026-03-25)
+
+* Add theme support for widget ([](https://github.com/mxvsh/livedot/commit/6ba053a6e3fc06fd083896b1c0f5daf911f5fa04))
+* Fix style embed components and page background ([](https://github.com/mxvsh/livedot/commit/1e26e0e668c71922945627d6c585110d9609a3eb))
+
 ## [0.1.12](https://github.com/mxvsh/livedot/compare/v0.1.11...v0.1.12) (2026-03-25)
 
 * Fix branding parameter handling in embed routes ([](https://github.com/mxvsh/livedot/commit/1558b5cf42c86631ff1c10db45501b8f460dd58a))
