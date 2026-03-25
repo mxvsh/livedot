@@ -33,10 +33,10 @@ function EmbedLive() {
         gap: 12 * size,
         padding: `${12 * size}px ${14 * size}px`,
         borderRadius: 18 * size,
-        backgroundColor: bg === "transparent" ? "rgba(10, 10, 10, 0.45)" : bg,
+        backgroundColor: bg === "transparent" ? "rgba(10, 10, 10, 0.85)" : bg,
         border: "1px solid rgba(255, 255, 255, 0.1)",
         backdropFilter: "blur(18px)",
-        boxShadow: "0 18px 50px rgba(0, 0, 0, 0.22)",
+        boxShadow: "none",
         fontFamily: "system-ui, -apple-system, sans-serif",
         boxSizing: "border-box",
       }}

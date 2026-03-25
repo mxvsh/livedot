@@ -6,6 +6,20 @@
     <title>Livedot — Real-time Website Visitor Tracker</title>
     <meta name="description" content="Self-hosted, real-time website visitor tracker. See live visitors as glowing dots on a dark world map." />
     <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="light dark" />
+    
+    <style>
+      html, body {
+        margin: 0;
+        background: transparent;
+      }
+    
+      @media (prefers-color-scheme: dark) {
+        html, body {
+          background: transparent;
+        }
+      }
+    </style>
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />

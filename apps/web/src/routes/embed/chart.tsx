@@ -73,11 +73,11 @@ function EmbedChart() {
       <div
         style={{
           width: 240 * size,
-          borderRadius: 24 * size,
-          border: "1px solid rgba(255,255,255,0.08)",
-          background: "rgba(255,255,255,0.04)",
-          backdropFilter: "blur(24px)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          borderRadius: 18 * size,
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          background: bg === "transparent" ? "rgba(10, 10, 10, 0.85)" : bg,
+          backdropFilter: "blur(18px)",
+          boxShadow: "none",
           overflow: "hidden",
           padding: `${12 * size}px ${14 * size}px ${8 * size}px`,
         }}
