@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.9](https://github.com/mxvsh/livedot/compare/v0.1.8...v0.1.9) (2026-03-24)
+
+* Add FAQ for event ([](https://github.com/mxvsh/livedot/commit/e7464b3bd3f79063aefe436e73928eee22456995))
+* Count only new sessions toward monthly event limit ([](https://github.com/mxvsh/livedot/commit/d5d8cecb170b367256cd66685150e70be7b9f5a3))
+* Increase session timeout ([](https://github.com/mxvsh/livedot/commit/d050a1aaa432d56826d7914659b40f159480484b))
+
 ## [0.1.8](https://github.com/mxvsh/livedot/compare/v0.1.7...v0.1.8) (2026-03-24)
 
 * Fix explicitBranding ([](https://github.com/mxvsh/livedot/commit/33248b655ebbc4176d49f0a82977173bc6580ac9))
