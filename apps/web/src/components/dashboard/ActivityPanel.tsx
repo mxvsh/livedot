@@ -4,7 +4,7 @@ import type { VisitorSession, ActivityEvent } from "@livedot/shared";
 function DiceBearAvatar({ sessionId, size = 32 }: { sessionId: string; size?: number }) {
   return (
     <img
-      src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(sessionId)}&backgroundColor=111111`}
+      src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(sessionId)}&backgroundColor=111111`}
       width={size}
       height={size}
       className="rounded-full shrink-0"

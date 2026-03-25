@@ -6,6 +6,7 @@ interface Props {
   sessions: VisitorSession[];
   selectedSessionId?: string | null;
   onSessionSelect?: (sessionId: string | null) => void;
+  showAvatars?: boolean;
 }
 
 const DARK_STYLE = {
@@ -51,7 +52,7 @@ function sessionsToGeoJSON(sessions: VisitorSession[]): GeoJSON.FeatureCollectio
 }
 
 function avatarUrl(sessionId: string) {
-  return `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(sessionId)}&backgroundColor=111111`;
+  return `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(sessionId)}&backgroundColor=111111`;
 }
 
 async function loadAvatarToMap(map: maplibregl.Map, sessionId: string): Promise<boolean> {
@@ -93,7 +94,7 @@ async function loadAvatarToMap(map: maplibregl.Map, sessionId: string): Promise<
   }
 }
 
-export default function Map({ sessions, selectedSessionId, onSessionSelect }: Props) {
+export default function Map({ sessions, selectedSessionId, onSessionSelect, showAvatars = true }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const sourceReady = useRef(false);
@@ -101,6 +102,7 @@ export default function Map({ sessions, selectedSessionId, onSessionSelect }: Pr
   const onSessionSelectRef = useRef(onSessionSelect);
   const selectedSessionIdRef = useRef(selectedSessionId);
   const loadedAvatarsRef = useRef(new Set<string>());
+  const showAvatarsRef = useRef(showAvatars);
 
   pendingSessions.current = sessions;
   onSessionSelectRef.current = onSessionSelect;
@@ -184,7 +186,7 @@ export default function Map({ sessions, selectedSessionId, onSessionSelect }: Pr
         id: "visitor-avatars",
         type: "symbol",
         source: "visitors",
-        minzoom: AVATAR_SHOW_ZOOM,
+        minzoom: showAvatarsRef.current ? AVATAR_SHOW_ZOOM : 999,
         layout: {
           "icon-image": ["concat", "avatar-", ["get", "sessionId"]],
           "icon-size": [
@@ -239,14 +241,16 @@ export default function Map({ sessions, selectedSessionId, onSessionSelect }: Pr
     source?.setData(sessionsToGeoJSON(sessions));
 
     // Load avatars for top N most recent sessions
-    const topSessions = [...sessions]
-      .sort((a, b) => b.lastSeen - a.lastSeen)
-      .slice(0, MAX_AVATARS);
+    if (showAvatarsRef.current) {
+      const topSessions = [...sessions]
+        .sort((a, b) => b.lastSeen - a.lastSeen)
+        .slice(0, MAX_AVATARS);
 
-    for (const s of topSessions) {
-      if (!loadedAvatarsRef.current.has(s.sessionId)) {
-        loadedAvatarsRef.current.add(s.sessionId);
-        loadAvatarToMap(map, s.sessionId);
+      for (const s of topSessions) {
+        if (!loadedAvatarsRef.current.has(s.sessionId)) {
+          loadedAvatarsRef.current.add(s.sessionId);
+          loadAvatarToMap(map, s.sessionId);
+        }
       }
     }
   }, [sessions]);
