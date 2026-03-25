@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.12](https://github.com/mxvsh/livedot/compare/v0.1.11...v0.1.12) (2026-03-25)
+
+* Fix branding parameter handling in embed routes ([](https://github.com/mxvsh/livedot/commit/1558b5cf42c86631ff1c10db45501b8f460dd58a))
+
 ## [0.1.11](https://github.com/mxvsh/livedot/compare/v0.1.10...v0.1.11) (2026-03-25)
 
 * Fix embed branding to skip API call when explicitly enabled ([](https://github.com/mxvsh/livedot/commit/890aefb2acfe824c745f1fc970b734ab9bef99b0))
