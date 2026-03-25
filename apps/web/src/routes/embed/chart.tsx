@@ -3,6 +3,7 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { aggregateHistoryPoints } from "@/lib/chart";
 import { useEmbedBranding } from "@/components/embed/useEmbedBranding";
 import { useEmbedTheme, type EmbedTheme } from "@/components/embed/useEmbedTheme";
+import BrandingBadge from "@/components/embed/BrandingBadge";
 
 export const Route = createFileRoute("/embed/chart")({
   component: EmbedChart,
@@ -150,23 +151,7 @@ function EmbedChart() {
             <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke={accent} strokeOpacity="0.15" strokeWidth={1 * size} strokeDasharray="4 4" />
           )}
         </svg>
-        {showBranding && (
-          <a
-            href="https://livedot.dev"
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: "inline-block",
-              marginTop: 6 * size,
-              fontSize: 10 * size,
-              color: t.brandingText,
-              textDecoration: "none",
-              letterSpacing: "0.01em",
-            }}
-          >
-            Powered by Livedot
-          </a>
-        )}
+        {showBranding && <BrandingBadge theme={t} variant="inline" size={size} />}
       </div>
     </div>
   );

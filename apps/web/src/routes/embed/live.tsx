@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useEmbedBranding } from "@/components/embed/useEmbedBranding";
 import { useEmbedTheme, type EmbedTheme } from "@/components/embed/useEmbedTheme";
+import BrandingBadge from "@/components/embed/BrandingBadge";
 
 export const Route = createFileRoute("/embed/live")({
   component: EmbedLive,
@@ -57,36 +58,7 @@ function EmbedLive() {
       <span style={{ fontSize: 34 * size, lineHeight: 1, fontWeight: 750, color: t.text, letterSpacing: "-0.04em" }}>
         {count}
       </span>
-      {showBranding && (
-        <a
-          href="https://livedot.dev"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Open Livedot"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8 * size,
-            padding: `0 ${10 * size}px`,
-            height: 28 * size,
-            borderRadius: 999,
-            background: t.brandingBg,
-            border: `1px solid ${t.brandingBorder}`,
-            flexShrink: 0,
-            textDecoration: "none",
-          }}
-        >
-          <img
-            src="/logo.svg"
-            alt=""
-            aria-hidden="true"
-            style={{ width: 18 * size, height: 18 * size, borderRadius: 6 * size, display: "block" }}
-          />
-          <span style={{ fontSize: 11 * size, fontWeight: 600, color: t.brandingText, whiteSpace: "nowrap" }}>
-            Powered by Livedot
-          </span>
-        </a>
-      )}
+      {showBranding && <BrandingBadge theme={t} variant="inline" size={size} />}
     </div>
   );
 }
