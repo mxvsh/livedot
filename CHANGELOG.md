@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.10](https://github.com/mxvsh/livedot/compare/v0.1.9...v0.1.10) (2026-03-25)
+
+* Fix branding parameter logic in embed URLs ([](https://github.com/mxvsh/livedot/commit/b84594c5dbf581b29b869bc53f77557b8d7b360e))
+* Use adventurer icon for vistor ([](https://github.com/mxvsh/livedot/commit/bbeb891002cd4b0c9e2bdca2ea54837403705941))
+
 ## [0.1.9](https://github.com/mxvsh/livedot/compare/v0.1.8...v0.1.9) (2026-03-24)
 
 * Add FAQ for event ([](https://github.com/mxvsh/livedot/commit/e7464b3bd3f79063aefe436e73928eee22456995))
