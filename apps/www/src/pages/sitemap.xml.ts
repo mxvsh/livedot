@@ -1,5 +1,6 @@
 import { readdirSync, statSync } from "node:fs";
 import { posix, relative, resolve } from "node:path";
+import { getCollection } from "astro:content";
 
 export const prerender = true;
 
@@ -18,11 +19,12 @@ const exactMetadata = new Map([
   ["/pricing", { changefreq: "daily", priority: "0.9" }],
   ["/privacy", { changefreq: "daily", priority: "0.6" }],
   ["/terms", { changefreq: "daily", priority: "0.6" }],
+  ["/help", { changefreq: "weekly", priority: "0.8" }],
 ]);
 
 const prefixMetadata = [
   { prefix: "/blog/", changefreq: "weekly", priority: "0.8" },
-  { prefix: "/docs/", changefreq: "weekly", priority: "0.7" },
+  { prefix: "/help/", changefreq: "weekly", priority: "0.7" },
 ] as const;
 
 const defaultMetadata = { changefreq: "monthly", priority: "0.7" };
@@ -109,11 +111,26 @@ const toUrlEntry = (entry: SitemapEntry) => {
   ].join("\n");
 };
 
-export function GET() {
+const docsSourcePath = (slug: string) => resolve(process.cwd(), "src/content/docs", `${slug}.md`);
+
+export async function GET() {
+  const docs = await getCollection("docs");
+  const docsEntries: SitemapEntry[] = docs.map((doc) => {
+    const pathname = `/help/${doc.id}`;
+    const metadata = getMetadata(pathname);
+
+    return {
+      pathname,
+      source: docsSourcePath(doc.id),
+      changefreq: metadata.changefreq,
+      priority: metadata.priority,
+    };
+  });
+
   const xml = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    entries.map(toUrlEntry).join("\n"),
+    [...entries, ...docsEntries].map(toUrlEntry).join("\n"),
     "</urlset>",
   ].join("\n");
 

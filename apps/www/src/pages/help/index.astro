@@ -1,7 +1,5 @@
 ---
-import Footer from "../../components/Footer.astro";
-import Header from "../../components/Header.astro";
-import MainLayout from "../../layouts/MainLayout.astro";
+import DocsLayout from "../../layouts/DocsLayout.astro";
 
 const pathname = Astro.url.pathname;
 const pageUrl = new URL(pathname, Astro.site ?? Astro.url).href;
@@ -27,70 +25,27 @@ const structuredData = [
     ],
   },
 ];
-
-const helpSections = [
-  {
-    title: "Embed widgets",
-    href: "/help/embed",
-    description: "Learn how to add map, chart, and live count widgets to your site and customize their query parameters.",
-    status: "Available now",
-  },
-  {
-    title: "More guides coming soon",
-    href: "#",
-    description: "This help hub will expand with setup, billing, and product usage guides as the site grows.",
-    status: "Planned",
-  },
-];
 ---
 
-<MainLayout
+<DocsLayout
   title="Livedot Help"
   description="Browse Livedot help topics for embeds, setup, and product usage."
   pathname={pathname}
+  activeHref="/help"
   structuredData={structuredData}
 >
-  <Header pathname={pathname} />
-  <main class="pt-20">
-    <section class="mx-auto max-w-6xl px-6 py-24">
-      <div class="grid-panel border border-white/8 bg-surface-container p-8 md:p-12">
-        <a href="/" class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-on-surface-variant transition-colors hover:text-white">
-          Back to home
-        </a>
+  <article class="grid-panel border border-white/8 bg-surface-container p-8 md:p-12">
+    <a href="/" class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-on-surface-variant transition-colors hover:text-white">
+      Back to home
+    </a>
 
-        <div class="mt-8 max-w-3xl">
-          <p class="text-xs uppercase tracking-[0.32em] text-primary">Help</p>
-          <h1 class="mt-4 font-headline text-4xl font-bold tracking-[-0.06em] text-white md:text-6xl">Help center</h1>
-          <p class="mt-6 text-lg leading-8 text-on-surface-variant">
-            Start here when you need setup notes, embed references, and product guidance.
-          </p>
-        </div>
+    <div class="mt-8 max-w-3xl">
+      <p class="text-xs uppercase tracking-[0.32em] text-primary">Help</p>
+      <h1 class="mt-4 font-headline text-4xl font-bold tracking-[-0.06em] text-white md:text-6xl">Help center</h1>
+      <p class="mt-6 text-lg leading-8 text-on-surface-variant">
+        Start here when you need setup notes, embed references, and product guidance. Use the sidebar to jump between all available docs.
+      </p>
+    </div>
 
-        <section class="mt-14 border-t border-white/8 pt-8">
-          <div class="grid gap-6 md:grid-cols-2">
-            {helpSections.map((section) => (
-              <article class="rounded-3xl border border-white/8 bg-white/[0.02] p-6">
-                <p class="text-[11px] uppercase tracking-[0.24em] text-primary">{section.status}</p>
-                <h2 class="mt-3 font-headline text-2xl font-semibold tracking-[-0.04em] text-white">{section.title}</h2>
-                <p class="mt-3 text-sm leading-7 text-on-surface-variant">{section.description}</p>
-                {section.href === "#" ? (
-                  <span class="mt-6 inline-flex rounded-full border border-white/10 px-3 py-1 text-xs text-on-surface-variant">
-                    More sections soon
-                  </span>
-                ) : (
-                  <a
-                    href={section.href}
-                    class="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white transition-colors hover:border-white/20 hover:bg-white/5"
-                  >
-                    Open guide
-                  </a>
-                )}
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
-    </section>
-  </main>
-  <Footer />
-</MainLayout>
+  </article>
+</DocsLayout>

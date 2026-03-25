@@ -1,0 +1,44 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import DocsSidebar from "../components/docs/DocsSidebar.astro";
+import MainLayout from "./MainLayout.astro";
+
+interface SidebarItem {
+  title: string;
+  description: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  pathname: string;
+  activeHref?: string;
+  structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
+}
+
+const { title, description, pathname, activeHref, structuredData = [] } = Astro.props as Props;
+---
+
+<MainLayout title={title} description={description} pathname={pathname} structuredData={structuredData}>
+  <Header pathname={pathname} />
+  <main class="pt-20">
+    <section class="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[280px_1fr]">
+      <aside class="lg:sticky lg:top-24 lg:h-fit">
+        <div class="space-y-4">
+          <div>
+            <p class="text-xs uppercase tracking-[0.28em] text-primary">Docs</p>
+            <p class="mt-2 text-sm text-on-surface-variant">Browse the docs and jump between topics.</p>
+          </div>
+          <DocsSidebar activeHref={activeHref} />
+        </div>
+      </aside>
+
+      <div class="min-w-0">
+        <slot />
+      </div>
+    </section>
+  </main>
+  <Footer />
+</MainLayout>
