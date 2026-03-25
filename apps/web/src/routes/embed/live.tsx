@@ -9,7 +9,7 @@ export const Route = createFileRoute("/embed/live")({
     token: (search.token as string) ?? "",
     bg: (search.bg as string) ?? "transparent",
     accent: (search.accent as string) ?? "#96E421",
-    branding: (search.branding as string) ?? "",
+    branding: String(search.branding ?? ""),
     scale: Number(search.scale ?? 0.85),
   }),
 });

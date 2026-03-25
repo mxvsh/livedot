@@ -10,7 +10,7 @@ export const Route = createFileRoute("/embed/map")({
     website: (search.website as string) ?? "",
     token: (search.token as string) ?? "",
     bg: (search.bg as string) ?? "transparent",
-    branding: (search.branding as string) ?? "",
+    branding: String(search.branding ?? ""),
   }),
 });
 
