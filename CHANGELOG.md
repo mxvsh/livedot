@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.15](https://github.com/mxvsh/livedot/compare/v0.1.14...v0.1.15) (2026-03-25)
+
+* Add tracking script ([](https://github.com/mxvsh/livedot/commit/bf59b74d9e60297ff27c60574086f5a03e357d8e))
+
 ## [0.1.14](https://github.com/mxvsh/livedot/compare/v0.1.13...v0.1.14) (2026-03-25)
 
 * Add inline variant to BrandingBadge component ([](https://github.com/mxvsh/livedot/commit/870c7e766d050cf720166a0493fbde777c58afe0))
