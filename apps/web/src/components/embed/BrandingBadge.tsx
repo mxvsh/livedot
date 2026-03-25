@@ -1,4 +1,15 @@
-export default function BrandingBadge() {
+import type { ThemeColors } from "./useEmbedTheme";
+
+interface Props {
+  theme?: ThemeColors;
+}
+
+export default function BrandingBadge({ theme }: Props) {
+  const bg = theme?.bg ?? "rgba(10, 10, 10, 0.78)";
+  const border = theme?.border ?? "rgba(255, 255, 255, 0.12)";
+  const text = theme?.text ?? "#fafafa";
+  const textSecondary = theme?.brandingText ?? "rgba(255, 255, 255, 0.72)";
+
   return (
     <a
       href="https://livedot.dev"
@@ -14,12 +25,12 @@ export default function BrandingBadge() {
         gap: 8,
         padding: "7px 10px",
         borderRadius: 999,
-        background: "rgba(10, 10, 10, 0.78)",
-        border: "1px solid rgba(255, 255, 255, 0.12)",
+        background: bg,
+        border: `1px solid ${border}`,
         backdropFilter: "blur(12px)",
-        color: "#fafafa",
+        color: text,
         textDecoration: "none",
-        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.28)",
+        boxShadow: "none",
       }}
     >
       <img
@@ -28,8 +39,8 @@ export default function BrandingBadge() {
         aria-hidden="true"
         style={{ width: 18, height: 18, borderRadius: 5, flexShrink: 0 }}
       />
-      <span style={{ fontSize: 11, lineHeight: 1, color: "rgba(255, 255, 255, 0.72)" }}>Powered by</span>
-      <span style={{ fontSize: 12, lineHeight: 1, fontWeight: 700, letterSpacing: "-0.02em" }}>livedot</span>
+      <span style={{ fontSize: 11, lineHeight: 1, color: textSecondary }}>Powered by</span>
+      <span style={{ fontSize: 12, lineHeight: 1, fontWeight: 700, letterSpacing: "-0.02em" }}>{" "}livedot</span>
     </a>
   );
 }

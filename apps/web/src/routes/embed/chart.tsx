@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { aggregateHistoryPoints } from "@/lib/chart";
 import { useEmbedBranding } from "@/components/embed/useEmbedBranding";
+import { useEmbedTheme, type EmbedTheme } from "@/components/embed/useEmbedTheme";
 
 export const Route = createFileRoute("/embed/chart")({
   component: EmbedChart,
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/embed/chart")({
     accent: (search.accent as string) ?? "#96E421",
     branding: String(search.branding ?? ""),
     scale: Number(search.scale ?? 0.9),
+    theme: (String(search.theme ?? "system") as EmbedTheme),
   }),
 });
 
@@ -47,11 +49,12 @@ function buildPath(points: { count: number }[], close: boolean): string {
 }
 
 function EmbedChart() {
-  const { website, token, bg, accent, branding, scale } = Route.useSearch();
+  const { website, token, bg, accent, branding, scale, theme } = Route.useSearch();
   const { count, connected, history } = useWebSocket(website || null, { token: token || undefined, recent: "10m" });
   const explicitBranding = branding === "1" || branding === "true";
   const showBranding = useEmbedBranding(website, token, explicitBranding);
   const size = Number.isFinite(scale) ? Math.min(Math.max(scale, 0.6), 1.4) : 0.9;
+  const t = useEmbedTheme(theme === "dark" || theme === "light" ? theme : "system");
 
   if (!website || !token) {
     return null;
@@ -74,8 +77,8 @@ function EmbedChart() {
         style={{
           width: 240 * size,
           borderRadius: 18 * size,
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          background: bg === "transparent" ? "rgba(10, 10, 10, 0.85)" : bg,
+          border: `1px solid ${t.border}`,
+          background: bg === "transparent" ? t.bg : bg,
           backdropFilter: "blur(18px)",
           boxShadow: "none",
           overflow: "hidden",
@@ -84,7 +87,7 @@ function EmbedChart() {
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 * size }}>
           <div style={{ minWidth: 0 }}>
-            <p style={{ fontSize: 12 * size, color: "rgba(250,250,250,0.8)", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <p style={{ fontSize: 12 * size, color: t.textSecondary, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               Live visitors
             </p>
           </div>
@@ -98,13 +101,13 @@ function EmbedChart() {
                 boxShadow: connected ? `0 0 0 ${4 * size}px color-mix(in srgb, ${accent} 18%, transparent)` : "none",
               }}
             />
-            <span style={{ fontSize: 12 * size, color: "rgba(161,161,170,0.75)" }}>10m</span>
+            <span style={{ fontSize: 12 * size, color: t.textMuted }}>10m</span>
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 * size, marginBottom: 8 * size }}>
-          <span style={{ fontSize: 28 * size, fontWeight: 750, color: "#fafafa", lineHeight: 1, letterSpacing: "-0.04em" }}>{count}</span>
-          <span style={{ fontSize: 12 * size, color: "#a1a1aa" }}>visitors</span>
+          <span style={{ fontSize: 28 * size, fontWeight: 750, color: t.text, lineHeight: 1, letterSpacing: "-0.04em" }}>{count}</span>
+          <span style={{ fontSize: 12 * size, color: t.textMuted }}>visitors</span>
         </div>
 
         <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ width: "100%", height: 48 * size }}>
@@ -156,7 +159,7 @@ function EmbedChart() {
               display: "inline-block",
               marginTop: 6 * size,
               fontSize: 10 * size,
-              color: "rgba(255,255,255,0.48)",
+              color: t.brandingText,
               textDecoration: "none",
               letterSpacing: "0.01em",
             }}

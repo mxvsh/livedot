@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useEmbedBranding } from "@/components/embed/useEmbedBranding";
+import { useEmbedTheme, type EmbedTheme } from "@/components/embed/useEmbedTheme";
 
 export const Route = createFileRoute("/embed/live")({
   component: EmbedLive,
@@ -11,15 +12,17 @@ export const Route = createFileRoute("/embed/live")({
     accent: (search.accent as string) ?? "#96E421",
     branding: String(search.branding ?? ""),
     scale: Number(search.scale ?? 0.85),
+    theme: (String(search.theme ?? "system") as EmbedTheme),
   }),
 });
 
 function EmbedLive() {
-  const { website, token, bg, accent, branding, scale } = Route.useSearch();
+  const { website, token, bg, accent, branding, scale, theme } = Route.useSearch();
   const { count, connected } = useWebSocket(website || null, token || undefined);
   const explicitBranding = branding === "1" || branding === "true";
   const showBranding = useEmbedBranding(website, token, explicitBranding);
   const size = Number.isFinite(scale) ? Math.min(Math.max(scale, 0.55), 1.4) : 0.85;
+  const t = useEmbedTheme(theme === "dark" || theme === "light" ? theme : "system");
 
   if (!website || !token) {
     return null;
@@ -33,8 +36,8 @@ function EmbedLive() {
         gap: 12 * size,
         padding: `${12 * size}px ${14 * size}px`,
         borderRadius: 18 * size,
-        backgroundColor: bg === "transparent" ? "rgba(10, 10, 10, 0.85)" : bg,
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        backgroundColor: bg === "transparent" ? t.bg : bg,
+        border: `1px solid ${t.border}`,
         backdropFilter: "blur(18px)",
         boxShadow: "none",
         fontFamily: "system-ui, -apple-system, sans-serif",
@@ -51,7 +54,7 @@ function EmbedLive() {
           flexShrink: 0,
         }}
       />
-      <span style={{ fontSize: 34 * size, lineHeight: 1, fontWeight: 750, color: "#fafafa", letterSpacing: "-0.04em" }}>
+      <span style={{ fontSize: 34 * size, lineHeight: 1, fontWeight: 750, color: t.text, letterSpacing: "-0.04em" }}>
         {count}
       </span>
       {showBranding && (
@@ -67,8 +70,8 @@ function EmbedLive() {
             padding: `0 ${10 * size}px`,
             height: 28 * size,
             borderRadius: 999,
-            background: "rgba(255, 255, 255, 0.06)",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
+            background: t.brandingBg,
+            border: `1px solid ${t.brandingBorder}`,
             flexShrink: 0,
             textDecoration: "none",
           }}
@@ -79,7 +82,7 @@ function EmbedLive() {
             aria-hidden="true"
             style={{ width: 18 * size, height: 18 * size, borderRadius: 6 * size, display: "block" }}
           />
-          <span style={{ fontSize: 11 * size, fontWeight: 600, color: "rgba(255, 255, 255, 0.72)", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 11 * size, fontWeight: 600, color: t.brandingText, whiteSpace: "nowrap" }}>
             Powered by Livedot
           </span>
         </a>
