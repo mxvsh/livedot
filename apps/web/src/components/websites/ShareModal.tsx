@@ -27,7 +27,7 @@ export default function ShareModal({ website, onClose, onUpdated }: Props) {
   const isFreePlan = user?.plan === "free";
   const showBrandingNotice = isFreePlan;
   const origin = window.location.origin;
-  const brandingParam = !isFreePlan && brandingOptIn ? "&branding=1" : "";
+  const brandingParam = isFreePlan || brandingOptIn ? "&branding=1" : "";
   const mapSrc = shareToken ? `${origin}/embed/map?website=${website?.id}&token=${shareToken}${brandingParam}` : "";
   const chartSrc = shareToken ? `${origin}/embed/chart?website=${website?.id}&token=${shareToken}&scale=0.9${brandingParam}` : "";
   const liveSrc = shareToken ? `${origin}/embed/live?website=${website?.id}&token=${shareToken}&scale=0.85${brandingParam}` : "";

@@ -26,7 +26,7 @@ function EmbedMap() {
 
   return (
     <div style={{ width: "100%", height: "100vh", background: bg, overflow: "hidden", position: "relative" }}>
-      <Map sessions={Array.from(sessions.values())} />
+      <Map sessions={Array.from(sessions.values())} showAvatars={false} />
       {showBranding && <BrandingBadge />}
     </div>
   );
