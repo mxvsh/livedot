@@ -81,8 +81,13 @@
   }
 
   send();
-  setInterval(send, 5000);
+  var timer = setInterval(send, 25000);
   document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible") send();
+    if (document.visibilityState === "visible") {
+      send();
+      timer = setInterval(send, 25000);
+    } else {
+      clearInterval(timer);
+    }
   });
 })();
