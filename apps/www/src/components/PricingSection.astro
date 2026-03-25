@@ -1,19 +1,32 @@
 ---
 import { cloudPricingPlans, formatCount, formatHistory, formatRetention, selfHostedPlan } from "../data/pricing";
+
+interface Props {
+  isStandalonePage?: boolean;
+}
+
+const { isStandalonePage = false } = Astro.props as Props;
 ---
 
-<section class="mx-auto max-w-7xl px-6 py-28">
+<section id="pricing" class="mx-auto max-w-7xl px-6 py-28">
   <div class="mx-auto max-w-3xl text-center">
     <p class="mb-5 inline-flex items-center gap-3 border border-white/10 bg-white/4 px-4 py-2 text-xs uppercase tracking-[0.35em] text-on-surface-variant backdrop-blur">
       <span class="h-2 w-2 rounded-full bg-primary pulse-dot"></span>
       Pricing & limits
     </p>
-    <h1 class="font-headline text-5xl font-bold leading-[0.92] tracking-[-0.08em] md:text-7xl">
-      Pick the tier that fits your
-      <span class="text-primary"> live traffic shape.</span>
-    </h1>
+    {isStandalonePage ? (
+      <h1 class="font-headline text-5xl font-bold leading-[0.92] tracking-[-0.08em] md:text-7xl">
+        Pick the tier that fits your
+        <span class="text-primary"> live traffic shape.</span>
+      </h1>
+    ) : (
+      <h2 class="font-headline text-5xl font-bold leading-[0.92] tracking-[-0.08em] md:text-7xl">
+        Pick the tier that fits your
+        <span class="text-primary"> live traffic shape.</span>
+      </h2>
+    )}
     <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-on-surface-variant">
-      These plans are generated from the shared limit configuration used by Livedot itself, so the page reflects the actual site, connection, retention, and history ceilings defined in code.
+      These plans are generated from the shared limit configuration used by Livedot itself, so the page reflects the actual site, event volume, retention, and history ceilings defined in code.
     </p>
   </div>
 
