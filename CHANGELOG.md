@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.14](https://github.com/mxvsh/livedot/compare/v0.1.13...v0.1.14) (2026-03-25)
+
+* Add inline variant to BrandingBadge component ([](https://github.com/mxvsh/livedot/commit/870c7e766d050cf720166a0493fbde777c58afe0))
+
 ## [0.1.13](https://github.com/mxvsh/livedot/compare/v0.1.12...v0.1.13) (2026-03-25)
 
 * Add theme support for widget ([](https://github.com/mxvsh/livedot/commit/6ba053a6e3fc06fd083896b1c0f5daf911f5fa04))
