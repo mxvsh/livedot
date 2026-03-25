@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.11](https://github.com/mxvsh/livedot/compare/v0.1.10...v0.1.11) (2026-03-25)
+
+* Fix embed branding to skip API call when explicitly enabled ([](https://github.com/mxvsh/livedot/commit/890aefb2acfe824c745f1fc970b734ab9bef99b0))
+
 ## [0.1.10](https://github.com/mxvsh/livedot/compare/v0.1.9...v0.1.10) (2026-03-25)
 
 * Fix branding parameter logic in embed URLs ([](https://github.com/mxvsh/livedot/commit/b84594c5dbf581b29b869bc53f77557b8d7b360e))
