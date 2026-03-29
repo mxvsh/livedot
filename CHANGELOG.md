@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.16](https://github.com/mxvsh/livedot/compare/v0.1.15...v0.1.16) (2026-03-29)
+
+* Fix analytics tracking on embed routes ([](https://github.com/mxvsh/livedot/commit/890ac848a60cf2ed5dd377272d74fde1a65026a4))
+
 ## [0.1.15](https://github.com/mxvsh/livedot/compare/v0.1.14...v0.1.15) (2026-03-25)
 
 * Add tracking script ([](https://github.com/mxvsh/livedot/commit/bf59b74d9e60297ff27c60574086f5a03e357d8e))
